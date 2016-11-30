@@ -46,7 +46,7 @@ std::vector<glm::vec3> OctahedronToSphere(std::vector<glm::vec3> octahedronFaces
 glm::vec3 CalculateNormals(const std::vector<glm::vec3>& verticies);
 
 //Create a sphere
-std::vector<glm::vec3> CreateSphere(glm::vec3 center, float radius,
+void CreateSphere(glm::vec3 center, float radius,
 	std::vector<glm::vec3>& vertices_out, std::vector<glm::vec3>& normals_out, std::vector<glm::vec3>& cleanVert_out, std::vector<unsigned short> &cleanIndices_out);
 void CreateBox(glm::vec3 center, float width, float height, float length,
 	std::vector<glm::vec3>& vertices_out, std::vector<glm::vec3>& normals_out, std::vector<glm::vec3>& cleanVert_out, std::vector<unsigned short> &cleanIndices_out);

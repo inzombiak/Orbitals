@@ -185,7 +185,7 @@ std::vector<glm::vec3> OctahedronToSphere(std::vector<glm::vec3> octahedronVerti
 {
 	//Create vector to hold final vertices
 	std::vector<glm::vec3> result;
-	//Reerve amount of space that will be needed, 8 faces with 4^n triangles each with 3 vertices
+	//Reserve amount of space that will be needed, 8 faces with 4^n triangles each with 3 vertices
 	result.reserve((unsigned int)(pow(4, numSubdivisions) * 3 * 8));
 
 	unsigned int numVertices = octahedronVertices.size();
@@ -202,8 +202,8 @@ std::vector<glm::vec3> OctahedronToSphere(std::vector<glm::vec3> octahedronVerti
 		for (unsigned int i = 0; i < numVertices; i += 3)
 		{
 			faceVertices[0] = octahedronVertices[i];
-			faceVertices[1] = octahedronVertices[i + 2];
-			faceVertices[2] = octahedronVertices[i + 1];
+			faceVertices[1] = octahedronVertices[i + 1];
+			faceVertices[2] = octahedronVertices[i + 2];
 
 			//Call recrusive split function
 			splitResults = DivideTriangle(faceVertices, numSubdivisions);
@@ -226,7 +226,7 @@ std::vector<glm::vec3> OctahedronToSphere(std::vector<glm::vec3> octahedronVerti
 	}
 	//Perfrom split on each face
 	
-
+	printf("%i", result.size());
 	/*
 	We turn the split octahedron into a sphere by "wrapping" the vertices around the center.
 	This means we repeatedly loop over the vertices and move all of them to be radius distance from the center.
@@ -303,6 +303,9 @@ std::vector<glm::vec3> DivideTriangle(glm::vec3 originalVertices[3], int remaini
 		result.push_back(midPoints[(i + 2) % 3]);
 	}
 	//Append the central triangle, made up of only the midpoints
+	glm::vec3 temp = midPoints[1];
+	midPoints[1] = midPoints[2];
+	midPoints[2] = temp;
 	result.insert(result.begin(), midPoints, midPoints + 3);
 
 	//If we have no remaining subdivisions, terminate recursion
@@ -334,10 +337,10 @@ std::vector<glm::vec3> DivideTriangle(glm::vec3 originalVertices[3], int remaini
 	return newResult;
 }
 
-std::vector<glm::vec3> CreateSphere(glm::vec3 center, float radius,
+void CreateSphere(glm::vec3 center, float radius,
 	std::vector<glm::vec3>& vertices_out, std::vector<glm::vec3>& normals_out, std::vector<glm::vec3>& cleanVert_out, std::vector<unsigned short> &cleanIndices_out)
 {
-	return OctahedronToSphere(CreateOctahedronWithRadius(center, radius), center, radius, 0,
+	OctahedronToSphere(CreateOctahedronWithRadius(center, radius), center, radius, 2,
 		vertices_out, normals_out, cleanVert_out, cleanIndices_out);
 }
 
@@ -527,7 +530,7 @@ glm::vec3 CalculateNormals(const std::vector<glm::vec3>& vertices)
 
 	U = vertices[1] - vertices[0];
 	V = vertices[2] - vertices[0];
-	result = glm::cross(V, U);
+	result = glm::cross(U, V);
 	result = glm::normalize(result);
 
 	return result;

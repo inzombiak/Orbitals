@@ -99,8 +99,8 @@ void RenderingSystem::UpdateCameraRotation()
 	if (glm::length(mouseStatus.position - m_prevMouse) <= 0.1)
 		return;
 
-	float xRotate = (mouseStatus.position.x -m_prevMouse.x) / 100.f;
-	float yRotate = (mouseStatus.position.y -m_prevMouse.y) / 100.f;
+	float xRotate = (mouseStatus.position.x -m_prevMouse.x) * m_mouseSpeed;
+	float yRotate = (mouseStatus.position.y -m_prevMouse.y) * m_mouseSpeed;
 	
 	m_xRotate += xRotate;
 	m_yRotate += yRotate;
@@ -140,9 +140,6 @@ void RenderingSystem::Draw()
 	GLuint MVPMatID = glGetUniformLocation(m_program, "MVP");
 	glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &MVP[0][0]);
 
-	// Draw the triangle !
-	glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
-
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	
@@ -167,7 +164,7 @@ void RenderingSystem::CreateRenderComponent(IEventData* eventData)
 
 	newComponent->SetVertices(renderCompED->GetData()->vertices);
 	newComponent->SetNormals(renderCompED->GetData()->normals);
-	//newComponent->SetIndicies(renderCompED->GetData()->indicies);
+	newComponent->SetIndicies(renderCompED->GetData()->indicies);
 	newComponent->SetColor(renderCompED->GetData()->color);
 
 	newComponent->SetProgram(m_program);

@@ -67,13 +67,17 @@ void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos)
 	glUniform3f(lightPosID, lightPos.x, lightPos.y, lightPos.z);
 
 	//Draw
-	/*glDrawElements(
-		GL_TRIANGLES,      // mode
-		m_numIndicies,    // count
-		GL_UNSIGNED_SHORT,   // type
-		(void*)0           // element array buffer offset
-		);*/
-	glDrawArrays(m_drawPrimitive, 0, m_numVertices);
+	if (m_numIndicies >= 0)
+	{
+		glDrawElements(
+			GL_TRIANGLES,      // mode
+			m_numIndicies,    // count
+			GL_UNSIGNED_SHORT,   // type
+			(void*)0           // element array buffer offset
+			);
+	}
+	else
+		glDrawArrays(m_drawPrimitive, 0, m_numVertices);
 }
 
 void RenderComponent::Update()

@@ -84,7 +84,7 @@ void Engine::Test()
 	{
 		ObjectCreationData* ballData = new ObjectCreationData();
 		ballData->name = "ball";
-		ballData->renderCompData->color.push_back(glm::vec3(1.f, 0, 0));
+		ballData->renderCompData->color.push_back(glm::vec3(0.f, 0, 1.f));
 		ballData->renderCompData->drawType = GL_TRIANGLES;
 
 
@@ -94,14 +94,16 @@ void Engine::Test()
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec3> cleanVert;
 
-		ballData->renderCompData->vertices = CreateSphere(glm::vec3(0, 0, -5), 1, vertices, normals, cleanVert, cleanIndices);
+		CreateSphere(glm::vec3(0, 0, -5), 3, vertices, normals, cleanVert, cleanIndices);
+
 		IndexVBO(vertices, normals,
 			ballData->renderCompData->indicies, ballData->renderCompData->vertices, ballData->renderCompData->normals);
-		//ballData->renderCompData->verticesClean = cleanVert;
-		//ballData->renderCompData->indiciesClean = cleanIndices;
-
+		ballData->renderCompData->verticesClean = cleanVert;
+		ballData->renderCompData->indiciesClean = cleanIndices;
+		
+		//ballData->renderCompData->normals = normals;
 		auto eventData = new EDCreateObject(ballData);
-		//EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_OBJECT, eventData, false);
+		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_OBJECT, eventData, false);
 	}
 
 	{
@@ -117,14 +119,11 @@ void Engine::Test()
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec3> cleanVert;
 
-		CreateBox(glm::vec3(4, 0, -5), 4, 4, 4, vertices, normals, cleanVert, cleanIndices);
-		boxData->renderCompData->vertices = vertices;
-		boxData->renderCompData->normals = normals;
-		//IndexVBO(vertices, normals,
-		//	boxData->renderCompData->indicies, boxData->renderCompData->vertices, boxData->renderCompData->normals);
+		CreateBox(glm::vec3(6, 0, -5), 4, 4, 4, vertices, normals, cleanVert, cleanIndices);
+		IndexVBO(vertices, normals,
+			boxData->renderCompData->indicies, boxData->renderCompData->vertices, boxData->renderCompData->normals);
 		boxData->renderCompData->verticesClean = cleanVert;
 		boxData->renderCompData->indiciesClean = cleanIndices;
-
 		auto eventData = new EDCreateObject(boxData);
 		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_OBJECT, eventData, false);
 	}
