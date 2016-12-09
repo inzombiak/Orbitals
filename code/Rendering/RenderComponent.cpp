@@ -1,7 +1,7 @@
 #include "RenderComponent.h"
 #include "X:/code/ICelestialObject.h"
 
-void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos)
+/*void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos)
 {
 	//Set program
 	glUseProgram(m_program);
@@ -153,6 +153,6 @@ void RenderComponent::SetIndicies(const std::vector<unsigned short>& indices)
 void RenderComponent::SetDrawPrimitive(GLuint type)
 {
 	m_drawPrimitive = type;
-}
+}*/
 
 const char*  RenderComponent::COMPONENT_NAME = "RENDER_COMPONENT";

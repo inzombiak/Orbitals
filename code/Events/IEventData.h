@@ -1,5 +1,5 @@
 #pragma once
-#include "../EventDefs.h"
+#include "EventDefs.h"
 namespace EventDefs
 {
 	enum EventType

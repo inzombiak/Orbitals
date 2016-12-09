@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include "Engine.h"
-#include "RenderingSystem.h"
+#include "Rendering/RenderingSystem.h"
 #include "InputSystem.h"
 #include "CelestialObjectSystem.h"
 #include "Utilities/GLRenderHelpers.h"

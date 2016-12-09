@@ -9,11 +9,11 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include "RenderingSystem.h"
-#include "Rendering/RenderComponent.h"
-#include "Utilities/HelperFunctions.h"
-#include "Events/EventSystem.h"
-#include "Events/EDCreateRenderComp.h"
-#include "InputSystem.h"
+#include "RenderComponent.h"
+#include "../Utilities/HelperFunctions.h"
+#include "../Events/EventSystem.h"
+#include "../Events/EDCreateRenderComp.h"
+#include "../InputSystem.h"
 
 
 RenderingSystem::~RenderingSystem()
@@ -45,11 +45,11 @@ bool RenderingSystem::Init()
 }
 void RenderingSystem::Clear()
 {
-	for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
-	{
-		delete m_renderComponents[i];
-		m_renderComponents[i] = 0;
-	}
+	//for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
+	//{
+	//	delete m_renderComponents[i];
+	//	m_renderComponents[i] = 0;
+	//}
 
 	m_renderComponents.clear();
 }
@@ -65,7 +65,7 @@ void RenderingSystem::Update(float dt)
 	UpdateCameraRotation();
 
 	for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
-		m_renderComponents[i]->Update();
+		m_renderComponents[i].Update();
 }
 
 void RenderingSystem::UpdateCameraPosition()
@@ -144,7 +144,7 @@ void RenderingSystem::Draw()
 	glDisableVertexAttribArray(1);
 	
 	for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
-		m_renderComponents[i]->Draw(view, projection, m_position);
+		m_renderComponents[i].Draw(view, projection, m_position);
 
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR) 
@@ -156,43 +156,25 @@ void RenderingSystem::Draw()
 void RenderingSystem::CreateRenderComponent(IEventData* eventData)
 {
 	// Create a new render component and return it
-	RenderComponent* newComponent = new RenderComponent(m_renderComponents.size());
+	RenderComponent newComponent(m_renderComponents.size());
 
 	EDCreateRenderComp* renderCompED = dynamic_cast<EDCreateRenderComp*>(eventData);
 	if (!renderCompED)
 		return;
 
-	newComponent->SetVertices(renderCompED->GetData()->vertices);
-	newComponent->SetNormals(renderCompED->GetData()->normals);
-	newComponent->SetIndicies(renderCompED->GetData()->indicies);
-	newComponent->SetColor(renderCompED->GetData()->color);
-
-	newComponent->SetProgram(m_program);
-	newComponent->SetDrawPrimitive(renderCompED->GetData()->drawType);
-	newComponent->SetOwner(renderCompED->GetData()->owner);
+	newComponent.SetVertices(renderCompED->GetData()->vertices);
+	newComponent.SetNormals(renderCompED->GetData()->normals);
+	newComponent.SetIndicies(renderCompED->GetData()->indicies);
+	newComponent.SetColor(renderCompED->GetData()->color);
+				
+	newComponent.SetProgram(m_program);
+	newComponent.SetDrawPrimitive(renderCompED->GetData()->drawType);
+	newComponent.SetOwner(renderCompED->GetData()->owner);
 
 	m_renderComponents.push_back(newComponent);
 
 	eventData->SetDelete(true);
 }
 
-
-RenderComponent* RenderingSystem::CreateRay(glm::vec3 start, glm::vec3 end)
-{
-	RenderComponent* newComponent = new RenderComponent(m_renderComponents.size());
-	std::vector<glm::vec3> temp;
-	newComponent->SetDrawPrimitive(GL_LINES);
-
-	temp.push_back(start);
-	temp.push_back(end);
-	newComponent->SetVertices(temp);
-
-	temp.clear();
-	temp.push_back(glm::vec3(1.f, 0.f, 0.f));
-	newComponent->SetColor(temp);
-
-	m_renderComponents.push_back(newComponent);
-	return newComponent;
-}
 
 const std::string RenderingSystem::SYSTEM_NAME = "RenderingSystem";

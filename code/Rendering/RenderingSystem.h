@@ -1,12 +1,12 @@
 #ifndef RENDERING_SYSTEM_H
 #define RENDERING_SYSTEM_H
 
-#include "ISystem.h"
-#include "Utilities\HelperFunctions.h"
+#include "../ISystem.h"
+#include "..\Utilities\HelperFunctions.h"
 
 #include <unordered_map>
+#include "RenderComponent.h"
 
-class RenderComponent;
 class IEventData;
 class RenderingSystem : public ISystem
 {
@@ -23,7 +23,7 @@ public:
 	//Clear existing render components
 	void Clear();
 	void ClearRender();
-	RenderComponent* CreateRay(glm::vec3 start, glm::vec3 end);
+	//RenderComponent* CreateRay(glm::vec3 start, glm::vec3 end);
 
 	//Draw screen
 	void Draw();
@@ -39,12 +39,14 @@ public:
 
 private:
 
+	void DrawComponent(int index, glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos);
+
 	void UpdateCameraRotation();
 	void UpdateCameraPosition();
 
 	GLuint m_program;
 
-	std::vector<RenderComponent*> m_renderComponents;
+	std::vector<RenderComponent> m_renderComponents;
 
 	//Used for camera speed and positioning
 	glm::vec3 m_position = glm::vec3(-6, 0, -4);

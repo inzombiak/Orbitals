@@ -134,6 +134,9 @@ LRESULT CALLBACK WndProc(
 		}
 		case WM_PAINT:
 			break;
+		case WM_SIZE:
+			glViewport(0, 0, LOWORD(lParam), HIWORD(lParam));
+			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;

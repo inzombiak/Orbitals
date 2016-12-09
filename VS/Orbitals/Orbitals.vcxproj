@@ -23,8 +23,9 @@
     <ClInclude Include="..\..\code\InputSystem.h" />
     <ClInclude Include="..\..\code\IObjectComponent.h" />
     <ClInclude Include="..\..\code\ISystem.h" />
-    <ClInclude Include="..\..\code\RenderingSystem.h" />
+    <ClInclude Include="..\..\code\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\..\code\Rendering\RenderComponent.h" />
+    <ClInclude Include="..\..\code\Rendering\RenderingSystem.h" />
     <ClInclude Include="..\..\code\Utilities\GLRenderHelpers.h" />
     <ClInclude Include="..\..\code\Utilities\HelperFunctions.h" />
     <ClInclude Include="..\..\code\Utilities\OrbitalsDefs.h" />
@@ -37,8 +38,9 @@
     <ClCompile Include="..\..\code\ICelestialObject.cpp" />
     <ClCompile Include="..\..\code\InputSystem.cpp" />
     <ClCompile Include="..\..\code\main.cpp" />
-    <ClCompile Include="..\..\code\RenderingSystem.cpp" />
+    <ClCompile Include="..\..\code\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\..\code\Rendering\RenderComponent.cpp" />
+    <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp" />
     <ClCompile Include="..\..\code\Utilities\GLRenderHelpers.cpp" />
     <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp" />
   </ItemGroup>
