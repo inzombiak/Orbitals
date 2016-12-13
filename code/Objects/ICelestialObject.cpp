@@ -1,5 +1,5 @@
-#include "X:/code/ICelestialObject.h"
-#include "X:/code/IObjectComponent.h"
+#include "ICelestialObject.h"
+#include "IObjectComponent.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

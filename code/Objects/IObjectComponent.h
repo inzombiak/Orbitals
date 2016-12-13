@@ -1,7 +1,7 @@
 #ifndef I_OBJECT_COMPONENT_H
 #define I_OBJECT_COMPONENT_H
 
-#include "Utilities/OrbitalsDefs.h"
+#include "../Utilities/OrbitalsDefs.h"
 
 class ICelestialObject;
 class IObjectComponent

@@ -1,5 +1,5 @@
 #include "HelperFunctions.h"
-#include "GLRenderHelpers.h"
+#include "../Rendering/GLRenderHelpers.h"
 
 //#include <ddraw.h>
 #include <map>

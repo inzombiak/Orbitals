@@ -1,7 +1,7 @@
 #ifndef I_CELESTIAL_OBJECT_H
 #define I_CELESTIAL_OBJECT_H
 
-#include "Utilities/OrbitalsDefs.h"
+#include "../Utilities/OrbitalsDefs.h"
 #include <unordered_map>
 
 #include <glm/glm.hpp>

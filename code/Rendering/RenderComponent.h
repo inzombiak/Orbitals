@@ -1,7 +1,7 @@
 #ifndef RENDER_COMPONENT_H
 #define RENDER_COMPONENT_H
 
-#include "../IObjectComponent.h"
+#include "../Objects/IObjectComponent.h"
 
 #define GLEW_STATIC
 #include <GL\glew.h>

@@ -2,14 +2,19 @@
 #include <cmath>
 
 #include "Engine.h"
+
 #include "Rendering/RenderingSystem.h"
-#include "InputSystem.h"
-#include "CelestialObjectSystem.h"
-#include "Utilities/GLRenderHelpers.h"
-#include "Utilities/PhysicsDefs.h"
-#include "Events/EventSystem.h"
-#include "ICelestialObject.h"
+#include "Rendering/GLRenderHelpers.h"
+
+#include "Input/InputSystem.h"
+
+#include "Objects/ICelestialObject.h"
+#include "Objects/CelestialObjectSystem.h"
+
+#include "Physics/PhysicsDefs.h"
+
 #include "Events/EDCreateObject.h"
+#include "Events/EventSystem.h"
 
 Engine::Engine()
 {

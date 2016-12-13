@@ -13,7 +13,7 @@
 #include "../Utilities/HelperFunctions.h"
 #include "../Events/EventSystem.h"
 #include "../Events/EDCreateRenderComp.h"
-#include "../InputSystem.h"
+#include "../Input/InputSystem.h"
 
 
 RenderingSystem::~RenderingSystem()

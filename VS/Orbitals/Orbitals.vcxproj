@@ -11,44 +11,54 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\code\Camera.h" />
-    <ClInclude Include="..\..\code\CelestialObjectSystem.h" />
     <ClInclude Include="..\..\code\Engine.h" />
     <ClInclude Include="..\..\code\EventDefs.h" />
     <ClInclude Include="..\..\code\Events\EDCreateObject.h" />
+    <ClInclude Include="..\..\code\Events\EDCreatePhysComp.h" />
     <ClInclude Include="..\..\code\Events\EDCreateRenderComp.h" />
     <ClInclude Include="..\..\code\Events\EDKeyState.h" />
     <ClInclude Include="..\..\code\Events\EventSystem.h" />
-    <ClInclude Include="..\..\code\ICelestialObject.h" />
-    <ClInclude Include="..\..\code\InputSystem.h" />
-    <ClInclude Include="..\..\code\IObjectComponent.h" />
+    <ClInclude Include="..\..\code\Events\IEventData.h" />
+    <ClInclude Include="..\..\code\Input\InputSystem.h" />
     <ClInclude Include="..\..\code\ISystem.h" />
+    <ClInclude Include="..\..\code\Objects\CelestialObjectSystem.h" />
+    <ClInclude Include="..\..\code\Objects\ICelestialObject.h" />
+    <ClInclude Include="..\..\code\Objects\IObjectComponent.h" />
+    <ClInclude Include="..\..\code\Physics\IRigidBody.h" />
+    <ClInclude Include="..\..\code\Physics\PhysicsComponent.h" />
+    <ClInclude Include="..\..\code\Physics\PhysicsDefs.h" />
+    <ClInclude Include="..\..\code\Physics\PhysicsHelpers.h" />
     <ClInclude Include="..\..\code\Physics\PhysicsSystem.h" />
+    <ClInclude Include="..\..\code\Physics\PhysicsWorld.h" />
+    <ClInclude Include="..\..\code\Rendering\Camera.h" />
+    <ClInclude Include="..\..\code\Rendering\GLRenderHelpers.h" />
     <ClInclude Include="..\..\code\Rendering\RenderComponent.h" />
     <ClInclude Include="..\..\code\Rendering\RenderingSystem.h" />
-    <ClInclude Include="..\..\code\Utilities\GLRenderHelpers.h" />
+    <ClInclude Include="..\..\code\Utilities\GameDefs.h" />
     <ClInclude Include="..\..\code\Utilities\HelperFunctions.h" />
     <ClInclude Include="..\..\code\Utilities\OrbitalsDefs.h" />
-    <ClInclude Include="..\..\code\Utilities\PhysicsDefs.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\code\CelestialObjectSystem.cpp" />
-    <ClCompile Include="..\..\code\Engine.cpp" />
-    <ClCompile Include="..\..\code\Events\EventSystem.cpp" />
-    <ClCompile Include="..\..\code\ICelestialObject.cpp" />
-    <ClCompile Include="..\..\code\InputSystem.cpp" />
-    <ClCompile Include="..\..\code\main.cpp" />
-    <ClCompile Include="..\..\code\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="..\..\code\Rendering\RenderComponent.cpp" />
-    <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp" />
-    <ClCompile Include="..\..\code\Utilities\GLRenderHelpers.cpp" />
-    <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\FragmentShader.glsl" />
     <None Include="..\..\code\VertexShader.glsl" />
     <None Include="FragmentShader_Lighting.glsl" />
     <None Include="VertexShader_Lighting.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\code\Engine.cpp" />
+    <ClCompile Include="..\..\code\Events\EventSystem.cpp" />
+    <ClCompile Include="..\..\code\Input\InputSystem.cpp" />
+    <ClCompile Include="..\..\code\main.cpp" />
+    <ClCompile Include="..\..\code\Objects\CelestialObjectSystem.cpp" />
+    <ClCompile Include="..\..\code\Objects\ICelestialObject.cpp" />
+    <ClCompile Include="..\..\code\Physics\IRigidBody.cpp" />
+    <ClCompile Include="..\..\code\Physics\PhysicsComponent.cpp" />
+    <ClCompile Include="..\..\code\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="..\..\code\Physics\PhysicsWorld.cpp" />
+    <ClCompile Include="..\..\code\Rendering\GLRenderHelpers.cpp" />
+    <ClCompile Include="..\..\code\Rendering\RenderComponent.cpp" />
+    <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp" />
+    <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC8C0CB9-5F0A-4220-A9AA-D13445ECAFF3}</ProjectGuid>

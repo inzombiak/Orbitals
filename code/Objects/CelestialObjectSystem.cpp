@@ -1,7 +1,7 @@
 #include "CelestialObjectSystem.h"
-#include "Events/EDCreateObject.h"
-#include "Events/EDCreateRenderComp.h"
-#include "Events/EventSystem.h"
+#include "../Events/EDCreateObject.h"
+#include "../Events/EDCreateRenderComp.h"
+#include "../Events/EventSystem.h"
 
 #include <functional>
 

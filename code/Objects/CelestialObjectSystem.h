@@ -1,8 +1,8 @@
 #ifndef OBJECT_MANAGER_H
 #define OBJECT_MANAGER_H
-#include "ISystem.h"
+#include "../ISystem.h"
 #include "ICelestialObject.h"
-#include "Events/EDCreateObject.h"
+#include "../Events/EDCreateObject.h"
 #include <vector>
 
 class PhysicsComponent;

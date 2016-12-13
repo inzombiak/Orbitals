@@ -19,118 +19,176 @@
     <Filter Include="Header Files\Utilities">
       <UniqueIdentifier>{2c849f78-a2cf-4364-9a0c-0eea6ae625fa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Systems">
-      <UniqueIdentifier>{a9bf2ce9-2961-4a4e-9f8a-bc0a4bca7ce4}</UniqueIdentifier>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{90e701d5-4360-4102-aeec-cd3a187263bd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Systems">
-      <UniqueIdentifier>{cd3b8f83-f2d9-4f02-aeca-c3d392604005}</UniqueIdentifier>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{f982748d-ef2a-4038-93cc-9834e5db4306}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Components">
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{ccafea6a-0da0-4d2c-a184-6571805f3f87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{7981e15c-7847-4829-b5b3-fee25f97abd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Events">
+      <UniqueIdentifier>{be15a68b-67f2-4871-9e38-b10a45498bb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
       <UniqueIdentifier>{d3fd36be-8b2e-4cf7-9465-c3d1fa94b95e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{cf723b69-be6a-4a24-82f0-abc6684b241e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{3dc0099f-4637-4904-a8c8-1681630109bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{b50eb878-1310-4a7e-8d8a-e74787439df4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utilities">
+      <UniqueIdentifier>{40a67d07-d103-4774-adb6-ea2dc9cb4920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{2f9e2287-591d-4c28-a444-04976eb0d318}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\code\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\ICelestialObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\IObjectComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\Rendering\RenderComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\code\Events\EDCreateObject.h">
       <Filter>Header Files\Events</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\Events\EDCreateRenderComp.h">
       <Filter>Header Files\Events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\code\Utilities\PhysicsDefs.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\Utilities\OrbitalsDefs.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\code\EventDefs.h">
       <Filter>Header Files\Events</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\Utilities\HelperFunctions.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\Utilities\GLRenderHelpers.h">
-      <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\Events\EDKeyState.h">
       <Filter>Header Files\Events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\code\ISystem.h">
-      <Filter>Header Files\Systems</Filter>
+    <ClInclude Include="..\..\code\Events\EDCreatePhysComp.h">
+      <Filter>Header Files\Events</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\Events\EventSystem.h">
-      <Filter>Header Files\Systems</Filter>
+      <Filter>Header Files\Events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\code\CelestialObjectSystem.h">
-      <Filter>Header Files\Systems</Filter>
+    <ClInclude Include="..\..\code\Events\IEventData.h">
+      <Filter>Header Files\Events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\code\InputSystem.h">
-      <Filter>Header Files\Systems</Filter>
+    <ClInclude Include="..\..\code\Input\InputSystem.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Objects\IObjectComponent.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Objects\CelestialObjectSystem.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Objects\ICelestialObject.h">
+      <Filter>Header Files\Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\Physics\PhysicsSystem.h">
-      <Filter>Header Files\Systems</Filter>
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\PhysicsWorld.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\IRigidBody.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\PhysicsComponent.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\PhysicsDefs.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\PhysicsHelpers.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\Camera.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\GLRenderHelpers.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\RenderComponent.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\Rendering\RenderingSystem.h">
-      <Filter>Header Files\Systems</Filter>
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Utilities\OrbitalsDefs.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Utilities\GameDefs.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Utilities\HelperFunctions.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\ISystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Engine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\code\ICelestialObject.cpp">
-      <Filter>Source Files</Filter>
+    <None Include="..\..\code\VertexShader.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\..\code\FragmentShader.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="FragmentShader_Lighting.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="VertexShader_Lighting.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\code\Events\EventSystem.cpp">
+      <Filter>Source Files\Events</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\code\Input\InputSystem.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Objects\ICelestialObject.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Objects\CelestialObjectSystem.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\IRigidBody.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\PhysicsComponent.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\PhysicsWorld.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\PhysicsSystem.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Rendering\GLRenderHelpers.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Rendering\RenderComponent.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\Utilities\GLRenderHelpers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\Events\EventSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\CelestialObjectSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\InputSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\Physics\PhysicsSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\Rendering\RenderComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp">
-      <Filter>Source Files\Systems</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\code\FragmentShader.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\..\code\VertexShader.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="FragmentShader_Lighting.glsl" />
-    <None Include="VertexShader_Lighting.glsl" />
   </ItemGroup>
 </Project>

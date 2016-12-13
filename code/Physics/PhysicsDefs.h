@@ -3,8 +3,7 @@
 #include <array>
 #include <vector>
 
-#include "GameDefs.h"
-
+#include "../Utilities/GameDefs.h"
 
 class Object;
 namespace PhysicsDefs
