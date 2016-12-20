@@ -52,6 +52,12 @@
     <Filter Include="Source Files\Rendering">
       <UniqueIdentifier>{2f9e2287-591d-4c28-a444-04976eb0d318}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics\CollisionShapes">
+      <UniqueIdentifier>{8a5c6424-29ff-4282-abf1-5a2b9db34d2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics\CollisionShape">
+      <UniqueIdentifier>{04b58578-082b-487a-ac74-842d90384ca5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\Events\EDCreateObject.h">
@@ -132,6 +138,15 @@
     <ClInclude Include="..\..\code\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Physics\ICollisionShape.h">
+      <Filter>Header Files\Physics\CollisionShapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\BoxShape.h">
+      <Filter>Header Files\Physics\CollisionShapes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\SphereShape.h">
+      <Filter>Header Files\Physics\CollisionShapes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\VertexShader.glsl">
@@ -189,6 +204,15 @@
     </ClCompile>
     <ClCompile Include="..\..\code\Engine.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\ICollisionShape.cpp">
+      <Filter>Source Files\Physics\CollisionShape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\BoxShape.cpp">
+      <Filter>Source Files\Physics\CollisionShape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\SphereShape.cpp">
+      <Filter>Source Files\Physics\CollisionShape</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -33,7 +33,7 @@ public:
 	{
 		m_model = matrix;
 	}
-	void Update();
+	void Update(float dt) override;
 	const char* GetName() override
 	{
 		return COMPONENT_NAME;
