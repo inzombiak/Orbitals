@@ -24,6 +24,11 @@ public:
 	void Clear();
 	void CreateObject(IEventData* data);
 
+	SystemPriority GetPriority()
+	{
+		return Orbitals::SystemPriority::SObjects;
+	}
+
 	static std::string GetName()
 	{
 		return SYSTEM_NAME;

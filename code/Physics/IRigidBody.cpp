@@ -1,7 +1,9 @@
 #include "IRigidBody.h"
 
-IRigidBody::IRigidBody(const RigidBodyConstructionInfo& rbci)
+IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 {
+	m_gravity = glm::vec3(0.f);
+
 	m_mass				= rbci.mass;
 	m_linearDamping		= rbci.linearDamping;
 	m_angularDamping	= rbci.angularDamping;
@@ -18,7 +20,10 @@ void IRigidBody::ClearForces()
 {
 	m_totalForce = glm::vec3(0);
 }
-
+void IRigidBody::ApplyGravity()
+{
+	m_totalForce += m_gravity;
+}
 void IRigidBody::ApplyImpulse(const glm::vec3& impulse)
 {
 	m_linearVelocity += impulse / m_mass;
@@ -32,6 +37,14 @@ void IRigidBody::ApplyDamping(float timeStep)
 {
 	m_linearVelocity	*= std::powf(1 - m_linearDamping, timeStep);
 	m_angularVelocity	*= std::powf(1 - m_angularDamping, timeStep);
+}
+
+void IRigidBody::SetGravity(const glm::vec3& gravity)
+{
+	if (m_mass != 0)
+	{
+		m_gravity = gravity * m_mass;
+	}
 }
 
 void IRigidBody::GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax)
@@ -51,9 +64,17 @@ glm::vec3 IRigidBody::GetLinearVelocity() const
 {
 	return m_linearVelocity;
 }
+void IRigidBody::SetLinearVelocity(const glm::vec3& newLinVel)
+{
+	m_linearVelocity = newLinVel;
+}
 glm::vec3 IRigidBody::GetAngularVelocity() const
 {
 	return m_angularVelocity;
+}
+float IRigidBody::GetMass() const
+{
+	return m_mass;
 }
 
 void IRigidBody::UpdateTransform(const glm::mat4& predictedTrans)

@@ -253,6 +253,17 @@ namespace Orbitals
 		if (startIndex < strLength)
 			targetVec.push_back(str.substr(startIndex));
 	}
+
+
+	enum class SystemPriority : int
+	{
+		SInput		= 0,
+		SEvents		= 1,
+		SPhysics	= 2,
+		SObjects	= 3,
+		SRendering	= 4,
+	};
+
 }
 	
 using namespace Orbitals;

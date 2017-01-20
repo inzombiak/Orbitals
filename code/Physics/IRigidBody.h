@@ -3,49 +3,36 @@
 
 #include "ICollisionShape.h"
 
-enum RigidBodyType
-{
-	Static = 1,
-	Dynamic = 2,
-};
-
-struct RigidBodyConstructionInfo
-{
-	float mass;
-	float linearDamping;
-	float angularDamping;
-	float friction;
-	float rollingFriction;
-	float resititution;
-
-	glm::mat4 transform;
-	glm::vec3 localInertia;
-
-	ICollisionShape* collisionShape;
-};
 
 class IRigidBody
 {
 public:
-	IRigidBody(const RigidBodyConstructionInfo& rbci);
+	IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci);
 	virtual ~IRigidBody() {};
 
 	void ClearForces();
 
+	void ApplyGravity();
 	void ApplyImpulse(const glm::vec3& impulse);
 	void ApplyForce(const glm::vec3& force);
 	void ApplyDamping(float timeStep);
+
+	void SetGravity(const glm::vec3& m_gravity);
 
 	void GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax);
 
 	glm::vec3 GetTotalForce() const;
 	glm::vec3 GetLinearVelocity() const;
+	void SetLinearVelocity(const glm::vec3& newLinVel);
 	glm::vec3 GetAngularVelocity() const;
+	float GetMass() const;
 
 	void UpdateTransform(const glm::mat4& predictedTrans);
 	const glm::mat4& GetTransform() const;
 
 private:
+
+	glm::vec3 m_gravity;
 
 	float m_mass;
 	

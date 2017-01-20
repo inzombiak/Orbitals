@@ -14,7 +14,7 @@ public:
 
 	void Update(float dt) override;
 
-
+	void SetBody(IRigidBody* body);
 	const char* GetName() override
 	{
 		return COMPONENT_NAME;

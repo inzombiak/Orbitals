@@ -1,7 +1,6 @@
 #pragma once
 #include "IEventData.h"
-#include "PhysicsDefs.h"
-#include "GameDefs.h"
+#include "../Physics/PhysicsDefs.h"
 #include <array>
 
 class EDCreatePhysComp :

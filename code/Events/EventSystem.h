@@ -13,6 +13,8 @@ class EventSystem : public ISystem
 {
 public:
 	
+	bool Init() { return true; };
+
 	bool AddEventListener(EventDefs::EventType type, EventDelegate callBack);
 	bool RemoveEventListener(EventDefs::EventType type, EventDelegate callBack);
 	void QueueEvent(EventDefs::EventType type, IEventData* data, bool isSynchronous);
@@ -24,7 +26,12 @@ public:
 	{
 		return SYSTEM_NAME;
 	}
-	bool Init() { return true; };
+
+	SystemPriority GetPriority()
+	{
+		return Orbitals::SystemPriority::SEvents;
+	}
+
 
 	static EventSystem* GetInstance()
 	{

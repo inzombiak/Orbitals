@@ -1,12 +1,14 @@
 #pragma once
-#include "IEventData.h"
 
+#include "IEventData.h"
+#include "../Physics/PhysicsDefs.h"
 
 struct ObjectCreationData
 {
 	int nameID;
 	std::string name;
 	RenderCompCreationData* renderCompData = new RenderCompCreationData();
+	PhysicsDefs::IRigidBodyCreationData* rigidBodyData = 0;
 	ICelestialObject* createdObject = 0;
 };
 

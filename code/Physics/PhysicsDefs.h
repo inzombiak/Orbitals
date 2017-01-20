@@ -5,22 +5,40 @@
 
 #include "../Utilities/GameDefs.h"
 
-class Object;
+class ICelestialObject;
+class ICollisionShape;
 namespace PhysicsDefs
 {
-	enum PhysicsEntityTypes
+	enum RigidBodyType
 	{
-		Box,
-		Sphere,
-		Compound,
-		Constraint,
+		Static = 1,
+		Dynamic = 2,
 	};
-
+	enum CollisionShapeType
+	{
+		Box = 1,
+		Sphere = 2,
+	};
 	enum PhysicsBodyType
 	{
-		RigidBody,
-		CompoundBody,
-		NULLBody,
+		RigidBody= 1,
+		CompoundBody = 2,
+		NULLBody = 4,
+	};
+
+	struct RigidBodyConstructionInfo
+	{
+		float mass;
+		float linearDamping;
+		float angularDamping;
+		float friction;
+		float rollingFriction;
+		float resititution;
+
+		glm::mat4 transform;
+		glm::vec3 localInertia;
+
+		ICollisionShape* collisionShape;
 	};
 
 	class ICreationData
@@ -28,7 +46,7 @@ namespace PhysicsDefs
 	public:
 		virtual ~ICreationData() {};
 
-		PhysicsEntityTypes GetShape()
+		CollisionShapeType GetShape()
 		{
 			return shapeType;
 		}
@@ -39,26 +57,24 @@ namespace PhysicsDefs
 		}
 
 		int id;
-		Object* owner;
+		ICelestialObject* owner;
 		virtual ICreationData* clone() const = 0;
 	protected:
 		virtual void SetBodyAndShape() {};
-		PhysicsEntityTypes shapeType;
+		CollisionShapeType shapeType;
 		PhysicsBodyType bodyType;
 
 	};
 
+	
 	class IRigidBodyCreationData : public ICreationData
 	{
 	public:
 		virtual ~IRigidBodyCreationData() {};
-
-		double mass;
-		double friction;
-		double rollingFriction;
-		std::array<double, 3> rotationAngles;
-		std::array<double, 3> msPosition;
+		RigidBodyConstructionInfo rbci;
 	};
+
+	
 
 	class BoxCreationData : public IRigidBodyCreationData
 	{
@@ -69,7 +85,7 @@ namespace PhysicsDefs
 		}
 
 		virtual ~BoxCreationData() {};
-		std::array<double, 3> boxDimensions;
+		glm::vec3 boxDimensions;
 	
 		BoxCreationData* clone() const
 		{
@@ -79,10 +95,11 @@ namespace PhysicsDefs
 	protected:
 		void SetBodyAndShape() override
 		{
-			ICreationData::shapeType = PhysicsEntityTypes::Box;
+			ICreationData::shapeType = CollisionShapeType::Box;
 			ICreationData::bodyType = PhysicsBodyType::RigidBody;
 		}
 	};
+
 	class SphereCreationData : public IRigidBodyCreationData
 	{
 	public:
@@ -101,10 +118,9 @@ namespace PhysicsDefs
 	protected:
 		void SetBodyAndShape() override
 		{
-			ICreationData::shapeType = PhysicsEntityTypes::Sphere;
+			ICreationData::shapeType = CollisionShapeType::Sphere;
 			ICreationData::bodyType = PhysicsBodyType::RigidBody;
 		}
 	};
-
 }
 

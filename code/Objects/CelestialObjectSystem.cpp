@@ -1,6 +1,7 @@
 #include "CelestialObjectSystem.h"
 #include "../Events/EDCreateObject.h"
 #include "../Events/EDCreateRenderComp.h"
+#include "../Events/EDCreatePhysComp.h"
 #include "../Events/EventSystem.h"
 
 #include <functional>
@@ -31,11 +32,19 @@ void CelestialObjectSystem::CreateObject(IEventData* data)
 	bool isSync = objData->GetIsSynchronous();
 
 	ICelestialObject* newObject = new ICelestialObject(objData->GetData()->name, m_objects.size(), CelestialObjTypes::Planet);
-
-	objData->GetData()->renderCompData->owner = newObject;
-
-	EDCreateRenderComp* renderEventData = new EDCreateRenderComp(objData->GetData()->renderCompData);
-	EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_RENDER_COMPONENT, renderEventData, isSync);
+	if (objData->GetData()->renderCompData)
+	{
+		objData->GetData()->renderCompData->owner = newObject;
+		EDCreateRenderComp* renderEventData = new EDCreateRenderComp(objData->GetData()->renderCompData);
+		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_RENDER_COMPONENT, renderEventData, isSync);
+	}
+	
+	if (objData->GetData()->rigidBodyData)
+	{
+		objData->GetData()->rigidBodyData->owner = newObject;
+		EDCreatePhysComp* physEventData = new EDCreatePhysComp(objData->GetData()->rigidBodyData);
+		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_PHYSICS_COMPONENT, physEventData, isSync);
+	}
 
 	if (isSync)
 		objData->GetData()->createdObject = newObject;

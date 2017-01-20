@@ -80,7 +80,7 @@ void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos)
 		glDrawArrays(m_drawPrimitive, 0, m_numVertices);
 }
 
-void RenderComponent::Update()
+void RenderComponent::Update(float dt)
 {
 
 }

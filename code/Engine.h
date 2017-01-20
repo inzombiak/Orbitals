@@ -4,7 +4,7 @@
 #include "Utilities/OrbitalsDefs.h"
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
-#include <unordered_map>
+#include <map>
 
 class ISystem;
 class Engine
@@ -40,7 +40,7 @@ public:
 private:
 
 	template<class System>
-	bool FindSystem(SystemID sysId, std::shared_ptr<System>& result)//ConvertToStrongPtr and CastComponentToDerived in one function!
+	bool FindSystem(Orbitals::SystemPriority sysId, std::shared_ptr<System>& result)//ConvertToStrongPtr and CastComponentToDerived in one function!
 	{
 		auto it = m_systemMap.find(sysId);
 		if (it == m_systemMap.end())
@@ -66,7 +66,7 @@ private:
 	float m_timeStep = 1.f / 240.f;
 	int m_numberOfSubSteps = 10;
 	EngineState m_engineState;
-	std::unordered_map<SystemID, StrongSystemPtr> m_systemMap;
+	std::map<Orbitals::SystemPriority, StrongSystemPtr> m_systemMap;
 };
 
 #endif

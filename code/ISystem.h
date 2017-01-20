@@ -13,8 +13,10 @@ public:
 	virtual bool Init() = 0;
 	virtual void Update(float dt) = 0;
 
+	virtual SystemPriority GetPriority() = 0;
+
 private:
-	SystemID m_id;
+
 };
 
 #endif

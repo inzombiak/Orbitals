@@ -34,6 +34,11 @@ public:
 		//DestroyInstance();
 	};
 
+	SystemPriority GetPriority()
+	{
+		return Orbitals::SystemPriority::SInput;
+	}
+
 	static std::string GetName()
 	{
 		return SYSTEM_NAME;

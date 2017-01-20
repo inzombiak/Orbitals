@@ -41,6 +41,19 @@ bool RenderingSystem::Init()
 	//Create program
 	m_program = CreateProgram(shaderList);
 
+	m_direction = glm::vec3(
+		cos(m_yRotate) * sin(m_xRotate),
+		sin(m_yRotate),
+		cos(m_yRotate) * cos(m_xRotate)
+		);
+
+	m_right = glm::vec3(
+		sin(m_xRotate - 3.14f / 2.0f),
+		0,
+		cos(m_xRotate - 3.14f / 2.0f)
+		);
+	m_up = glm::cross(m_right, m_direction);
+
 	return true;
 }
 void RenderingSystem::Clear()
@@ -65,7 +78,7 @@ void RenderingSystem::Update(float dt)
 	UpdateCameraRotation();
 
 	for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
-		m_renderComponents[i].Update();
+		m_renderComponents[i].Update(dt);
 }
 
 void RenderingSystem::UpdateCameraPosition()
@@ -155,13 +168,11 @@ void RenderingSystem::Draw()
 
 void RenderingSystem::CreateRenderComponent(IEventData* eventData)
 {
-	// Create a new render component and return it
-	RenderComponent newComponent(m_renderComponents.size());
-
 	EDCreateRenderComp* renderCompED = dynamic_cast<EDCreateRenderComp*>(eventData);
 	if (!renderCompED)
 		return;
 
+	RenderComponent newComponent(m_renderComponents.size());
 	newComponent.SetVertices(renderCompED->GetData()->vertices);
 	newComponent.SetNormals(renderCompED->GetData()->normals);
 	newComponent.SetIndicies(renderCompED->GetData()->indicies);

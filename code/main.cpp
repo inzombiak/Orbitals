@@ -33,6 +33,31 @@ Engine m_engine;
 static TCHAR szWindowClass[] = _T("orbitalsApp");
 static TCHAR szTitle[] = _T("Orbitals");
 
+double m_clockFreq = 0;
+__int64 m_lastClockTime;
+//Timer function
+void StartCounter()
+{
+	LARGE_INTEGER li;
+	if (!QueryPerformanceFrequency(&li))
+		std::cout << "QueryPerformanceFrequency failed!\n";
+	std::cout << "Freq " << li.QuadPart << std::endl;
+	m_clockFreq = double(li.QuadPart);// / 1000.0;
+
+	QueryPerformanceCounter(&li);
+	m_lastClockTime = li.QuadPart;
+}
+
+double GetCounter()
+{
+	LARGE_INTEGER li;
+	QueryPerformanceCounter(&li);
+
+	double result = double(li.QuadPart - m_lastClockTime) / m_clockFreq;
+	m_lastClockTime = li.QuadPart;
+	return result;
+}
+
 void EnableConsole()
 {
 	//Create a console for this application
@@ -255,6 +280,7 @@ int WINAPI WinMain(		 //https://msdn.microsoft.com/library/windows/desktop/ms633
 				nCmdShow); //Parameter passed to WinMain
 	UpdateWindow(hWnd);
 	m_engine.Init();
+	StartCounter();
 	//Next we create a message loop to hgandle incoming messages
 	MSG msg; //Holds message info https://msdn.microsoft.com/en-us/library/ms644958(v=vs.110).aspx
 	while (GetMessage(       //https://msdn.microsoft.com/en-us/library/ms644936(v=vs.110).aspx
@@ -264,8 +290,8 @@ int WINAPI WinMain(		 //https://msdn.microsoft.com/library/windows/desktop/ms633
 	{
 		GLfloat bg[3] = {255, 0, 0 };
 		glClearBufferfv(GL_COLOR, 0, bg); // clear the color buffer to color bg, which we set to red
-
-		m_engine.Step(1);
+		std::cout << GetCounter() << std::endl;
+		m_engine.Step(GetCounter());
       
 		SwapBuffers(hdc);  //Swap buffers to new display
 		DispatchMessage(&msg);  //Sends message to the window  procedure
