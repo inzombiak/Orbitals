@@ -17,7 +17,7 @@ public:
 
 	bool AddEventListener(EventDefs::EventType type, EventDelegate callBack);
 	bool RemoveEventListener(EventDefs::EventType type, EventDelegate callBack);
-	void QueueEvent(EventDefs::EventType type, IEventData* data, bool isSynchronous);
+	void QueueEvent(IEventData* data, bool isSynchronous);
 	void Update(float dt);
 
 	void Destroy();

@@ -29,6 +29,7 @@ public:
 
 	void UpdateTransform(const glm::mat4& predictedTrans);
 	const glm::mat4& GetTransform() const;
+	glm::mat4& GetInterpolationTransform();
 
 private:
 
@@ -36,10 +37,11 @@ private:
 
 	float m_mass;
 	
-	glm::vec3 m_linearVelocity;
-	glm::vec3 m_angularVelocity;
+	glm::vec3 m_linearVelocity = glm::vec3(0.f);
+	glm::vec3 m_angularVelocity = glm::vec3(0.f);
 
 	glm::mat4 m_transform;
+	glm::mat4 m_interpolationTransform;
 	glm::vec3 m_localInertia;
 
 	float m_linearDamping;

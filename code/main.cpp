@@ -290,7 +290,6 @@ int WINAPI WinMain(		 //https://msdn.microsoft.com/library/windows/desktop/ms633
 	{
 		GLfloat bg[3] = {255, 0, 0 };
 		glClearBufferfv(GL_COLOR, 0, bg); // clear the color buffer to color bg, which we set to red
-		std::cout << GetCounter() << std::endl;
 		m_engine.Step(GetCounter());
       
 		SwapBuffers(hdc);  //Swap buffers to new display

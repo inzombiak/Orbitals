@@ -7,6 +7,7 @@
 #include "PhysicsComponent.h"
 
 class IEventData;
+class PhysDebugDrawer;
 class PhysicsSystem : public ISystem
 {
 
@@ -23,6 +24,11 @@ public:
 
 	//Create a render component
 	void CreatePhysicsComponent(IEventData* eventData);
+
+	void SetPhysDebugDrawer(PhysDebugDrawer* pdd)
+	{
+		m_physWorld.SetPhysDebugDrawer(pdd);
+	}
 
 	SystemPriority GetPriority()
 	{

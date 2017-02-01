@@ -7,6 +7,7 @@
 
 #include "IRigidBody.h"
 
+class PhysDebugDrawer;
 class PhysicsWorld
 {
 public:
@@ -18,10 +19,13 @@ public:
 	void SetGravity(const glm::vec3& grav);
 	void StepSimulation(float timeStep, int maxSubStep = 1, float fixedTimeStep = 1.f/60.f);
 	
+	void SetPhysDebugDrawer(PhysDebugDrawer* pdd);
 
 private:
 	void ApplyGravity();
 	void PredictMotion(float timeStep);
+	void PerformMovement(float timeStep);
+	void PerformCollisionCheck();
 	void ClearForces();
 	
 	void SingleSimulationStep(float fixedTimeStep);
@@ -33,6 +37,8 @@ private:
 	std::vector<IRigidBody*> m_staticRigidBodies;
 
 	glm::vec3 m_gravity;
+
+	PhysDebugDrawer* m_physDebugDrawer;
 };
 
 #endif

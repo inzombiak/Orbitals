@@ -85,3 +85,7 @@ const glm::mat4& IRigidBody::GetTransform() const
 {
 	return m_transform;
 }
+glm::mat4& IRigidBody::GetInterpolationTransform()
+{
+	return m_interpolationTransform;
+}

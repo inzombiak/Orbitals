@@ -25,7 +25,7 @@ void CelestialObjectSystem::Update(float dt)
 
 void CelestialObjectSystem::CreateObject(IEventData* data)
 {
-	EDCreateObject* objData = dynamic_cast<EDCreateObject*>(data); 
+	EDCreateObject* objData = (EDCreateObject*)data; 
 	if (!objData)
 		return;
 
@@ -36,14 +36,14 @@ void CelestialObjectSystem::CreateObject(IEventData* data)
 	{
 		objData->GetData()->renderCompData->owner = newObject;
 		EDCreateRenderComp* renderEventData = new EDCreateRenderComp(objData->GetData()->renderCompData);
-		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_RENDER_COMPONENT, renderEventData, isSync);
+		EventSystem::GetInstance()->QueueEvent(renderEventData, isSync);
 	}
 	
 	if (objData->GetData()->rigidBodyData)
 	{
 		objData->GetData()->rigidBodyData->owner = newObject;
 		EDCreatePhysComp* physEventData = new EDCreatePhysComp(objData->GetData()->rigidBodyData);
-		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_PHYSICS_COMPONENT, physEventData, isSync);
+		EventSystem::GetInstance()->QueueEvent(physEventData, isSync);
 	}
 
 	if (isSync)

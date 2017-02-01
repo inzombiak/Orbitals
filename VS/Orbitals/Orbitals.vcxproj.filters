@@ -147,6 +147,9 @@
     <ClInclude Include="..\..\code\Physics\SphereShape.h">
       <Filter>Header Files\Physics\CollisionShapes</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\PhysDebugDrawer.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\VertexShader.glsl">
@@ -213,6 +216,9 @@
     </ClCompile>
     <ClCompile Include="..\..\code\Physics\SphereShape.cpp">
       <Filter>Source Files\Physics\CollisionShape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Rendering\PhysDebugDrawer.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

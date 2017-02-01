@@ -31,15 +31,17 @@ bool RenderingSystem::Init()
 	glFrontFace(GL_CCW);
 	EventSystem::GetInstance()->AddEventListener(EventDefs::CREATE_RENDER_COMPONENT, std::bind(&RenderingSystem::CreateRenderComponent, this, std::placeholders::_1));
 
-	//Create shaders and add to vector
-	//Create shaders and add to vector
 	std::vector<GLuint> shaderList;
 	shaderList.push_back(CreateShader(GL_VERTEX_SHADER, ReadFileToString("VertexShader_Lighting.glsl")));
 	shaderList.push_back(CreateShader(GL_FRAGMENT_SHADER, ReadFileToString("FragmentShader_Lighting.glsl")));
 	m_program = CreateProgram(shaderList);
 
-	//Create program
-	m_program = CreateProgram(shaderList);
+	//Debug drawing program
+	shaderList.clear();
+	shaderList.push_back(CreateShader(GL_VERTEX_SHADER, ReadFileToString("VertexShader.glsl")));
+	shaderList.push_back(CreateShader(GL_FRAGMENT_SHADER, ReadFileToString("FragmentShader.glsl")));
+	GLuint program = CreateProgram(shaderList);
+	m_physDebugDrawer.SetProgram(program);
 
 	m_direction = glm::vec3(
 		cos(m_yRotate) * sin(m_xRotate),
@@ -53,6 +55,7 @@ bool RenderingSystem::Init()
 		cos(m_xRotate - 3.14f / 2.0f)
 		);
 	m_up = glm::cross(m_right, m_direction);
+
 
 	return true;
 }
@@ -164,6 +167,9 @@ void RenderingSystem::Draw()
 	{
 		std::cerr << "OpenGL error: " << err << std::endl;
 	}
+
+	m_physDebugDrawer.Draw(MVP);
+	m_physDebugDrawer.Clear();
 }
 
 void RenderingSystem::CreateRenderComponent(IEventData* eventData)

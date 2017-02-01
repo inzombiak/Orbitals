@@ -1,11 +1,13 @@
 #ifndef RENDERING_SYSTEM_H
 #define RENDERING_SYSTEM_H
 
+#include <unordered_map>
+
 #include "../ISystem.h"
 #include "..\Utilities\HelperFunctions.h"
 
-#include <unordered_map>
 #include "RenderComponent.h"
+#include "PhysDebugDrawer.h"
 
 class IEventData;
 class RenderingSystem : public ISystem
@@ -23,7 +25,11 @@ public:
 	//Clear existing render components
 	void Clear();
 	void ClearRender();
-	//RenderComponent* CreateRay(glm::vec3 start, glm::vec3 end);
+	
+	PhysDebugDrawer* GetPhysDebugDrawer()
+	{
+		return &m_physDebugDrawer;
+	}
 
 	//Draw screen
 	void Draw();
@@ -50,6 +56,8 @@ private:
 	void UpdateCameraPosition();
 
 	GLuint m_program;
+
+	PhysDebugDrawer m_physDebugDrawer;
 
 	std::vector<RenderComponent> m_renderComponents;
 

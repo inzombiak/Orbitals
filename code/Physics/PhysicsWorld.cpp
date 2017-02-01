@@ -1,6 +1,6 @@
 #include "PhysicsWorld.h"
-
 #include "glm\gtc\matrix_transform.hpp"
+#include "../Rendering/PhysDebugDrawer.h"
 
 PhysicsWorld::PhysicsWorld()
 {
@@ -89,7 +89,14 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 
 	}
 
-	
+	//TODO: ADD FLAG TO DISABLE DRAWING
+	glm::vec3 aabbMin, aabbMax;
+	glm::vec3 color(1.f, 0.f, 0.f);
+	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
+	{
+		m_nonStaticRigidBodies[i]->GetAABB(aabbMin, aabbMax);
+		m_physDebugDrawer->DrawAABB(aabbMin, aabbMax, color);
+	}
 
 	ClearForces();
 }
@@ -105,6 +112,25 @@ void PhysicsWorld::ApplyGravity()
 void PhysicsWorld::PredictMotion(float timeStep)
 {
 	glm::vec3 linVel, angVel, totalF;
+	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
+	{
+		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
+		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
+		totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
+
+		//TODO MOVE TO RIGID BODY
+		if (m_nonStaticRigidBodies[i]->GetMass() != 0)
+			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
+
+		m_nonStaticRigidBodies[i]->GetInterpolationTransform() = 
+			glm::translate(m_nonStaticRigidBodies[i]->GetInterpolationTransform(), linVel *timeStep);
+
+	}
+}
+
+void PhysicsWorld::PerformMovement(float timeStep)
+{
+	glm::vec3 linVel, angVel, totalF;
 	glm::mat4 trans, predictedTrans;
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
@@ -113,14 +139,48 @@ void PhysicsWorld::PredictMotion(float timeStep)
 		totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
 
 		trans = m_nonStaticRigidBodies[i]->GetTransform();
-
-		linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
+		if (m_nonStaticRigidBodies[i]->GetMass() != 0)
+			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
 		
 		predictedTrans = glm::translate(trans, linVel *timeStep);
 
 		m_nonStaticRigidBodies[i]->UpdateTransform(predictedTrans);
 		m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
 
+	}
+}
+
+bool CheckAABBIntersection(const glm::vec3& aabbMin1, const glm::vec3& aabbMax1, const glm::vec3& aabbMin2, const glm::vec3& aabbMax2)
+{
+	if (aabbMin1.x <= aabbMax2.x && aabbMax1.x >= aabbMin2.x &&
+		aabbMin1.y <= aabbMax2.y && aabbMax1.y >= aabbMin2.y &&
+		aabbMin1.z <= aabbMax2.z && aabbMax1.z >= aabbMin2.z)
+		return true;
+	return false;
+}
+
+void PhysicsWorld::PerformCollisionCheck()
+{
+	glm::vec3 aabbMin1, aabbMax1, aabbMin2, aabbMax2;
+
+	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
+	{
+		for (unsigned int j = 0; j < m_nonStaticRigidBodies.size(); ++j)
+		{
+			if (i == j)
+				continue;
+
+			m_nonStaticRigidBodies[i]->GetAABB(aabbMin1, aabbMax1);
+			m_nonStaticRigidBodies[j]->GetAABB(aabbMin2, aabbMax2);
+
+			if (CheckAABBIntersection(aabbMin1, aabbMax1, aabbMin2, aabbMax2))
+			{
+				float xDepth, yDepth, zDepth;
+
+				m_nonStaticRigidBodies[i]->SetLinearVelocity(glm::vec3(0.f));
+				m_nonStaticRigidBodies[i]->ApplyForce(glm::vec3(0, 9.8f, 0) * m_nonStaticRigidBodies[i]->GetMass());
+			}
+		}
 	}
 }
 
@@ -134,5 +194,20 @@ void PhysicsWorld::ClearForces()
 
 void PhysicsWorld::SingleSimulationStep(float fixedTimeStep)
 {
+	//Predict motion
 	PredictMotion(fixedTimeStep);
+
+	//Check collisions and apply
+	PerformCollisionCheck();
+
+	//Solve Constraints
+	//SolveConstraints();
+
+	//Perform movement
+	PerformMovement(fixedTimeStep);
+}
+
+void PhysicsWorld::SetPhysDebugDrawer(PhysDebugDrawer* pdd)
+{
+	m_physDebugDrawer = pdd;
 }

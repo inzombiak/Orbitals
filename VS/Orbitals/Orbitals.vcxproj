@@ -35,6 +35,7 @@
     <ClInclude Include="..\..\code\Physics\SphereShape.h" />
     <ClInclude Include="..\..\code\Rendering\Camera.h" />
     <ClInclude Include="..\..\code\Rendering\GLRenderHelpers.h" />
+    <ClInclude Include="..\..\code\Rendering\PhysDebugDrawer.h" />
     <ClInclude Include="..\..\code\Rendering\RenderComponent.h" />
     <ClInclude Include="..\..\code\Rendering\RenderingSystem.h" />
     <ClInclude Include="..\..\code\Utilities\GameDefs.h" />
@@ -62,6 +63,7 @@
     <ClCompile Include="..\..\code\Physics\PhysicsWorld.cpp" />
     <ClCompile Include="..\..\code\Physics\SphereShape.cpp" />
     <ClCompile Include="..\..\code\Rendering\GLRenderHelpers.cpp" />
+    <ClCompile Include="..\..\code\Rendering\PhysDebugDrawer.cpp" />
     <ClCompile Include="..\..\code\Rendering\RenderComponent.cpp" />
     <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp" />
     <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp" />

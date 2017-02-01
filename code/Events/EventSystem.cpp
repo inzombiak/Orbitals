@@ -37,8 +37,12 @@ bool EventSystem::RemoveEventListener(EventDefs::EventType type, EventDelegate c
 	return false;
 }
 
-void EventSystem::QueueEvent(EventDefs::EventType type, IEventData* data, bool isSynchronous)
+void EventSystem::QueueEvent(IEventData* data, bool isSynchronous)
 {
+	if (!data)
+		return;
+	EventDefs::EventType type = data->GetEventType();
+
 	if (!m_isSyncEventList.at(type) && !isSynchronous)
 	{
 		m_eventQueue.push(data);

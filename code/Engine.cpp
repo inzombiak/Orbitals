@@ -85,6 +85,8 @@ void Engine::InitSim()
 		sys5->Init();
 	m_systemMap[sys5->GetPriority()] = std::shared_ptr<PhysicsSystem>(sys5);
 
+	sys5->SetPhysDebugDrawer(sys->GetPhysDebugDrawer());
+
 	Test();
 	m_engineState = Running;
 }
@@ -108,7 +110,7 @@ void Engine::Test()
 		std::vector<unsigned short> cleanIndices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec3> cleanVert;
-		glm::vec3 position	= glm::vec3(0, 0, -5);
+		glm::vec3 position	= glm::vec3(6, 16, -5);
 		glm::vec3 rotation	= glm::vec3(0, 0, 0);
 		glm::vec3 scale		= glm::vec3(1, 1, 1);
 		double radius = 3;
@@ -139,7 +141,7 @@ void Engine::Test()
 
 		//ballData->renderCompData->normals = normals;
 		auto eventData = new EDCreateObject(ballData);
-		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_OBJECT, eventData, false);
+		EventSystem::GetInstance()->QueueEvent(eventData, false);
 	}
 
 	{
@@ -154,14 +156,36 @@ void Engine::Test()
 		std::vector<unsigned short> cleanIndices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec3> cleanVert;
-
-		CreateBox(glm::vec3(6, 0, -5), 4, 4, 4, vertices, normals, cleanVert, cleanIndices);
+		float boxWidth = 4, boxLength = 4, boxHeight = 4;
+		glm::vec3 position = glm::vec3(6, 0, -5);
+		glm::vec3 rotation = glm::vec3(0, 0, 0);
+		glm::vec3 scale = glm::vec3(1, 1, 1);
+		CreateBox(glm::vec3(0, 0, 0), boxWidth, boxHeight, boxLength, vertices, normals, cleanVert, cleanIndices);
 		IndexVBO(vertices, normals,
 			boxData->renderCompData->indicies, boxData->renderCompData->vertices, boxData->renderCompData->normals);
+
+		PhysicsDefs::BoxCreationData* bcd = new PhysicsDefs::BoxCreationData();
+		bcd->boxDimensions = glm::vec3(boxWidth, boxHeight, boxLength);
+
+		bcd->rbci.mass = 0.f;
+		bcd->rbci.linearDamping = 0.f;
+		bcd->rbci.angularDamping = 0.f;
+		bcd->rbci.friction = 0.f;
+		bcd->rbci.rollingFriction = 0.f;
+		bcd->rbci.resititution = 0.f;
+
+		glm::mat4 translationMat = glm::translate(position);
+		glm::mat4 scalingMat = glm::scale(scale);
+		glm::mat4 rotationMat = glm::toMat4(glm::quat(rotation));
+		bcd->rbci.transform = translationMat * rotationMat * scalingMat;
+		bcd->rbci.localInertia = glm::vec3(0, 0, 0); //TODO: INCORRECT, add calculator funciton;
+
+		boxData->rigidBodyData = bcd;
+
 		boxData->renderCompData->verticesClean = cleanVert;
 		boxData->renderCompData->indiciesClean = cleanIndices;
 		auto eventData = new EDCreateObject(boxData);
-		EventSystem::GetInstance()->QueueEvent(EventDefs::CREATE_OBJECT, eventData, false);
+		EventSystem::GetInstance()->QueueEvent(eventData, false);
 	}
 }
 

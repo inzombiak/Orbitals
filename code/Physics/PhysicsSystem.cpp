@@ -55,7 +55,7 @@ void PhysicsSystem::Update(float dt)
 //TODO: bad and unclean, maybe add factory. Need to fix how and what data is transferred 
 void PhysicsSystem::CreatePhysicsComponent(IEventData* eventData)
 {
-	EDCreatePhysComp* physCompED = dynamic_cast<EDCreatePhysComp*>(eventData);
+	EDCreatePhysComp* physCompED =(EDCreatePhysComp*)(eventData);
 	if (!physCompED)
 		return;
 

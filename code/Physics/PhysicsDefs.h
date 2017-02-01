@@ -41,6 +41,24 @@ namespace PhysicsDefs
 		ICollisionShape* collisionShape;
 	};
 
+	struct Contact
+	{
+		//Contact points in global space
+		glm::vec3 worldPointA;
+		glm::vec3 worldPointB;
+
+		//Contact points in local space
+		glm::vec3 localPointA;
+		glm::vec3 localPointB;
+
+		//Contact normal and tangents
+		glm::vec3 normal;
+		glm::vec3 tangent1, tangent2;
+
+		//Depth of penetration
+		float depth;
+	};
+
 	class ICreationData
 	{
 	public:
@@ -65,17 +83,12 @@ namespace PhysicsDefs
 		PhysicsBodyType bodyType;
 
 	};
-
-	
 	class IRigidBodyCreationData : public ICreationData
 	{
 	public:
 		virtual ~IRigidBodyCreationData() {};
 		RigidBodyConstructionInfo rbci;
 	};
-
-	
-
 	class BoxCreationData : public IRigidBodyCreationData
 	{
 	public:
@@ -99,7 +112,6 @@ namespace PhysicsDefs
 			ICreationData::bodyType = PhysicsBodyType::RigidBody;
 		}
 	};
-
 	class SphereCreationData : public IRigidBodyCreationData
 	{
 	public:
