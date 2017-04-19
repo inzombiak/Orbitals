@@ -19,7 +19,7 @@ public:
 		;
 	}
 
-	virtual void GetAABB(const glm::mat4& transform, glm::vec3& aabbMin, glm::vec3& aabbMax) = 0;
+	virtual void GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax) = 0;
 	CollisionShapeType GetType();
 
 protected:

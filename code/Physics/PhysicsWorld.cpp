@@ -91,10 +91,16 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 
 	//TODO: ADD FLAG TO DISABLE DRAWING
 	glm::vec3 aabbMin, aabbMax;
+	glm::vec4 aabbMin4, aabbMax4;
 	glm::vec3 color(1.f, 0.f, 0.f);
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		m_nonStaticRigidBodies[i]->GetAABB(aabbMin, aabbMax);
+		auto transform = m_nonStaticRigidBodies[i]->GetTransform();
+		aabbMin4 = transform * glm::vec4(aabbMin, 1.f);
+		aabbMax4 = transform * glm::vec4(aabbMax, 1.f);
+		aabbMin = glm::vec3(aabbMin4);
+		aabbMax = glm::vec3(aabbMax4);
 		m_physDebugDrawer->DrawAABB(aabbMin, aabbMax, color);
 	}
 
@@ -123,7 +129,8 @@ void PhysicsWorld::PredictMotion(float timeStep)
 			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
 
 		m_nonStaticRigidBodies[i]->GetInterpolationTransform() = 
-			glm::translate(m_nonStaticRigidBodies[i]->GetInterpolationTransform(), linVel *timeStep);
+			glm::translate(m_nonStaticRigidBodies[i]->GetTransform(), linVel *timeStep);
+		m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
 
 	}
 }
@@ -138,15 +145,10 @@ void PhysicsWorld::PerformMovement(float timeStep)
 		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
 		totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
 
-		trans = m_nonStaticRigidBodies[i]->GetTransform();
-		if (m_nonStaticRigidBodies[i]->GetMass() != 0)
-			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
+		trans = m_nonStaticRigidBodies[i]->GetInterpolationTransform();
 		
 		predictedTrans = glm::translate(trans, linVel *timeStep);
-
 		m_nonStaticRigidBodies[i]->UpdateTransform(predictedTrans);
-		m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
-
 	}
 }
 
@@ -155,30 +157,116 @@ bool CheckAABBIntersection(const glm::vec3& aabbMin1, const glm::vec3& aabbMax1,
 	if (aabbMin1.x <= aabbMax2.x && aabbMax1.x >= aabbMin2.x &&
 		aabbMin1.y <= aabbMax2.y && aabbMax1.y >= aabbMin2.y &&
 		aabbMin1.z <= aabbMax2.z && aabbMax1.z >= aabbMin2.z)
+	{
 		return true;
+	}
+
 	return false;
+}
+
+bool SATDetectionAABB(const glm::vec3& aabbMin1, const glm::vec3& aabbMax1, const glm::vec3& aabbMin2, const glm::vec3& aabbMax2,
+	glm::vec3& normalOut, float& depthOut)
+{
+	depthOut = FLT_MAX;
+	float currentAxisDepth = 0;
+	bool test = true;
+
+	if (aabbMin1.x <= aabbMax2.x && aabbMax1.x >= aabbMin2.x)
+	{
+		currentAxisDepth = std::max(0.f, std::min(aabbMax2.x, aabbMax2.x) - std::max(aabbMin1.x, aabbMin2.x));
+		if (currentAxisDepth < depthOut)
+		{
+			depthOut = currentAxisDepth;
+			normalOut = glm::vec3(1.f, 0 , 0);
+		}
+	}
+	else
+		return false;
+
+	if (aabbMin1.y <= aabbMax2.y && aabbMax1.y >= aabbMin2.y)
+	{
+		currentAxisDepth = std::max(0.f, std::min(aabbMax2.y, aabbMax2.y) - std::max(aabbMin1.y, aabbMin2.y));
+		if (currentAxisDepth < depthOut)
+		{
+			depthOut = currentAxisDepth;
+			normalOut = glm::vec3(0, 1.0f, 0);
+		}
+	}
+	else
+		return false;
+
+	if (aabbMin1.z <= aabbMax2.z && aabbMax1.z >= aabbMin2.z)
+	{
+		currentAxisDepth = std::max(0.f, std::min(aabbMax2.z, aabbMax2.z) - std::max(aabbMin1.z, aabbMin2.z));
+		if (currentAxisDepth < depthOut)
+		{
+			depthOut = currentAxisDepth;
+			normalOut = glm::vec3(0, 0, 1.f);
+		}
+	}
+	else
+		return false;
+
+	return true;
 }
 
 void PhysicsWorld::PerformCollisionCheck()
 {
-	glm::vec3 aabbMin1, aabbMax1, aabbMin2, aabbMax2;
+	glm::vec3 aabbMin1, aabbMax1, aabbMin2, aabbMax2, normal, vel1, vel2, relativeVel, impulse, correction;
+	glm::vec4 aabbMin2_4, aabbMax2_4;
+	glm::mat4 invTransform1;
+	glm::mat4& interpolationTrans1 = glm::mat4(1);
+	glm::mat4& interpolationTrans2 = glm::mat4(1);
+
+	float depth, velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
 
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
-		for (unsigned int j = 0; j < m_nonStaticRigidBodies.size(); ++j)
+		m_nonStaticRigidBodies[i]->GetAABB(aabbMin1, aabbMax1);
+		interpolationTrans1 = m_nonStaticRigidBodies[i]->GetInterpolationTransform();
+		invTransform1 = glm::inverse(interpolationTrans1);
+		vel1 = m_nonStaticRigidBodies[i]->GetLinearVelocity();
+		mass1 = m_nonStaticRigidBodies[i]->GetMass();
+		invMass1 = m_nonStaticRigidBodies[i]->GetInverseMass();
+
+		for (unsigned int j = i + 1; j < m_nonStaticRigidBodies.size(); ++j)
 		{
-			if (i == j)
-				continue;
-
-			m_nonStaticRigidBodies[i]->GetAABB(aabbMin1, aabbMax1);
 			m_nonStaticRigidBodies[j]->GetAABB(aabbMin2, aabbMax2);
+			interpolationTrans2 = m_nonStaticRigidBodies[j]->GetInterpolationTransform();
+			aabbMin2_4 = invTransform1 * interpolationTrans2 * glm::vec4(aabbMin2, 1.f);
+			aabbMax2_4 = invTransform1 * interpolationTrans2 * glm::vec4(aabbMax2, 1.f);
+			aabbMin2 = glm::vec3(aabbMin2_4);
+			aabbMax2 = glm::vec3(aabbMax2_4);
 
-			if (CheckAABBIntersection(aabbMin1, aabbMax1, aabbMin2, aabbMax2))
+			if (SATDetectionAABB(aabbMin1, aabbMax1, aabbMin2, aabbMax2, normal, depth))
 			{
 				float xDepth, yDepth, zDepth;
 
-				m_nonStaticRigidBodies[i]->SetLinearVelocity(glm::vec3(0.f));
-				m_nonStaticRigidBodies[i]->ApplyForce(glm::vec3(0, 9.8f, 0) * m_nonStaticRigidBodies[i]->GetMass());
+				vel2 = m_nonStaticRigidBodies[j]->GetLinearVelocity();
+				relativeVel = vel2 - vel1;
+				velAlongColNormal = glm::dot(relativeVel, normal);
+
+				if (velAlongColNormal < 0)
+					continue;
+
+				minConst = std::min(m_nonStaticRigidBodies[i]->GetRestitution(), m_nonStaticRigidBodies[j]->GetRestitution());
+				mass2 = m_nonStaticRigidBodies[j]->GetMass();
+				invMass2 = m_nonStaticRigidBodies[j]->GetInverseMass();
+				totalSytemMass = mass1 + mass2;
+
+				impulse = normal * (-(1 + minConst) * velAlongColNormal* 10);
+
+				m_nonStaticRigidBodies[i]->ApplyImpulse(-impulse * mass1 / totalSytemMass);
+				m_nonStaticRigidBodies[j]->ApplyImpulse(impulse * mass2 / totalSytemMass);
+
+				//Pushout to avoid sinking
+				const float PERCENT = 1;
+				const float THRESHOLD = 0.001;
+				correction = std::max(depth - THRESHOLD, 0.0f) / (invMass1 + invMass2) * PERCENT * normal;
+				interpolationTrans1 = glm::translate(interpolationTrans1, invMass1 * correction);
+				interpolationTrans2 = glm::translate(interpolationTrans2, -invMass2 * correction);
+				m_nonStaticRigidBodies[i]->GetInterpolationTransform() = interpolationTrans1;
+				m_nonStaticRigidBodies[j]->GetInterpolationTransform() = interpolationTrans2;
 			}
 		}
 	}

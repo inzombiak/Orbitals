@@ -5,6 +5,10 @@ IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 	m_gravity = glm::vec3(0.f);
 
 	m_mass				= rbci.mass;
+	if (m_mass == 0)
+		m_invMass		= 0;
+	else
+		m_invMass		= 1 / m_mass;
 	m_linearDamping		= rbci.linearDamping;
 	m_angularDamping	= rbci.angularDamping;
 	m_friction			= rbci.friction;
@@ -26,7 +30,7 @@ void IRigidBody::ApplyGravity()
 }
 void IRigidBody::ApplyImpulse(const glm::vec3& impulse)
 {
-	m_linearVelocity += impulse / m_mass;
+	m_linearVelocity += impulse * m_invMass;
 }
 
 void IRigidBody::ApplyForce(const glm::vec3& force)
@@ -52,7 +56,7 @@ void IRigidBody::GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax)
 	//TODO Add assert
 	if (m_collisionShape)
 	{
-		m_collisionShape->GetAABB(m_transform, aabbMin, aabbMax);
+		m_collisionShape->GetAABB(aabbMin, aabbMax);
 	}
 }
 
@@ -76,7 +80,10 @@ float IRigidBody::GetMass() const
 {
 	return m_mass;
 }
-
+float IRigidBody::GetInverseMass() const
+{
+	return m_invMass;
+}
 void IRigidBody::UpdateTransform(const glm::mat4& predictedTrans)
 {
 	m_transform = predictedTrans;
@@ -88,4 +95,16 @@ const glm::mat4& IRigidBody::GetTransform() const
 glm::mat4& IRigidBody::GetInterpolationTransform()
 {
 	return m_interpolationTransform;
+}
+float IRigidBody::GetFriction() const
+{
+	return m_friction;
+}
+float IRigidBody::GetRollingFriction() const
+{
+	return m_rollingFriction;
+}
+float IRigidBody::GetRestitution() const
+{
+	return m_restitution;
 }

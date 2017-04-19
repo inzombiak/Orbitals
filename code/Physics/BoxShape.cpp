@@ -6,9 +6,9 @@ BoxShape::BoxShape(const glm::vec3& extents)
 	m_type = Box;
 }
 
-void BoxShape::GetAABB(const glm::mat4& transform, glm::vec3& aabbMin, glm::vec3& aabbMax)
+void BoxShape::GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax)
 {
-	glm::vec3 origin(transform[3]);
-	aabbMax = origin + m_extents * 0.5f;
-	aabbMin = origin - m_extents * 0.5f;
+	//glm::vec3 origin(transform[3]);
+	aabbMax = m_extents * 0.5f;
+	aabbMin = - m_extents * 0.5f;
 }

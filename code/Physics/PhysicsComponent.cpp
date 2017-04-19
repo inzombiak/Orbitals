@@ -7,7 +7,7 @@
 void PhysicsComponent::Update(float dt)
 {
 	//TODO: I'm not sure if this is the best way to handle movement
-	glm::mat4 transform = m_rigidBody->GetTransform();
+	/*glm::mat4 transform = m_rigidBody->GetTransform();
 
 	glm::vec3 scale;
 	glm::quat rotation;
@@ -17,8 +17,8 @@ void PhysicsComponent::Update(float dt)
 	glm::decompose(transform, scale, rotation, translation, skew, perspective);
 
 	m_owner->SetPosition(translation);
-	m_owner->SetRotation(glm::conjugate(rotation));
-
+	m_owner->SetRotation(glm::conjugate(rotation));*/
+	m_owner->SetOpenGLMatrix(m_rigidBody->GetTransform());
 }
 
 void PhysicsComponent::SetBody(IRigidBody* body)

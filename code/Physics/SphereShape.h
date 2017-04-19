@@ -8,7 +8,7 @@ class SphereShape : public ICollisionShape
 
 public:
 	SphereShape(float radius);
-	void GetAABB(const glm::mat4& transform, glm::vec3& aabbMin, glm::vec3& aabbMax) override;
+	void GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax) override;
 
 private:
 	

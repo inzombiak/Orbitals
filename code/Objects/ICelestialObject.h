@@ -33,6 +33,7 @@ public:
 	glm::vec3 GetScale();
 
 	glm::mat4 GetOpenGLMatrix() const;
+	void SetOpenGLMatrix(const glm::mat4 newMat);
 
 	std::string GetName() const
 	{
@@ -51,6 +52,7 @@ private:
 	glm::vec3 m_position;
 	glm::quat m_rotation;
 	glm::vec3 m_scale;
+	glm::mat4 m_openGLMat;
 
 	std::string m_name;
 	typedef std::unordered_map<ObjComponentID, StrongObjComponentPtr, std::hash<int>> ComponentMap;

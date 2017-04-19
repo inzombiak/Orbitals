@@ -26,16 +26,22 @@ public:
 	void SetLinearVelocity(const glm::vec3& newLinVel);
 	glm::vec3 GetAngularVelocity() const;
 	float GetMass() const;
+	float GetInverseMass() const;
 
 	void UpdateTransform(const glm::mat4& predictedTrans);
 	const glm::mat4& GetTransform() const;
 	glm::mat4& GetInterpolationTransform();
+
+	float GetFriction() const;
+	float GetRollingFriction() const;
+	float GetRestitution() const;
 
 private:
 
 	glm::vec3 m_gravity;
 
 	float m_mass;
+	float m_invMass;
 	
 	glm::vec3 m_linearVelocity = glm::vec3(0.f);
 	glm::vec3 m_angularVelocity = glm::vec3(0.f);
