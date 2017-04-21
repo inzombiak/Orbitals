@@ -58,6 +58,12 @@
     <Filter Include="Source Files\Physics\CollisionShape">
       <UniqueIdentifier>{04b58578-082b-487a-ac74-842d90384ca5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics\Solvers">
+      <UniqueIdentifier>{c15bf0e2-4dee-48a4-9048-0b5ba481aa55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics\Solvers">
+      <UniqueIdentifier>{68262477-0f0e-4c60-b803-c3d5d550d5b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\Events\EDCreateObject.h">
@@ -150,6 +156,9 @@
     <ClInclude Include="..\..\code\Rendering\PhysDebugDrawer.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Physics\GJKSolver.h">
+      <Filter>Header Files\Physics\Solvers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\VertexShader.glsl">
@@ -219,6 +228,9 @@
     </ClCompile>
     <ClCompile Include="..\..\code\Rendering\PhysDebugDrawer.cpp">
       <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\GJKSolver.cpp">
+      <Filter>Source Files\Physics\Solvers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

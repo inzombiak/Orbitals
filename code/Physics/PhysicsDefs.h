@@ -59,6 +59,48 @@ namespace PhysicsDefs
 		float depth;
 	};
 
+	struct SupportPoint
+	{
+		glm::vec3 position;
+		glm::vec3 originA;
+		glm::vec3 originB;
+		glm::vec3 dir;
+	};
+
+	inline SupportPoint GetSupportPoint(const std::vector<glm::vec3>& verticesA, const std::vector<glm::vec3>& verticesB, const glm::vec3& dir)
+	{
+		SupportPoint result;
+		result.dir = dir;
+
+		float max = -FLT_MAX;
+		float dot;
+
+		for (int i = 0; i < verticesA.size(); ++i)
+		{
+			dot = glm::dot(dir, verticesA[i]);
+			if (dot > max)
+			{
+				max = dot;
+				result.originA = verticesA[i];
+			}
+		}
+
+		max = -FLT_MAX;
+		for (int i = 0; i < verticesB.size(); ++i)
+		{
+			dot = glm::dot(-dir, verticesB[i]);
+			if (dot > max)
+			{
+				max = dot;
+				result.originB = verticesB[i];
+			}
+		}
+
+		result.position = result.originA - result.originB;
+
+		return result;
+	}
+
 	class ICreationData
 	{
 	public:

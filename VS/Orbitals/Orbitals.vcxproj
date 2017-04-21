@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\code\Objects\ICelestialObject.h" />
     <ClInclude Include="..\..\code\Objects\IObjectComponent.h" />
     <ClInclude Include="..\..\code\Physics\BoxShape.h" />
+    <ClInclude Include="..\..\code\Physics\GJKSolver.h" />
     <ClInclude Include="..\..\code\Physics\ICollisionShape.h" />
     <ClInclude Include="..\..\code\Physics\IRigidBody.h" />
     <ClInclude Include="..\..\code\Physics\PhysicsComponent.h" />
@@ -56,6 +57,7 @@
     <ClCompile Include="..\..\code\Objects\CelestialObjectSystem.cpp" />
     <ClCompile Include="..\..\code\Objects\ICelestialObject.cpp" />
     <ClCompile Include="..\..\code\Physics\BoxShape.cpp" />
+    <ClCompile Include="..\..\code\Physics\GJKSolver.cpp" />
     <ClCompile Include="..\..\code\Physics\ICollisionShape.cpp" />
     <ClCompile Include="..\..\code\Physics\IRigidBody.cpp" />
     <ClCompile Include="..\..\code\Physics\PhysicsComponent.cpp" />
