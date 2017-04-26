@@ -124,12 +124,12 @@ void Engine::Test()
 		PhysicsDefs::SphereCreationData* scd = new PhysicsDefs::SphereCreationData();
 		scd->sphereRadius = radius;
 
-		scd->rbci.mass				= 10.f;
+		scd->rbci.mass				= 1.f;
 		scd->rbci.linearDamping		= 0.f;
 		scd->rbci.angularDamping	= 0.f;
 		scd->rbci.friction			= 0.f;
 		scd->rbci.rollingFriction	= 0.f;
-		scd->rbci.resititution		= 0.2f;
+		scd->rbci.resititution		= 0.5f;
 
 		glm::mat4 translationMat	= glm::translate(position);
 		glm::mat4 scalingMat		= glm::scale(scale);
@@ -159,7 +159,7 @@ void Engine::Test()
 		float boxWidth = 4, boxLength = 4, boxHeight = 4;
 		glm::vec3 position = glm::vec3(6, 0, -5);
 		glm::vec3 rotation = glm::vec3(0, 0, 0);
-		glm::vec3 scale = glm::vec3(1, 2, 1);
+		glm::vec3 scale = glm::vec3(1, 3, 1);
 		CreateBox(glm::vec3(0, 0, 0), boxWidth, boxHeight, boxLength, vertices, normals, cleanVert, cleanIndices);
 		IndexVBO(vertices, normals,
 			boxData->renderCompData->indicies, boxData->renderCompData->vertices, boxData->renderCompData->normals);
@@ -172,7 +172,7 @@ void Engine::Test()
 		bcd->rbci.angularDamping = 0.f;
 		bcd->rbci.friction = 0.f;
 		bcd->rbci.rollingFriction = 0.f;
-		bcd->rbci.resititution = 0.2f;
+		bcd->rbci.resititution = 0.5f;
 
 		glm::mat4 translationMat = glm::translate(position);
 		glm::mat4 scalingMat = glm::scale(scale);

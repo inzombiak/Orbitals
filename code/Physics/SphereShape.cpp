@@ -6,9 +6,18 @@ SphereShape::SphereShape(float radius)
 	m_radius = radius;
 }
 
-void SphereShape::GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax)
+PhysicsDefs::AABB SphereShape::GetAABB()
 {
 	//glm::vec3 origin(transform[3]);
-	aabbMax = glm::vec3(m_radius, m_radius, m_radius);
-	aabbMin = -aabbMax;
+	PhysicsDefs::AABB result;
+
+	result.max = glm::vec3(m_radius, m_radius, m_radius);
+	result.min = -result.max;
+
+	return result;
+}
+
+glm::vec3 SphereShape::GetSupportPoint(const glm::vec3& dir) const
+{
+	return dir*m_radius;
 }

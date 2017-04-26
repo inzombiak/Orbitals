@@ -18,6 +18,10 @@ IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 	m_transform			= rbci.transform;
 	m_localInertia		= rbci.localInertia;
 	m_collisionShape	= rbci.collisionShape;
+
+	m_aabb = m_collisionShape->GetAABB();
+	m_aabb.body = this;
+	m_aabb.worldTransfrom = m_transform;
 }
 
 void IRigidBody::ClearForces()
@@ -51,12 +55,12 @@ void IRigidBody::SetGravity(const glm::vec3& gravity)
 	}
 }
 
-void IRigidBody::GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax)
+PhysicsDefs::AABB& IRigidBody::GetAABB()
 {
 	//TODO Add assert
 	if (m_collisionShape)
 	{
-		m_collisionShape->GetAABB(aabbMin, aabbMax);
+		return m_aabb;
 	}
 }
 
@@ -87,12 +91,18 @@ float IRigidBody::GetInverseMass() const
 void IRigidBody::UpdateTransform(const glm::mat4& predictedTrans)
 {
 	m_transform = predictedTrans;
+	m_aabb.worldTransfrom = m_transform;
 }
 const glm::mat4& IRigidBody::GetTransform() const
 {
 	return m_transform;
 }
-glm::mat4& IRigidBody::GetInterpolationTransform()
+void IRigidBody::UpdateInterpolationTransform(const glm::mat4& predictedTrans)
+{
+	m_aabb.worldTransfrom = predictedTrans;
+	m_interpolationTransform = predictedTrans;
+}
+const glm::mat4& IRigidBody::GetInterpolationTransform()
 {
 	return m_interpolationTransform;
 }
@@ -107,4 +117,8 @@ float IRigidBody::GetRollingFriction() const
 float IRigidBody::GetRestitution() const
 {
 	return m_restitution;
+}
+glm::vec3 IRigidBody::GetSupportPoint(glm::vec3 dir) const
+{
+	return m_collisionShape->GetSupportPoint(dir);
 }

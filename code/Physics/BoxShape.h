@@ -7,7 +7,8 @@ class BoxShape : public ICollisionShape
 {
 public:
 	BoxShape(const glm::vec3& extents);
-	void GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax) override;
+	PhysicsDefs::AABB GetAABB() override;
+	glm::vec3 GetSupportPoint(const glm::vec3& dir) const;
 
 private:
 	glm::vec3 m_extents;

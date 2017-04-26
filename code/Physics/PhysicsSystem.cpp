@@ -2,8 +2,12 @@
 #include "../Events/EDCreatePhysComp.h"
 #include "../Events/EventSystem.h"
 
+#include "PhysicsWorld.h"
 #include "BoxShape.h"
 #include "SphereShape.h"
+#include "NarrowphaseSAT.h"
+#include "NarrowphaseGJK_EPA.h"
+#include "BroadphaseAABB.h"
 
 //TODO: Collision Shape reuse
 //TODO: Collision Shape factory
@@ -15,7 +19,19 @@ PhysicsSystem::~PhysicsSystem()
 
 bool PhysicsSystem::Init()
 {
-	m_physWorld.SetGravity(glm::vec3(0, -9.8f, 0));
+	m_broadphase = new BroadphaseAABB();
+	m_narrowphase = new NarrowphaseGJK_EPA();
+
+	if (m_physWorld)
+	{
+		ClearPhysWorld();
+		delete m_physWorld;
+		m_physWorld = new PhysicsWorld(m_broadphase, m_narrowphase);
+	}
+	else
+		m_physWorld = new PhysicsWorld(m_broadphase, m_narrowphase);
+
+	m_physWorld->SetGravity(glm::vec3(0, -9.8f, 0));
 	EventSystem::GetInstance()->AddEventListener(EventDefs::CREATE_PHYSICS_COMPONENT, std::bind(&PhysicsSystem::CreatePhysicsComponent, this, std::placeholders::_1));
 	return true;
 }
@@ -33,20 +49,31 @@ void PhysicsSystem::Clear()
 		m_collisionShapes[i] = 0;
 	}
 
+	ClearPhysWorld();
+
+	if (m_physWorld)
+		delete m_physWorld;
+	if (m_broadphase)
+		delete m_broadphase;
+	if (m_narrowphase)
+		delete m_narrowphase;
+};
+
+void PhysicsSystem::ClearPhysWorld()
+{
 	for (unsigned int i = 0; i < m_rigidBodies.size(); ++i)
 	{
 		if (!m_rigidBodies[i])
 			continue;
-		m_physWorld.RemoveRigidBody(m_rigidBodies[i]);
+		m_physWorld->RemoveRigidBody(m_rigidBodies[i]);
 		delete m_rigidBodies[i];
 		m_rigidBodies[i] = 0;
 	}
-
-};
+}
 
 void PhysicsSystem::Update(float dt)
 {
-	m_physWorld.StepSimulation(dt);
+	m_physWorld->StepSimulation(dt);
 
 	for (unsigned int i = 0; i < m_physComponents.size(); ++i)
 		m_physComponents[i].Update(dt);
@@ -83,8 +110,12 @@ void PhysicsSystem::CreatePhysicsComponent(IEventData* eventData)
 	newComponent.SetBody(rb);
 	newComponent.SetOwner(physCompED->GetData()->owner);
 	m_physComponents.push_back(newComponent);
-	m_physWorld.AddRigidBody(rb);
+	m_physWorld->AddRigidBody(rb);
 	eventData->SetDelete(true);
+}
+void PhysicsSystem::SetPhysDebugDrawer(PhysDebugDrawer* pdd)
+{
+	m_physWorld->SetPhysDebugDrawer(pdd);
 }
 
 const std::string PhysicsSystem::SYSTEM_NAME = "PhysicsSystem";

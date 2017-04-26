@@ -64,6 +64,18 @@
     <Filter Include="Source Files\Physics\Solvers">
       <UniqueIdentifier>{68262477-0f0e-4c60-b803-c3d5d550d5b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics\Broadphase">
+      <UniqueIdentifier>{38044cb2-7282-45de-908e-b0bc17bca200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics\Broadphase">
+      <UniqueIdentifier>{69d8030a-5ce9-4654-bb26-95e44aa2a3d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics\Narrowphase">
+      <UniqueIdentifier>{4cd21192-da93-4760-a36d-3ac57f5887ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics\Narrowphase">
+      <UniqueIdentifier>{2e0c372b-ffaf-4ebf-9279-f83405f1883b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\Events\EDCreateObject.h">
@@ -156,8 +168,20 @@
     <ClInclude Include="..\..\code\Rendering\PhysDebugDrawer.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\code\Physics\GJKSolver.h">
-      <Filter>Header Files\Physics\Solvers</Filter>
+    <ClInclude Include="..\..\code\Physics\IBroadphase.h">
+      <Filter>Header Files\Physics\Broadphase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\BroadphaseAABB.h">
+      <Filter>Header Files\Physics\Broadphase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\INarrowphase.h">
+      <Filter>Header Files\Physics\Narrowphase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\NarrowphaseSAT.h">
+      <Filter>Header Files\Physics\Narrowphase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\NarrowphaseGJK_EPA.h">
+      <Filter>Header Files\Physics\Narrowphase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -229,8 +253,14 @@
     <ClCompile Include="..\..\code\Rendering\PhysDebugDrawer.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\Physics\GJKSolver.cpp">
-      <Filter>Source Files\Physics\Solvers</Filter>
+    <ClCompile Include="..\..\code\Physics\BroadphaseAABB.cpp">
+      <Filter>Source Files\Physics\Broadphase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\NarrowphaseSAT.cpp">
+      <Filter>Source Files\Physics\Narrowphase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\NarrowphaseGJK_EPA.cpp">
+      <Filter>Source Files\Physics\Narrowphase</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

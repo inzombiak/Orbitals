@@ -7,6 +7,7 @@
 
 class ICelestialObject;
 class ICollisionShape;
+class IRigidBody;
 namespace PhysicsDefs
 {
 	enum RigidBodyType
@@ -25,7 +26,7 @@ namespace PhysicsDefs
 		CompoundBody = 2,
 		NULLBody = 4,
 	};
-
+	
 	struct RigidBodyConstructionInfo
 	{
 		float mass;
@@ -38,7 +39,7 @@ namespace PhysicsDefs
 		glm::mat4 transform;
 		glm::vec3 localInertia;
 
-		ICollisionShape* collisionShape;
+		ICollisionShape* collisionShape = 0;
 	};
 
 	struct Contact
@@ -67,7 +68,30 @@ namespace PhysicsDefs
 		glm::vec3 dir;
 	};
 
-	inline SupportPoint GetSupportPoint(const std::vector<glm::vec3>& verticesA, const std::vector<glm::vec3>& verticesB, const glm::vec3& dir)
+	struct AABB
+	{
+		glm::vec3 min;
+		glm::vec3 max;
+
+		glm::mat4 worldTransfrom;
+		IRigidBody* body = 0;
+
+		bool Intersects(const AABB& other) const
+		{
+			if (min.x <= other.max.x && max.x >= other.min.x &&
+				min.y <= other.max.y && max.y >= other.min.y &&
+				min.z <= other.max.z && max.z >= other.min.z)
+			{
+				return true;
+			}
+
+			return false;
+		}
+	};
+
+	typedef std::pair<IRigidBody*, IRigidBody*> CollisionPair;
+
+	/*inline SupportPoint GetSupportPoint(const std::vector<glm::vec3>& verticesA, const std::vector<glm::vec3>& verticesB, const glm::vec3& dir)
 	{
 		SupportPoint result;
 		result.dir = dir;
@@ -99,7 +123,7 @@ namespace PhysicsDefs
 		result.position = result.originA - result.originB;
 
 		return result;
-	}
+	}*/
 
 	class ICreationData
 	{

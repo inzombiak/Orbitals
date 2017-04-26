@@ -19,7 +19,7 @@ public:
 
 	void SetGravity(const glm::vec3& m_gravity);
 
-	void GetAABB(glm::vec3& aabbMin, glm::vec3& aabbMax);
+	PhysicsDefs::AABB& GetAABB();
 
 	glm::vec3 GetTotalForce() const;
 	glm::vec3 GetLinearVelocity() const;
@@ -30,11 +30,15 @@ public:
 
 	void UpdateTransform(const glm::mat4& predictedTrans);
 	const glm::mat4& GetTransform() const;
-	glm::mat4& GetInterpolationTransform();
+	void UpdateInterpolationTransform(const glm::mat4& predictedTrans);
+	const glm::mat4& GetInterpolationTransform();
 
 	float GetFriction() const;
 	float GetRollingFriction() const;
 	float GetRestitution() const;
+
+	//For GJK and EPA
+	glm::vec3 GetSupportPoint(glm::vec3 dir) const;
 
 private:
 
@@ -58,6 +62,8 @@ private:
 	float m_restitution;
 
 	glm::vec3 m_totalForce;
+
+	PhysicsDefs::AABB m_aabb;
 
 	ICollisionShape* m_collisionShape;
 };

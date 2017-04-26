@@ -8,11 +8,13 @@
 #include "IRigidBody.h"
 
 class PhysDebugDrawer;
+class IBroadphase;
+class INarrowphase;
 class PhysicsWorld
 {
 public:
 
-	PhysicsWorld();
+	PhysicsWorld(IBroadphase* broadphase, INarrowphase* narrowphase);
 
 	void AddRigidBody(IRigidBody* body);
 	void RemoveRigidBody(IRigidBody* body);
@@ -26,6 +28,7 @@ private:
 	void PredictMotion(float timeStep);
 	void PerformMovement(float timeStep);
 	void PerformCollisionCheck();
+
 	void ClearForces();
 	
 	void SingleSimulationStep(float fixedTimeStep);
@@ -38,7 +41,9 @@ private:
 
 	glm::vec3 m_gravity;
 
-	PhysDebugDrawer* m_physDebugDrawer;
+	PhysDebugDrawer* m_physDebugDrawer = 0;
+	IBroadphase* m_broadphase = 0;
+	INarrowphase* m_narrowphase = 0;
 };
 
 #endif
