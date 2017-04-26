@@ -4,7 +4,7 @@ WIP 3D Physics Engine
 A 3D physics engine. ~~I got sidetracked by [MinkowskiSum](https://github.com/inzombiak/MinkowskiSum), but I hope to come back to this soon~~ 
 Back on track!
 
-## Controls
+## Controls:
   * WASD - move camera
   * Click and drag - rotate camera
   
@@ -14,6 +14,10 @@ Back on track!
 * Camera controls
 * Broadphase collision detection using AABBs
 * Narrowphase collision detection using GJK/EPA or SAT
+
+## Build Requirements:
+* glm
+* glew 2.0 or higher
 
 ## References:
  * Online resources
