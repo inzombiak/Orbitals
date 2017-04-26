@@ -56,8 +56,6 @@ void NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDef
 bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::Contact& contactData)
 {
 	glm::vec3 dir;
-	//glm::mat4 bodyATrans = bodyA->GetInterpolationTransform();
-	//glm::mat4 bodyBTrans = bodyB->GetInterpolationTransform();
 	glm::mat4 bodyBtoATrans = glm::inverse(bodyA->GetInterpolationTransform()) * bodyB->GetInterpolationTransform();
 	PhysicsDefs::SupportPoint nextSupportPoint;
 	m_faceList.clear();
@@ -67,8 +65,6 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 	//Init simplex
 	dir = glm::vec3(1, 0, 0);
 
-	//nextSupportPoint.originA = glm::vec3(bodyATrans * glm::vec4(bodyA->GetSupportPoint(dir), 1));
-	//nextSupportPoint.originB = glm::vec3(bodyBTrans * glm::vec4(bodyB->GetSupportPoint(-dir), 1));
 	nextSupportPoint.originA = bodyA->GetSupportPoint(dir);
 	nextSupportPoint.originB = glm::vec3(bodyBtoATrans * glm::vec4(bodyB->GetSupportPoint(-dir), 1));
 	nextSupportPoint.position = nextSupportPoint.originA - nextSupportPoint.originB;
@@ -84,8 +80,6 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 	{
 		nextSupportPoint.originA = bodyA->GetSupportPoint(dir);
 		nextSupportPoint.originB = glm::vec3(bodyBtoATrans * glm::vec4(bodyB->GetSupportPoint(-dir), 1));
-		//nextSupportPoint.originA = glm::vec3(bodyATrans * glm::vec4(bodyA->GetSupportPoint(dir), 1));
-		//nextSupportPoint.originB = glm::vec3(bodyBTrans * glm::vec4(bodyB->GetSupportPoint(-dir), 1));
 		nextSupportPoint.position = nextSupportPoint.originA - nextSupportPoint.originB;
 		nextSupportPoint.dir = dir;
 
@@ -119,8 +113,6 @@ PhysicsDefs::Contact NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, IRigi
 	//This should never happen, but I'm leaving it just in case
 	if (simplex.size() < 4)
 		assert(false);
-	glm::mat4 bodyATrans = bodyA->GetInterpolationTransform();
-	glm::mat4 bodyBTrans = bodyB->GetInterpolationTransform();
 	PhysicsDefs::Contact result;
 	PhysicsDefs::SupportPoint nextSupportPoint;
 	FaceListIterator closestFaceIt;
@@ -138,10 +130,8 @@ PhysicsDefs::Contact NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, IRigi
 		closestFaceIt = FindClosestFace();
 
 		//Get next point
-		nextSupportPoint.originA = glm::vec3(bodyATrans * glm::vec4(bodyA->GetSupportPoint(closestFaceIt->normal), 1.f));
-		nextSupportPoint.originB = glm::vec3(bodyBTrans * glm::vec4(bodyB->GetSupportPoint(-closestFaceIt->normal), 1.f));
-		//nextSupportPoint.originA = bodyA->GetSupportPoint(closestFaceIt->normal);
-		//nextSupportPoint.originB = glm::vec3(bodyBtoATrans * glm::vec4(bodyB->GetSupportPoint(-closestFaceIt->normal), 1));
+		nextSupportPoint.originA = bodyA->GetSupportPoint(closestFaceIt->normal);
+		nextSupportPoint.originB = glm::vec3(bodyBtoATrans * glm::vec4(bodyB->GetSupportPoint(-closestFaceIt->normal), 1));
 		nextSupportPoint.position = nextSupportPoint.originA - nextSupportPoint.originB;
 		nextSupportPoint.dir = closestFaceIt->normal;
 

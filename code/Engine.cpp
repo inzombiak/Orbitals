@@ -110,7 +110,7 @@ void Engine::Test()
 		std::vector<unsigned short> cleanIndices;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec3> cleanVert;
-		glm::vec3 position	= glm::vec3(6, 16, -5);
+		glm::vec3 position	= glm::vec3(3, 16, -5);
 		glm::vec3 rotation	= glm::vec3(0, 0, 0);
 		glm::vec3 scale		= glm::vec3(1, 1, 1);
 		double radius = 3;
@@ -159,7 +159,7 @@ void Engine::Test()
 		float boxWidth = 4, boxLength = 4, boxHeight = 4;
 		glm::vec3 position = glm::vec3(6, 0, -5);
 		glm::vec3 rotation = glm::vec3(0, 0, 0);
-		glm::vec3 scale = glm::vec3(1, 3, 1);
+		glm::vec3 scale = glm::vec3(1, 1, 1);
 		CreateBox(glm::vec3(0, 0, 0), boxWidth, boxHeight, boxLength, vertices, normals, cleanVert, cleanIndices);
 		IndexVBO(vertices, normals,
 			boxData->renderCompData->indicies, boxData->renderCompData->vertices, boxData->renderCompData->normals);

@@ -28,14 +28,14 @@ private:
 
 			CalculateNormal();
 
-			//Normal should point away from origin
-			if (glm::dot(normal, a.position) < 0)
-			{
-				std::swap(b, c);
-				CalculateNormal();
-				if (glm::dot(normal, a.position) < 0)
-					assert(0);
-			}
+			////Normal should point away from origin
+			//if (glm::dot(normal, a.position) < 0)
+			//{
+			//	std::swap(b, c);
+			//	CalculateNormal();
+			//	if (glm::dot(normal, a.position) < 0)
+			//		assert(0);
+			//}
 
 			CalculateDistanceToOrigin();
 		}
@@ -45,7 +45,7 @@ private:
 		void CalculateNormal()
 		{
 			glm::vec3 ab = b.position - a.position, ac = c.position - a.position;
-			normal = glm::normalize(glm::cross(ac, ab));
+			normal = glm::normalize(glm::cross(ab, ac));
 		}
 		void CalculateDistanceToOrigin()
 		{
