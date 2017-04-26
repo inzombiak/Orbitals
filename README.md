@@ -16,8 +16,7 @@ Back on track!
 * Narrowphase collision detection using GJK/EPA or SAT
 
 ## Build Requirements:
-* glm
-* glew 2.0 or higher
+GLM for math, GLEW 2.0 or higher for OpenGL
 
 ## References:
  * Online resources
