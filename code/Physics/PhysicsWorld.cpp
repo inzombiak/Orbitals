@@ -111,6 +111,14 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 		m_physDebugDrawer->DrawAABB(aabb.min, aabb.max, color);
 	}
 
+	if (m_narrowphaseError.size() > 1)
+	{
+		for (int i = 0; i < m_narrowphaseError.size(); ++i)
+		{
+			m_physDebugDrawer->DrawLine(m_narrowphaseError[i], m_narrowphaseError[(i + 1) % m_narrowphaseError.size()], glm::vec3(1.f, 1.f, 0.f));
+		}
+	}
+
 	ClearForces();
 }
 
@@ -167,37 +175,12 @@ void PhysicsWorld::PerformCollisionCheck()
 	if (collidingPairs.size() == 0)
 		return;
 
-	m_narrowphase->PerformCollisionResolution(collidingPairs);
+	m_narrowphase->PerformCollisionResolution(collidingPairs, NarrowphaseErrorCalback);
+}
 
-	/*PhysicsDefs::AABB aabb1, aabb2;
-	glm::vec3 normal, vel1, vel2, relativeVel, impulse, correction;
-	glm::mat4 invTransform1;
-	glm::mat4& interpolationTrans1 = glm::mat4(1);
-	glm::mat4& interpolationTrans2 = glm::mat4(1);
-
-	float depth, velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
-
-	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
-	{
-		aabb1 = m_nonStaticRigidBodies[i]->GetAABB();
-		interpolationTrans1 = m_nonStaticRigidBodies[i]->GetInterpolationTransform();
-		invTransform1 = glm::inverse(interpolationTrans1);
-		vel1 = m_nonStaticRigidBodies[i]->GetLinearVelocity();
-		mass1 = m_nonStaticRigidBodies[i]->GetMass();
-		invMass1 = m_nonStaticRigidBodies[i]->GetInverseMass();
-
-		for (unsigned int j = i + 1; j < m_nonStaticRigidBodies.size(); ++j)
-		{
-			aabb2 = m_nonStaticRigidBodies[j]->GetAABB();
-			interpolationTrans2 = m_nonStaticRigidBodies[j]->GetInterpolationTransform();
-			aabb2.min = glm::vec3(invTransform1 * interpolationTrans2 * glm::vec4(aabb2.min, 1.f);
-			aabb2.max = glm::vec3(invTransform1 * interpolationTrans2 * glm::vec4(aabb2.max, 1.f);
-			if (DoGJKAABB(aabbMin1, aabbMax1, aabbMin2, aabbMax2))
-			{
-				m_nonStaticRigidBodies[i]->SetLinearVelocity(glm::vec3(0,0,0));
-			}
-		}
-	}*/
+void PhysicsWorld::NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult)
+{
+	m_narrowphaseError = finalResult;
 }
 
 void PhysicsWorld::ClearForces()
@@ -227,3 +210,5 @@ void PhysicsWorld::SetPhysDebugDrawer(PhysDebugDrawer* pdd)
 {
 	m_physDebugDrawer = pdd;
 }
+
+std::vector<glm::vec3> PhysicsWorld::m_narrowphaseError;

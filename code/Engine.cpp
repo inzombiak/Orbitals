@@ -4,21 +4,19 @@
 #include "Engine.h"
 
 #include "Rendering/RenderingSystem.h"
-#include "Rendering/GLRenderHelpers.h"
 
 #include "Input/InputSystem.h"
 
 #include "Objects/ICelestialObject.h"
 #include "Objects/CelestialObjectSystem.h"
+#include "Objects\ObjectCreatorFunctions.h"
 
-#include "Physics/PhysicsDefs.h"
 #include "Physics/PhysicsSystem.h"
 
 #include "Events/EDCreateObject.h"
 #include "Events/EventSystem.h"
 
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
+#include "Utilities\Debug.h"
 
 Engine::Engine()
 {
@@ -60,6 +58,12 @@ void Engine::InitSim()
 {
 	m_engineState = Initializing;
 
+	Functor<EDCreateObject*, TYPELIST_1(ObjectCreators::IDefaultShapeData*)> SphereDataCreator(&ObjectCreators::CreateSphereEventData);
+	Functor<EDCreateObject*, TYPELIST_1(ObjectCreators::IDefaultShapeData*)> BoxDataCreator(&ObjectCreators::CreateBoxEventData);
+
+	ObjectCreators::DefaultObjectFactory::Instance().Register(ObjectCreators::DefaultShapeType::Box, BoxDataCreator);
+	ObjectCreators::DefaultObjectFactory::Instance().Register(ObjectCreators::DefaultShapeType::Sphere, SphereDataCreator);
+
 	RenderingSystem* sys = new RenderingSystem();
 	if (sys)
 		sys->Init();
@@ -98,95 +102,37 @@ void Engine::Reset()
 
 void Engine::Test()
 {
-	{
-		ObjectCreationData* ballData = new ObjectCreationData();
-		ballData->name = "ball";
-		ballData->renderCompData->color.push_back(glm::vec3(0.f, 0, 1.f));
-		ballData->renderCompData->drawType = GL_TRIANGLES;
+	ObjectCreators::SphereShapeData sphereData;
+	sphereData.radius = 3;
+	sphereData.position = glm::vec3(3, 16, -5);
+	sphereData.rotation = glm::vec3(0, 0, 0);
+	sphereData.scale = glm::vec3(1, 1, 1);
+	sphereData.color = glm::vec3(0.f, 0, 1.f);
 
+	ObjectCreators::BoxShapeData boxData;
+	boxData.extents = glm::vec3(20, 3, 20);
+	boxData.position = glm::vec3(6, 0, -5);
+	boxData.rotation = glm::vec3(0, 0, 0);
+	boxData.scale = glm::vec3(1, 1, 1);
+	boxData.color = glm::vec3(0.f, 1.f, 0.f);
 
-		std::vector<glm::vec3> vertices;
-		std::vector<unsigned short> faceIndices;
-		std::vector<unsigned short> cleanIndices;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec3> cleanVert;
-		glm::vec3 position	= glm::vec3(3, 16, -5);
-		glm::vec3 rotation	= glm::vec3(0, 0, 0);
-		glm::vec3 scale		= glm::vec3(1, 1, 1);
-		double radius = 3;
-		CreateSphere(glm::vec3(0, 0, 0), radius, vertices, normals, cleanVert, cleanIndices);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData)), false);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
+	sphereData.position = glm::vec3(3, 8, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
+	sphereData.position = glm::vec3(3, 32, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
+	sphereData.position = glm::vec3(3, 24, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
+	sphereData.position = glm::vec3(3, 74, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
+	sphereData.position = glm::vec3(3, 64, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
+	sphereData.position = glm::vec3(3, 44, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
+	sphereData.position = glm::vec3(3, 54, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
 
-		IndexVBO(vertices, normals,
-			ballData->renderCompData->indicies, ballData->renderCompData->vertices, ballData->renderCompData->normals);
-		ballData->renderCompData->verticesClean = cleanVert;
-		ballData->renderCompData->indiciesClean = cleanIndices;
-		
-		PhysicsDefs::SphereCreationData* scd = new PhysicsDefs::SphereCreationData();
-		scd->sphereRadius = radius;
-
-		scd->rbci.mass				= 1.f;
-		scd->rbci.linearDamping		= 0.f;
-		scd->rbci.angularDamping	= 0.f;
-		scd->rbci.friction			= 0.f;
-		scd->rbci.rollingFriction	= 0.f;
-		scd->rbci.resititution		= 0.5f;
-
-		glm::mat4 translationMat	= glm::translate(position);
-		glm::mat4 scalingMat		= glm::scale(scale);
-		glm::mat4 rotationMat		= glm::toMat4(glm::quat(rotation));
-		scd->rbci.transform			= translationMat * rotationMat * scalingMat;
-		scd->rbci.localInertia = glm::vec3(0, 0, 0); //TODO: INCORRECT, add calculator funciton;
-
-		ballData->rigidBodyData = scd;
-
-		//ballData->renderCompData->normals = normals;
-		auto eventData = new EDCreateObject(ballData);
-		EventSystem::GetInstance()->QueueEvent(eventData, false);
-	}
-
-	{
-		ObjectCreationData* boxData = new ObjectCreationData();
-		boxData->name = "box";
-		boxData->renderCompData->color.push_back(glm::vec3(0.f, 1.f, 0));
-		boxData->renderCompData->drawType = GL_TRIANGLES;
-
-
-		std::vector<glm::vec3> vertices;
-		std::vector<unsigned short> faceIndices;
-		std::vector<unsigned short> cleanIndices;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec3> cleanVert;
-		float boxWidth = 4, boxLength = 4, boxHeight = 4;
-		glm::vec3 position = glm::vec3(6, 0, -5);
-		glm::vec3 rotation = glm::vec3(0, 0, 0);
-		glm::vec3 scale = glm::vec3(1, 1, 1);
-		CreateBox(glm::vec3(0, 0, 0), boxWidth, boxHeight, boxLength, vertices, normals, cleanVert, cleanIndices);
-		IndexVBO(vertices, normals,
-			boxData->renderCompData->indicies, boxData->renderCompData->vertices, boxData->renderCompData->normals);
-
-		PhysicsDefs::BoxCreationData* bcd = new PhysicsDefs::BoxCreationData();
-		bcd->boxDimensions = glm::vec3(boxWidth, boxHeight, boxLength);
-
-		bcd->rbci.mass = 0.f;
-		bcd->rbci.linearDamping = 0.f;
-		bcd->rbci.angularDamping = 0.f;
-		bcd->rbci.friction = 0.f;
-		bcd->rbci.rollingFriction = 0.f;
-		bcd->rbci.resititution = 0.5f;
-
-		glm::mat4 translationMat = glm::translate(position);
-		glm::mat4 scalingMat = glm::scale(scale);
-		glm::mat4 rotationMat = glm::toMat4(glm::quat(rotation));
-		bcd->rbci.transform = translationMat * rotationMat * scalingMat;
-		bcd->rbci.localInertia = glm::vec3(0, 0, 0); //TODO: INCORRECT, add calculator funciton;
-
-		boxData->rigidBodyData = bcd;
-
-		boxData->renderCompData->verticesClean = cleanVert;
-		boxData->renderCompData->indiciesClean = cleanIndices;
-		auto eventData = new EDCreateObject(boxData);
-		EventSystem::GetInstance()->QueueEvent(eventData, false);
-	}
 }
 
 void Engine::Step(double dt)
@@ -201,6 +147,7 @@ void Engine::Step(double dt)
 		it->second->Update(dt);
 		it++;
 	}
+	ORB_DBG::Instance().DisplayFPS(dt);
 	Draw();
 }
 

@@ -76,6 +76,12 @@
     <Filter Include="Source Files\Physics\Narrowphase">
       <UniqueIdentifier>{2e0c372b-ffaf-4ebf-9279-f83405f1883b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Metaprogramming">
+      <UniqueIdentifier>{81c43b61-9ef6-44d6-a9e4-90aa06f48648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Metaprogramming\Common">
+      <UniqueIdentifier>{89f40111-e0db-4975-aa42-ac87df0c8885}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\Events\EDCreateObject.h">
@@ -183,6 +189,33 @@
     <ClInclude Include="..\..\code\Physics\NarrowphaseGJK_EPA.h">
       <Filter>Header Files\Physics\Narrowphase</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Metaprogramming\Common\Singleton.h">
+      <Filter>Header Files\Metaprogramming\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Metaprogramming\Common\TypeInfo.h">
+      <Filter>Header Files\Metaprogramming\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Metaprogramming\Common\Typelists.h">
+      <Filter>Header Files\Metaprogramming\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Metaprogramming\Common\TypeTraits.h">
+      <Filter>Header Files\Metaprogramming\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Metaprogramming\Factories.h">
+      <Filter>Header Files\Metaprogramming</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Metaprogramming\Functors.h">
+      <Filter>Header Files\Metaprogramming</Filter>
+    </ClInclude>
+    <ClInclude Include="IObjectFactory.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Objects\ObjectCreatorFunctions.h">
+      <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Utilities\Debug.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\VertexShader.glsl">
@@ -261,6 +294,12 @@
     </ClCompile>
     <ClCompile Include="..\..\code\Physics\NarrowphaseGJK_EPA.cpp">
       <Filter>Source Files\Physics\Narrowphase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Objects\ObjectCreatorFunctions.cpp">
+      <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Utilities\Debug.cpp">
+      <Filter>Source Files\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

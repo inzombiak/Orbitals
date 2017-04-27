@@ -1,7 +1,7 @@
 #include "NarrowphaseSAT.h"
 #include "glm\gtc\matrix_transform.hpp"
 
-void NarrowphaseSAT::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs)
+void NarrowphaseSAT::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 
 	PhysicsDefs::AABB aabb1, aabb2;
@@ -69,7 +69,7 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 		if (currentAxisDepth < depthOut)
 		{
 			depthOut = currentAxisDepth;
-			normalOut = glm::vec3(1.f, 0, 0);
+			normalOut = glm::vec3(-1.f, 0, 0);
 		}
 	}
 	else
@@ -81,7 +81,7 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 		if (currentAxisDepth < depthOut)
 		{
 			depthOut = currentAxisDepth;
-			normalOut = glm::vec3(0, 1.0f, 0);
+			normalOut = glm::vec3(0, -1.0f, 0);
 		}
 	}
 	else
@@ -93,7 +93,7 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 		if (currentAxisDepth < depthOut)
 		{
 			depthOut = currentAxisDepth;
-			normalOut = glm::vec3(0, 0, 1.f);
+			normalOut = glm::vec3(0, 0, -1.f);
 		}
 	}
 	else

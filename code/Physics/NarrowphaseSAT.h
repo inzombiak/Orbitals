@@ -6,7 +6,7 @@
 class NarrowphaseSAT : public INarrowphase
 {
 public:
-	void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs);
+	void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
 
 private:
 

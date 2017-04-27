@@ -3,12 +3,14 @@
 
 #include "IRigidBody.h"
 
+
+
 class INarrowphase
 {
 public:
 	virtual ~INarrowphase() {}
-
-	virtual void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs) = 0;
+	typedef void(*ErrorCallBack)(std::vector<glm::vec3>);
+	virtual void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0) = 0;
 };
 
 #endif

@@ -8,10 +8,10 @@
 class NarrowphaseGJK_EPA : public INarrowphase
 {
 public:
-	void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs);
+	void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
 
 private:
-	bool RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::Contact& contactData);
+	bool RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::Contact& contactData, ErrorCallBack ecb = 0);
 
 	//EPA
 	struct Face

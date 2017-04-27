@@ -1,0 +1,1 @@
+The code in this folder was written while I was reading the book"Modern C++ Design" by Andrei Alexandrescu.

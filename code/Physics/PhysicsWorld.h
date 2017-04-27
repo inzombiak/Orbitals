@@ -33,6 +33,11 @@ private:
 	
 	void SingleSimulationStep(float fixedTimeStep);
 
+	// Called to draw points narrowphase fails
+	static void NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult);
+	// Stores error
+	static std::vector<glm::vec3> m_narrowphaseError;
+
 	float m_fixedTimeStep = 0;
 	float m_localTime = 0;
 

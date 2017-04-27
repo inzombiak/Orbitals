@@ -2,7 +2,7 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtx\norm.hpp"
 
-void NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs)
+void NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 	PhysicsDefs::Contact contactData;
 	PhysicsDefs::AABB aabb1, aabb2;
@@ -16,7 +16,7 @@ void NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDef
 	{
 		interpolationTrans1 = collisionPairs[i].first->GetInterpolationTransform();
 		interpolationTrans2 = collisionPairs[i].second->GetInterpolationTransform();
-		if (RunGJK_EPA(collisionPairs[i].first, collisionPairs[i].second, contactData))
+		if (RunGJK_EPA(collisionPairs[i].first, collisionPairs[i].second, contactData), ecb)
 		{
 			vel1 = collisionPairs[i].first->GetLinearVelocity();
 			vel2 = collisionPairs[i].second->GetLinearVelocity();
@@ -49,12 +49,16 @@ void NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDef
 			//collisionPairs[i].first->SetLinearVelocity(glm::vec3(0, 0, 0));
 			//collisionPairs[i].second->SetLinearVelocity(glm::vec3(0, 0, 0));
 		}
+	
 	}
 	
 }
 
-bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::Contact& contactData)
+bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::Contact& contactData, ErrorCallBack ecb)
 {
+	static const int MAX_ITERATIONS = 60;
+	int iterations = 0;
+
 	glm::vec3 dir;
 	glm::mat4 bodyBtoATrans = glm::inverse(bodyA->GetInterpolationTransform()) * bodyB->GetInterpolationTransform();
 	PhysicsDefs::SupportPoint nextSupportPoint;
@@ -76,13 +80,13 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 
 	bool intersection = false;
 
-	while (true)
+	while (iterations < MAX_ITERATIONS)
 	{
 		nextSupportPoint.originA = bodyA->GetSupportPoint(dir);
 		nextSupportPoint.originB = glm::vec3(bodyBtoATrans * glm::vec4(bodyB->GetSupportPoint(-dir), 1));
 		nextSupportPoint.position = nextSupportPoint.originA - nextSupportPoint.originB;
 		nextSupportPoint.dir = dir;
-
+		iterations++;
 		//No intersection
 		if (glm::dot(nextSupportPoint.position, dir) < 0)
 		{
@@ -95,8 +99,46 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 			intersection = true;
 			break;
 		}
-
+		
 		dir = glm::normalize(dir);
+	}
+
+	if (iterations >= MAX_ITERATIONS && ecb != 0)
+	{
+		std::vector<glm::vec3> errorSmplex;
+		if (simplex.size() == 2)
+		{
+			errorSmplex.push_back(simplex[0].position);
+			errorSmplex.push_back(simplex[1].position);
+		}
+		else if (simplex.size() == 3)
+		{
+			errorSmplex.push_back(simplex[0].position);
+			errorSmplex.push_back(simplex[1].position);
+			errorSmplex.push_back(simplex[1].position);
+			errorSmplex.push_back(simplex[2].position);
+			errorSmplex.push_back(simplex[2].position);
+			errorSmplex.push_back(simplex[0].position);
+		}
+		else if (simplex.size() == 3)
+		{
+			errorSmplex.push_back(simplex[0].position);
+			errorSmplex.push_back(simplex[1].position);
+			errorSmplex.push_back(simplex[1].position);
+			errorSmplex.push_back(simplex[2].position);
+			errorSmplex.push_back(simplex[2].position);
+			errorSmplex.push_back(simplex[0].position);
+
+			errorSmplex.push_back(simplex[1].position);
+			errorSmplex.push_back(simplex[3].position);
+			errorSmplex.push_back(simplex[3].position);
+			errorSmplex.push_back(simplex[0].position);
+
+			errorSmplex.push_back(simplex[2].position);
+			errorSmplex.push_back(simplex[3].position);
+		}
+
+		ecb(errorSmplex);
 	}
 
 	//Don't run epa

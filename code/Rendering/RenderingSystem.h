@@ -70,7 +70,7 @@ private:
 	float m_speed = .04f;
 	float m_mouseSpeed = 0.005f;
 	bool m_trackingMouse = false;
-	float m_xRotate = 2.515, m_yRotate = -0.475;
+	float m_xRotate = 2.515f, m_yRotate = -0.475f;
 	glm::vec2 m_prevMouse;
 	static const std::string SYSTEM_NAME;
 };

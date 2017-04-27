@@ -120,7 +120,7 @@ void RenderingSystem::UpdateCameraRotation()
 	
 	m_xRotate += xRotate;
 	m_yRotate += yRotate;
-	printf("X: %lf, Y: %lf \n", xRotate, yRotate);
+
 	m_direction = glm::vec3(
 		cos(m_yRotate) * sin(m_xRotate),
 		sin(m_yRotate),
