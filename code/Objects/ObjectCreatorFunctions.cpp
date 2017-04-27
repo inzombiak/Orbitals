@@ -37,8 +37,8 @@ EDCreateObject* ObjectCreators::CreateSphereEventData(IDefaultShapeData* data)
 	scd->rbci.mass = 1.f;
 	scd->rbci.linearDamping = 0.f;
 	scd->rbci.angularDamping = 0.f;
-	scd->rbci.friction = 0.f;
-	scd->rbci.rollingFriction = 0.f;
+	scd->rbci.friction = 0.3f;
+	scd->rbci.rollingFriction = 0.3f;
 	scd->rbci.resititution = 0.5f;
 
 	glm::mat4 translationMat = glm::translate(data->position);
@@ -83,8 +83,8 @@ EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 	bcd->rbci.mass = 0.f;
 	bcd->rbci.linearDamping = 0.f;
 	bcd->rbci.angularDamping = 0.f;
-	bcd->rbci.friction = 0.f;
-	bcd->rbci.rollingFriction = 0.f;
+	bcd->rbci.friction = 0.3f;
+	bcd->rbci.rollingFriction = 0.3f;
 	bcd->rbci.resititution = 0.5f;
 
 	glm::mat4 translationMat = glm::translate(data->position);

@@ -6,11 +6,11 @@
 class NarrowphaseSAT : public INarrowphase
 {
 public:
-	void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
+	std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
 
 private:
 
-	bool SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, glm::vec3& normalOut, float& depthOut);
+	bool SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo);
 };
 
 #endif

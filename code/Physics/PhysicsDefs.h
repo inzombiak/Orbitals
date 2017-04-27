@@ -42,7 +42,7 @@ namespace PhysicsDefs
 		ICollisionShape* collisionShape = 0;
 	};
 
-	struct Contact
+	struct ContactInfo
 	{
 		//Contact points in global space
 		glm::vec3 worldPointA;

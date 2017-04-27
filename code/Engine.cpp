@@ -132,7 +132,8 @@ void Engine::Test()
 	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
 	sphereData.position = glm::vec3(3, 54, -5);
 	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
-
+	boxData.position = glm::vec3(3, 94, -5);
+	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData)), false);
 }
 
 void Engine::Step(double dt)
@@ -147,6 +148,7 @@ void Engine::Step(double dt)
 		it->second->Update(dt);
 		it++;
 	}
+
 	ORB_DBG::Instance().DisplayFPS(dt);
 	Draw();
 }

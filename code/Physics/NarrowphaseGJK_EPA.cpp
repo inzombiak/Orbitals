@@ -2,59 +2,24 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtx\norm.hpp"
 
-void NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
-{
-	PhysicsDefs::Contact contactData;
-	PhysicsDefs::AABB aabb1, aabb2;
-	glm::vec3 vel1, vel2, relativeVel, impulse, correction;
-	glm::mat4 invTransform1;
-	glm::mat4& interpolationTrans1 = glm::mat4(1);
-	glm::mat4& interpolationTrans2 = glm::mat4(1);
-	float velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
+#include "../Utilities/Debug.h"
 
+std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
+{
+	PhysicsDefs::ContactInfo contactData;
+	PhysicsDefs::AABB aabb1, aabb2;
+	
+	std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> result;
 	for (int i = 0; i < collisionPairs.size(); ++i)
 	{
-		interpolationTrans1 = collisionPairs[i].first->GetInterpolationTransform();
-		interpolationTrans2 = collisionPairs[i].second->GetInterpolationTransform();
 		if (RunGJK_EPA(collisionPairs[i].first, collisionPairs[i].second, contactData), ecb)
-		{
-			vel1 = collisionPairs[i].first->GetLinearVelocity();
-			vel2 = collisionPairs[i].second->GetLinearVelocity();
-			relativeVel = vel2 - vel1;
-			velAlongColNormal = glm::dot(relativeVel, contactData.normal);
-
-			if (velAlongColNormal < 0)
-				continue;
-
-			minConst = std::min(collisionPairs[i].first->GetRestitution(), collisionPairs[i].second->GetRestitution());
-			mass1 = collisionPairs[i].first->GetMass();
-			invMass1 = collisionPairs[i].first->GetInverseMass();
-			mass2 = collisionPairs[i].second->GetMass();
-			invMass2 = collisionPairs[i].second->GetInverseMass();
-			totalSytemMass = mass1 + mass2;
-
-			impulse = contactData.normal * (-(1 + minConst) * velAlongColNormal);
-
-			collisionPairs[i].first->ApplyImpulse(-impulse * mass1 / totalSytemMass);
-			collisionPairs[i].second->ApplyImpulse(impulse * mass2 / totalSytemMass);
-
-			//Pushout to avoid sinking
-			const float PERCENT = 1;
-			const float THRESHOLD = 0.001;
-			correction = std::max(contactData.depth - THRESHOLD, 0.0f) / (invMass1 + invMass2) * PERCENT * contactData.normal;
-			interpolationTrans1 = glm::translate(interpolationTrans1, invMass1 * correction);
-			interpolationTrans2 = glm::translate(interpolationTrans2, -invMass2 * correction);
-			collisionPairs[i].first->UpdateInterpolationTransform(interpolationTrans1);
-			collisionPairs[i].second->UpdateInterpolationTransform(interpolationTrans2);
-			//collisionPairs[i].first->SetLinearVelocity(glm::vec3(0, 0, 0));
-			//collisionPairs[i].second->SetLinearVelocity(glm::vec3(0, 0, 0));
-		}
-	
+			result.push_back(std::make_pair(collisionPairs[i], contactData));	
 	}
 	
+	return result;
 }
 
-bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::Contact& contactData, ErrorCallBack ecb)
+bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::ContactInfo& contactData, ErrorCallBack ecb)
 {
 	static const int MAX_ITERATIONS = 60;
 	int iterations = 0;
@@ -147,28 +112,33 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 
 	contactData = GetContactInfo(bodyA, bodyB, simplex);
 
+	//
+
 	return true;
 }
 
-PhysicsDefs::Contact NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, IRigidBody* bodyB, std::vector<PhysicsDefs::SupportPoint>& simplex)
+PhysicsDefs::ContactInfo NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, IRigidBody* bodyB, std::vector<PhysicsDefs::SupportPoint>& simplex)
 {
 	//This should never happen, but I'm leaving it just in case
 	if (simplex.size() < 4)
 		assert(false);
-	PhysicsDefs::Contact result;
+	PhysicsDefs::ContactInfo result;
 	PhysicsDefs::SupportPoint nextSupportPoint;
 	FaceListIterator closestFaceIt;
 	glm::mat4 bodyBtoATrans = glm::inverse(bodyA->GetInterpolationTransform()) * bodyB->GetInterpolationTransform();
+	
 	//Construct initial faces
 	m_faceList.emplace_back(Face(simplex[3], simplex[1], simplex[2]));
 	m_faceList.emplace_back(Face(simplex[3], simplex[2], simplex[0]));
 	m_faceList.emplace_back(Face(simplex[3], simplex[0], simplex[1]));
 	m_faceList.emplace_back(Face(simplex[2], simplex[1], simplex[0]));
 
-	//float lastDist = FLT_MAX;;
-
-	while (true)
+	int iterationCount = 0;
+	static const int MAX_ITERATIONS = 30;
+	Face f = *m_faceList.begin();
+	while (iterationCount < MAX_ITERATIONS)
 	{
+		iterationCount++;
 		closestFaceIt = FindClosestFace();
 
 		//Get next point
@@ -186,6 +156,7 @@ PhysicsDefs::Contact NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, IRigi
 		{
 			result.normal = -closestFaceIt->normal;
 			result.depth = closestFaceIt->distance;
+			f = *closestFaceIt;
 			break;
 		}
 
@@ -211,10 +182,10 @@ PhysicsDefs::Contact NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, IRigi
 			++edgeIt;
 		}
 		m_edgeList.clear();
+
 	}
 
-	//Calculate barycentric coordinates
-	Face f = *closestFaceIt;
+	//ORB_DBG::Instance().PrintMessage("EPA iteration count: " + std::to_string(iterationCount));
 
 	//Project origin onto normal
 	glm::vec3 originProjNormal = glm::dot(-f.a.position, f.normal) * f.normal;// / glm::length2(f.normal);
@@ -232,8 +203,13 @@ PhysicsDefs::Contact NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, IRigi
 	float w = (d00 * d21 - d01 * d20) / denom;
 	float u = 1.0f - v - w;
 
-	result.worldPointA = u * f.a.originA + v * f.b.originA + w* f.c.originA;
-	result.worldPointB = u * f.a.originB + v * f.b.originB + w* f.c.originB;
+	result.localPointA = u * f.a.originA + v * f.b.originA + w* f.c.originA;
+	result.localPointB = glm::vec3(glm::inverse(bodyBtoATrans) * glm::vec4((u * f.a.originB + v * f.b.originB + w* f.c.originB), 1.f));
+	result.worldPointA = glm::vec3(bodyA->GetInterpolationTransform() * glm::vec4(result.localPointA, 1.f));
+	result.worldPointB = glm::vec3(bodyB->GetInterpolationTransform() * glm::vec4(result.localPointB, 1.f));
+
+	// From "Game Physics", pg. 531
+ 
 	float test = glm::length(result.worldPointB - result.worldPointA);
 	return result;
 }

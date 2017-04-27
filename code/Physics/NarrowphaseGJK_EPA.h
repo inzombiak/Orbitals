@@ -8,10 +8,10 @@
 class NarrowphaseGJK_EPA : public INarrowphase
 {
 public:
-	void PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
+	std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
 
 private:
-	bool RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::Contact& contactData, ErrorCallBack ecb = 0);
+	bool RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::ContactInfo& contactData, ErrorCallBack ecb = 0);
 
 	//EPA
 	struct Face
@@ -68,7 +68,7 @@ private:
 	typedef std::list<Edge>::iterator EdgeListIterator;
 	std::list<Edge> m_edgeList;
 
-	PhysicsDefs::Contact GetContactInfo(IRigidBody* bodyA, IRigidBody* bodyB, std::vector<PhysicsDefs::SupportPoint>& simplex);
+	PhysicsDefs::ContactInfo GetContactInfo(IRigidBody* bodyA, IRigidBody* bodyB, std::vector<PhysicsDefs::SupportPoint>& simplex);
 	FaceListIterator FindClosestFace();
 	void AddFaceEdges(FaceListIterator face);
 	void InsertEdge(const Edge& edge);

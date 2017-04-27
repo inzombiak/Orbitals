@@ -20,7 +20,7 @@ PhysicsSystem::~PhysicsSystem()
 bool PhysicsSystem::Init()
 {
 	m_broadphase = new BroadphaseAABB();
-	m_narrowphase = new NarrowphaseGJK_EPA();
+	m_narrowphase = new NarrowphaseSAT();
 
 	if (m_physWorld)
 	{

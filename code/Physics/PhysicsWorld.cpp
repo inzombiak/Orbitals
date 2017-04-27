@@ -175,7 +175,63 @@ void PhysicsWorld::PerformCollisionCheck()
 	if (collidingPairs.size() == 0)
 		return;
 
-	m_narrowphase->PerformCollisionResolution(collidingPairs, NarrowphaseErrorCalback);
+	auto narrowPhaseResult = m_narrowphase->PerformCollisionResolution(collidingPairs, NarrowphaseErrorCalback);
+
+	//TODO: THIS RESULT MIGHT NOT HAVE THE RIGHT LOCAL AND WORLD POINTS IN A AND B, TEST IT
+
+	if (narrowPhaseResult.size() < 1)
+		return;
+
+	float xDepth, yDepth, zDepth;
+	glm::vec3 vel1, vel2, relativeVel, impulse, correction;
+	glm::mat4 invTransform1;
+	glm::mat4 interpolationTrans1;
+	glm::mat4 interpolationTrans2;
+
+	float velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
+	for (int i = 0; i < narrowPhaseResult.size(); ++i)
+	{
+		interpolationTrans1 = narrowPhaseResult[i].first.first->GetInterpolationTransform();
+		interpolationTrans2 = narrowPhaseResult[i].first.second->GetInterpolationTransform();
+		vel1 = narrowPhaseResult[i].first.first->GetLinearVelocity();
+		vel2 = narrowPhaseResult[i].first.second->GetLinearVelocity();
+
+		relativeVel = vel2 - vel1;
+		narrowPhaseResult[i].second.tangent1 = glm::normalize(relativeVel);
+		narrowPhaseResult[i].second.tangent2 = glm::cross(narrowPhaseResult[i].second.tangent1, narrowPhaseResult[i].second.normal);
+		velAlongColNormal = glm::dot(relativeVel, narrowPhaseResult[i].second.normal);
+
+		if (velAlongColNormal < 0)
+			continue;
+
+		minConst = std::min(narrowPhaseResult[i].first.first->GetRestitution(), narrowPhaseResult[i].first.second->GetRestitution());
+		mass1 = narrowPhaseResult[i].first.first->GetMass();
+		invMass1 = narrowPhaseResult[i].first.first->GetInverseMass();
+		mass2 = narrowPhaseResult[i].first.second->GetMass();
+		invMass2 = narrowPhaseResult[i].first.second->GetInverseMass();
+		totalSytemMass = mass1 + mass2;
+
+		impulse = narrowPhaseResult[i].second.normal * (-(1 + minConst) * velAlongColNormal);
+
+		narrowPhaseResult[i].first.first->ApplyImpulse(-impulse * mass1 / totalSytemMass);
+		narrowPhaseResult[i].first.second->ApplyImpulse(impulse * mass2 / totalSytemMass);
+
+		//Pushout to avoid sinking
+		const float PERCENT = 1;
+		const float THRESHOLD = 0.001;
+		correction = std::max(narrowPhaseResult[i].second.depth - THRESHOLD, 0.0f) / (invMass1 + invMass2) * PERCENT * narrowPhaseResult[i].second.normal;
+		interpolationTrans1 = glm::translate(interpolationTrans1, invMass1 * correction);
+		interpolationTrans2 = glm::translate(interpolationTrans2, -invMass2 * correction);
+		narrowPhaseResult[i].first.first->UpdateInterpolationTransform(interpolationTrans1);
+		narrowPhaseResult[i].first.second->UpdateInterpolationTransform(interpolationTrans2);
+
+		//Apply friction
+		float frict1 = narrowPhaseResult[i].first.first->GetFriction();
+		float frict2 = narrowPhaseResult[i].first.second->GetFriction();
+
+		//collisionPairs[i].first->SetLinearVelocity(glm::vec3(0, 0, 0));
+		//collisionPairs[i].second->SetLinearVelocity(glm::vec3(0, 0, 0));
+	}
 }
 
 void PhysicsWorld::NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult)
