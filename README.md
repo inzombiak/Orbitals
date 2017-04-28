@@ -24,6 +24,7 @@ GLM for math, GLEW 2.0 or higher for OpenGL
    * Jake Tyndall, 3D Convex Collision Detection - [hacktank.net](http://hacktank.net/blog/?p=93)
    * Randy Gaul, Modelling and Solving Physical Constraints - [tutsplus.com](https://gamedevelopment.tutsplus.com/tutorials/modelling-and-solving-physical-constraints--gamedev-12578) (use [QuickLaTeX](http://quicklatex.com/) if equations don't show)
    * Nilson Souto, Constrained Rigid Body Simulation - [toptal.com](https://www.toptal.com/game/video-game-physics-part-iii-constrained-rigid-body-simulation)
+   * Erin Catto, Numerous publications - [box2d.org](http://box2d.org/downloads/)
  * Books
    * Ericson, Christer. *Real-time collision detection*. CRC Press, 2004.
    * Eberly, David H. *Game physics*. CRC Press, 2010.
