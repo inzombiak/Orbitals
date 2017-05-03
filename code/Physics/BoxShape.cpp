@@ -6,6 +6,18 @@ BoxShape::BoxShape(const glm::vec3& extents)
 	m_type = Box;
 }
 
+glm::mat3 BoxShape::GetTensor(float mass)
+{
+	//TODO: FIX FOR SCALING
+	glm::mat3 result(0.f);
+
+	result[0][0] = mass / 12 * (m_extents.y * m_extents.y + m_extents.z * m_extents.z);
+	result[1][1] = mass / 12 * (m_extents.x * m_extents.x + m_extents.z * m_extents.z);
+	result[2][2] = mass / 12 * (m_extents.y * m_extents.y + m_extents.x * m_extents.x);
+
+	return result;
+}
+
 PhysicsDefs::AABB BoxShape::GetAABB()
 {
 	//glm::vec3 origin(transform[3]);

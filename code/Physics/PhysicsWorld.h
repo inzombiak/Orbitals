@@ -10,11 +10,12 @@
 class PhysDebugDrawer;
 class IBroadphase;
 class INarrowphase;
+class IConstraintSolver;
 class PhysicsWorld
 {
 public:
 
-	PhysicsWorld(IBroadphase* broadphase, INarrowphase* narrowphase);
+	PhysicsWorld(IBroadphase* broadphase, INarrowphase* narrowphase, IConstraintSolver* constraintSolver);
 
 	void AddRigidBody(IRigidBody* body);
 	void RemoveRigidBody(IRigidBody* body);
@@ -27,7 +28,7 @@ private:
 	void ApplyGravity();
 	void PredictMotion(float timeStep);
 	void PerformMovement(float timeStep);
-	void PerformCollisionCheck();
+	void PerformCollisionCheck(float timeStep);
 
 	void ClearForces();
 	
@@ -49,6 +50,7 @@ private:
 	PhysDebugDrawer* m_physDebugDrawer = 0;
 	IBroadphase* m_broadphase = 0;
 	INarrowphase* m_narrowphase = 0;
+	IConstraintSolver* m_constraintSolver;
 };
 
 #endif

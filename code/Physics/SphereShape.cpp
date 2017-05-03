@@ -6,6 +6,14 @@ SphereShape::SphereShape(float radius)
 	m_radius = radius;
 }
 
+glm::mat3 SphereShape::GetTensor(float mass)
+{
+	glm::mat3 result((2.f / 5.f) * mass * m_radius * m_radius);
+
+	return result;
+}
+
+
 PhysicsDefs::AABB SphereShape::GetAABB()
 {
 	//glm::vec3 origin(transform[3]);

@@ -5,9 +5,13 @@
 #include "PhysicsWorld.h"
 #include "BoxShape.h"
 #include "SphereShape.h"
+
 #include "NarrowphaseSAT.h"
 #include "NarrowphaseGJK_EPA.h"
+
 #include "BroadphaseAABB.h"
+
+#include "ConstraintSolverSeqImpulse.h"
 
 //TODO: Collision Shape reuse
 //TODO: Collision Shape factory
@@ -21,15 +25,15 @@ bool PhysicsSystem::Init()
 {
 	m_broadphase = new BroadphaseAABB();
 	m_narrowphase = new NarrowphaseSAT();
-
+	m_constraintSolver = new ConstraintSolverSeqImpulse();;
 	if (m_physWorld)
 	{
 		ClearPhysWorld();
 		delete m_physWorld;
-		m_physWorld = new PhysicsWorld(m_broadphase, m_narrowphase);
+		m_physWorld = new PhysicsWorld(m_broadphase, m_narrowphase, m_constraintSolver);
 	}
 	else
-		m_physWorld = new PhysicsWorld(m_broadphase, m_narrowphase);
+		m_physWorld = new PhysicsWorld(m_broadphase, m_narrowphase, m_constraintSolver);
 
 	m_physWorld->SetGravity(glm::vec3(0, -9.8f, 0));
 	EventSystem::GetInstance()->AddEventListener(EventDefs::CREATE_PHYSICS_COMPONENT, std::bind(&PhysicsSystem::CreatePhysicsComponent, this, std::placeholders::_1));
@@ -57,6 +61,8 @@ void PhysicsSystem::Clear()
 		delete m_broadphase;
 	if (m_narrowphase)
 		delete m_narrowphase;
+	if (m_constraintSolver)
+		delete m_constraintSolver;
 };
 
 void PhysicsSystem::ClearPhysWorld()

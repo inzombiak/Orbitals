@@ -58,6 +58,10 @@ namespace PhysicsDefs
 
 		//Depth of penetration
 		float depth;
+
+		//TODO: Maybe move it out
+		float prevNormalImp = 0.f;
+		float prevTangImp = 0.f;
 	};
 
 	struct SupportPoint
@@ -90,40 +94,9 @@ namespace PhysicsDefs
 	};
 
 	typedef std::pair<IRigidBody*, IRigidBody*> CollisionPair;
-
-	/*inline SupportPoint GetSupportPoint(const std::vector<glm::vec3>& verticesA, const std::vector<glm::vec3>& verticesB, const glm::vec3& dir)
-	{
-		SupportPoint result;
-		result.dir = dir;
-
-		float max = -FLT_MAX;
-		float dot;
-
-		for (int i = 0; i < verticesA.size(); ++i)
-		{
-			dot = glm::dot(dir, verticesA[i]);
-			if (dot > max)
-			{
-				max = dot;
-				result.originA = verticesA[i];
-			}
-		}
-
-		max = -FLT_MAX;
-		for (int i = 0; i < verticesB.size(); ++i)
-		{
-			dot = glm::dot(-dir, verticesB[i]);
-			if (dot > max)
-			{
-				max = dot;
-				result.originB = verticesB[i];
-			}
-		}
-
-		result.position = result.originA - result.originB;
-
-		return result;
-	}*/
+	typedef std::pair<CollisionPair, ContactInfo> CollPairContactInfo;
+	
+	
 
 	class ICreationData
 	{

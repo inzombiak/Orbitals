@@ -33,8 +33,10 @@
     <ClInclude Include="..\..\code\Objects\ObjectCreatorFunctions.h" />
     <ClInclude Include="..\..\code\Physics\BoxShape.h" />
     <ClInclude Include="..\..\code\Physics\BroadphaseAABB.h" />
+    <ClInclude Include="..\..\code\Physics\ConstraintSolverSeqImpulse.h" />
     <ClInclude Include="..\..\code\Physics\IBroadphase.h" />
     <ClInclude Include="..\..\code\Physics\ICollisionShape.h" />
+    <ClInclude Include="..\..\code\Physics\IConstraintSolver.h" />
     <ClInclude Include="..\..\code\Physics\INarrowphase.h" />
     <ClInclude Include="..\..\code\Physics\IRigidBody.h" />
     <ClInclude Include="..\..\code\Physics\NarrowphaseGJK_EPA.h" />
@@ -72,6 +74,7 @@
     <ClCompile Include="..\..\code\Objects\ObjectCreatorFunctions.cpp" />
     <ClCompile Include="..\..\code\Physics\BoxShape.cpp" />
     <ClCompile Include="..\..\code\Physics\BroadphaseAABB.cpp" />
+    <ClCompile Include="..\..\code\Physics\ConstriantSolverSeqImpulse.cpp" />
     <ClCompile Include="..\..\code\Physics\ICollisionShape.cpp" />
     <ClCompile Include="..\..\code\Physics\IRigidBody.cpp" />
     <ClCompile Include="..\..\code\Physics\NarrowphaseGJK_EPA.cpp" />

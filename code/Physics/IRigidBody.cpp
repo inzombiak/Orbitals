@@ -11,7 +11,7 @@ IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 		m_invMass		= 1 / m_mass;
 	m_linearDamping		= rbci.linearDamping;
 	m_angularDamping	= rbci.angularDamping;
-	m_friction			= rbci.friction;
+	m_friction			= rbci.friction - 0.9;
 	m_rollingFriction	= rbci.rollingFriction;
 	m_restitution		= rbci.resititution;
 
@@ -22,6 +22,10 @@ IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 	m_aabb = m_collisionShape->GetAABB();
 	m_aabb.body = this;
 	m_aabb.worldTransfrom = m_transform;
+	if (m_mass == 0)
+		m_invInertiaTensor = glm::mat3(0.f);
+	else
+		m_invInertiaTensor = glm::inverse(m_collisionShape->GetTensor(m_mass));
 }
 
 void IRigidBody::ClearForces()
@@ -34,7 +38,7 @@ void IRigidBody::ApplyGravity()
 }
 void IRigidBody::ApplyImpulse(const glm::vec3& impulse)
 {
-	m_linearVelocity += impulse * m_invMass;
+	SetLinearVelocity(m_linearVelocity + impulse * m_invMass);
 }
 
 void IRigidBody::ApplyForce(const glm::vec3& force)
@@ -82,6 +86,11 @@ glm::vec3 IRigidBody::GetAngularVelocity() const
 {
 	return m_angularVelocity;
 }
+
+void IRigidBody::SetAngularVelocity(const glm::vec3& newAngVel)
+{
+	m_angularVelocity = newAngVel;
+}
 float IRigidBody::GetMass() const
 {
 	return m_mass;
@@ -89,6 +98,10 @@ float IRigidBody::GetMass() const
 float IRigidBody::GetInverseMass() const
 {
 	return m_invMass;
+}
+glm::mat3  IRigidBody::GetInverseInertiaTensor() const
+{
+	return m_invInertiaTensor;
 }
 void IRigidBody::UpdateTransform(const glm::mat4& predictedTrans)
 {

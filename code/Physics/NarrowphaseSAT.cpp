@@ -1,7 +1,7 @@
 #include "NarrowphaseSAT.h"
 #include "glm\gtc\matrix_transform.hpp"
 
-std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> NarrowphaseSAT::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
+std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 
 	PhysicsDefs::AABB aabb1, aabb2;
@@ -10,7 +10,7 @@ std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> Nar
 	glm::mat4& interpolationTrans1 = glm::mat4(1);
 	glm::mat4& interpolationTrans2 = glm::mat4(1);
 	glm::mat4 bodyBtoA; 
-	std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> result;
+	std::vector<PhysicsDefs::CollPairContactInfo> result;
 	PhysicsDefs::ContactInfo contactInfo;
 
 	float depth, velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
@@ -43,6 +43,7 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 	contactInfo.depth = FLT_MAX;
 	float currentAxisDepth = 0;
 	bool test = true;
+	int sign;
 
 	if (aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x)
 	{
@@ -51,6 +52,9 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 		{
 			contactInfo.depth = currentAxisDepth;
 			contactInfo.normal = glm::vec3(1.f, 0, 0);
+			sign = (aabb2.min.x - aabb1.min.x < 0) ? -1 : 1;
+			contactInfo.normal *= sign;
+
 			contactInfo.localPointA = aabb1.max.x - contactInfo.normal * contactInfo.depth;
 		}
 	}
@@ -64,6 +68,9 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 		{
 			contactInfo.depth = currentAxisDepth;
 			contactInfo.normal = glm::vec3(0, 1.0f, 0);
+			sign = (aabb2.min.y - aabb1.min.y < 0) ? -1 : 1;
+			contactInfo.normal *= sign;
+
 			contactInfo.localPointA = aabb1.max.y - contactInfo.normal * contactInfo.depth;
 		}
 	}
@@ -77,6 +84,9 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 		{
 			contactInfo.depth = currentAxisDepth;
 			contactInfo.normal = glm::vec3(0, 0, 1.f);
+			sign = (aabb2.min.z - aabb1.min.z < 0) ? -1 : 1;
+			contactInfo.normal *= sign;
+
 			contactInfo.localPointA = aabb1.max.z - contactInfo.normal * contactInfo.depth;
 		}
 	}

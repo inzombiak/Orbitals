@@ -10,6 +10,7 @@ class PhysDebugDrawer;
 class PhysicsWorld;
 class INarrowphase;
 class IBroadphase;
+class IConstraintSolver;
 class PhysicsSystem : public ISystem
 {
 
@@ -47,6 +48,7 @@ private:
 	std::vector<IRigidBody*>		m_rigidBodies;
 	IBroadphase*					m_broadphase = 0;
 	INarrowphase*					m_narrowphase = 0;
+	IConstraintSolver*				m_constraintSolver = 0;
 	PhysicsWorld*					m_physWorld = 0;
 
 

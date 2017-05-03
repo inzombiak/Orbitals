@@ -3,13 +3,12 @@
 #include "glm\gtx\norm.hpp"
 
 #include "../Utilities/Debug.h"
-
-std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
+std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseGJK_EPA::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 	PhysicsDefs::ContactInfo contactData;
 	PhysicsDefs::AABB aabb1, aabb2;
 	
-	std::vector<std::pair<PhysicsDefs::CollisionPair, PhysicsDefs::ContactInfo>> result;
+	std::vector<PhysicsDefs::CollPairContactInfo> result;
 	for (int i = 0; i < collisionPairs.size(); ++i)
 	{
 		if (RunGJK_EPA(collisionPairs[i].first, collisionPairs[i].second, contactData), ecb)
@@ -154,7 +153,7 @@ PhysicsDefs::ContactInfo NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, I
 		auto dist = std::abs(glm::dot(closestFaceIt->normal, nextSupportPoint.position)) - closestFaceIt->distance;
 		if (dist  < 0.001f)
 		{
-			result.normal = -closestFaceIt->normal;
+			result.normal = closestFaceIt->normal;
 			result.depth = closestFaceIt->distance;
 			f = *closestFaceIt;
 			break;

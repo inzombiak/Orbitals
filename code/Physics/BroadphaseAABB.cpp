@@ -10,7 +10,7 @@ const std::vector<PhysicsDefs::CollisionPair>& BroadphaseAABB::GetCollisionPairs
 	for (int i = 0; i < m_aabbs.size(); ++i)
 	{
 		aabb1Inverse = glm::inverse(m_aabbs[i]->worldTransfrom);
-		for (int j = 0; j < m_aabbs.size(); ++j)
+		for (int j = i + 1; j < m_aabbs.size(); ++j)
 		{
 			if (i == j)
 				continue;

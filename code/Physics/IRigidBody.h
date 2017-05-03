@@ -25,8 +25,10 @@ public:
 	glm::vec3 GetLinearVelocity() const;
 	void SetLinearVelocity(const glm::vec3& newLinVel);
 	glm::vec3 GetAngularVelocity() const;
+	void SetAngularVelocity(const glm::vec3& newAngVel);
 	float GetMass() const;
 	float GetInverseMass() const;
+	glm::mat3 GetInverseInertiaTensor() const;
 
 	void UpdateTransform(const glm::mat4& predictedTrans);
 	const glm::mat4& GetTransform() const;
@@ -52,6 +54,7 @@ private:
 
 	glm::mat4 m_transform;
 	glm::mat4 m_interpolationTransform;
+	glm::mat3 m_invInertiaTensor;
 	glm::vec3 m_localInertia;
 
 	float m_linearDamping;

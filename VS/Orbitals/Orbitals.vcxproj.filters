@@ -216,6 +216,12 @@
     <ClInclude Include="..\..\code\Utilities\Debug.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Physics\IConstraintSolver.h">
+      <Filter>Header Files\Physics\Solvers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Physics\ConstraintSolverSeqImpulse.h">
+      <Filter>Header Files\Physics\Solvers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\VertexShader.glsl">
@@ -265,9 +271,6 @@
     <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp">
-      <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\code\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -299,6 +302,12 @@
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\Utilities\Debug.cpp">
+      <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\ConstriantSolverSeqImpulse.cpp">
+      <Filter>Source Files\Physics\Solvers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp">
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
