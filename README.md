@@ -25,7 +25,7 @@ GLM for math, GLEW 2.0 or higher for OpenGL
    * Randy Gaul, Modelling and Solving Physical Constraints - [tutsplus.com](https://gamedevelopment.tutsplus.com/tutorials/modelling-and-solving-physical-constraints--gamedev-12578) (use [QuickLaTeX](http://quicklatex.com/) if equations don't show)
    * Nilson Souto, Constrained Rigid Body Simulation - [toptal.com](https://www.toptal.com/game/video-game-physics-part-iii-constrained-rigid-body-simulation)
    * Erin Catto, Numerous publications - [box2d.org](http://box2d.org/downloads/)
-   * Dirk Gregorius, The Seperating Axis Test Between Convex Polyhedra - [link] (http://twvideo01.ubm-us.net/o1/vault/gdc2013/slides/822403Gregorius_Dirk_TheSeparatingAxisTest.pdf)
+   * Dirk Gregorius, The Seperating Axis Test Between Convex Polyhedra - [link](http://twvideo01.ubm-us.net/o1/vault/gdc2013/slides/822403Gregorius_Dirk_TheSeparatingAxisTest.pdf)
  * Books
    * Ericson, Christer. *Real-time collision detection*. CRC Press, 2004.
    * Eberly, David H. *Game physics*. CRC Press, 2010.
