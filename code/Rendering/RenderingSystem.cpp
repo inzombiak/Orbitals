@@ -138,6 +138,7 @@ void RenderingSystem::UpdateCameraRotation()
 
 void RenderingSystem::Draw()
 {
+	std::cout << "DRAW START" << std::endl;
 	glUseProgram(m_program);
 	glClearColor(.7f, 0.7f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -155,9 +156,9 @@ void RenderingSystem::Draw()
 	auto MVP = projection * view * glm::mat4(1.f);
 	GLuint MVPMatID = glGetUniformLocation(m_program, "MVP");
 	glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &MVP[0][0]);
-
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
+	std::cout << "DRAW MID" << std::endl;
+	//glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(1);
 	
 	for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
 		m_renderComponents[i].Draw(view, projection, m_position);
@@ -170,6 +171,8 @@ void RenderingSystem::Draw()
 
 	m_physDebugDrawer.Draw(MVP);
 	m_physDebugDrawer.Clear();
+
+	std::cout << "DRAW END" << std::endl;
 }
 
 void RenderingSystem::CreateRenderComponent(IEventData* eventData)

@@ -44,6 +44,9 @@ namespace PhysicsDefs
 
 	struct ContactInfo
 	{
+		//Contact point in global space
+		glm::vec3 worldPos;
+
 		//Contact points in global space
 		glm::vec3 worldPointA;
 		glm::vec3 worldPointB;

@@ -1,7 +1,7 @@
 #include "NarrowphaseSAT.h"
 #include "glm\gtc\matrix_transform.hpp"
 
-std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::PerformCollisionResolution(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
+std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 
 	PhysicsDefs::AABB aabb1, aabb2;
@@ -18,17 +18,18 @@ std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::PerformCollisionRe
 	{	
 		interpolationTrans1 = collisionPairs[i].first->GetInterpolationTransform();
 		interpolationTrans2 = collisionPairs[i].second->GetInterpolationTransform();
-		bodyBtoA = glm::inverse(interpolationTrans1) * interpolationTrans2;
 		aabb1 = collisionPairs[i].first->GetAABB();
 		aabb2 = collisionPairs[i].second->GetAABB();
-		aabb2.min = glm::vec3(bodyBtoA * glm::vec4(aabb2.min, 1.f));
-		aabb2.max = glm::vec3(bodyBtoA * glm::vec4(aabb2.max, 1.f));
+		aabb2.min = glm::vec3(glm::inverse(interpolationTrans1) * interpolationTrans2 * glm::vec4(aabb2.min, 1.f));
+		aabb2.max = glm::vec3(glm::inverse(interpolationTrans1) * interpolationTrans2 * glm::vec4(aabb2.max, 1.f));
 		if (SATDetectionAABB(aabb1, aabb2, contactInfo))
 		{
-			contactInfo.worldPointA = glm::vec3(interpolationTrans1 *  glm::vec4(contactInfo.localPointA, 1));
+			//contactInfo.worldPointB = glm::vec3(interpolationTrans1 *  glm::vec4(contactInfo.localPointA - contactInfo.normal * contactInfo.depth, 1.f));
+
+			//contactInfo.localPointA = glm::vec3(glm::inverse(interpolationTrans2) *  glm::vec4(contactInfo.worldPointB, 1.f));
+			contactInfo.worldPointA = glm::vec3(interpolationTrans1 * glm::vec4(contactInfo.localPointA, 1));
 			//Since we moved everything into A's space we neeed to move it out 
-			contactInfo.worldPointB = glm::vec3(interpolationTrans1 *  glm::vec4(contactInfo.localPointA + contactInfo.normal * contactInfo.depth, 1.f));
-			contactInfo.localPointB = glm::vec3(glm::inverse(interpolationTrans2) *  glm::vec4(contactInfo.worldPointB, 1.f));
+
 			
 			result.push_back(std::make_pair(collisionPairs[i], contactInfo));
 		}
@@ -40,22 +41,29 @@ std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::PerformCollisionRe
 
 bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo)
 {
+
+}
+
+/*bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo)
+{
 	contactInfo.depth = FLT_MAX;
 	float currentAxisDepth = 0;
 	bool test = true;
 	int sign;
-
+	glm::vec3 contactPointA, contactNormal;
 	if (aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x)
 	{
 		currentAxisDepth = std::min(aabb1.max.x, aabb2.max.x) - std::max(aabb1.min.x, aabb2.min.x);
+		contactNormal = glm::vec3(1.f, 0, 0);
+		sign = (aabb2.min.x - aabb1.min.x < 0) ? -1 : 1;
+		
+		contactPointA.x = sign * (currentAxisDepth);
+		contactNormal *= sign;
+
 		if (currentAxisDepth < contactInfo.depth)
 		{
 			contactInfo.depth = currentAxisDepth;
-			contactInfo.normal = glm::vec3(1.f, 0, 0);
-			sign = (aabb2.min.x - aabb1.min.x < 0) ? -1 : 1;
-			contactInfo.normal *= sign;
-
-			contactInfo.localPointA = aabb1.max.x - contactInfo.normal * contactInfo.depth;
+			contactInfo.normal = contactNormal;
 		}
 	}
 	else
@@ -63,15 +71,17 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 
 	if (aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y)
 	{
-		currentAxisDepth =std::min(aabb1.max.y, aabb2.max.y) - std::max(aabb1.min.y, aabb2.min.y);
+		currentAxisDepth = std::min(aabb1.max.y, aabb2.max.y) - std::max(aabb1.min.y, aabb2.min.y);
+		contactNormal = glm::vec3(0, 1.0f, 0);
+		sign = (aabb2.min.y - aabb1.min.y < 0) ? -1 : 1;
+		
+		contactPointA.y = sign * (aabb1.max.y - currentAxisDepth);
+		contactNormal *= sign;
+
 		if (currentAxisDepth < contactInfo.depth)
 		{
 			contactInfo.depth = currentAxisDepth;
-			contactInfo.normal = glm::vec3(0, 1.0f, 0);
-			sign = (aabb2.min.y - aabb1.min.y < 0) ? -1 : 1;
-			contactInfo.normal *= sign;
-
-			contactInfo.localPointA = aabb1.max.y - contactInfo.normal * contactInfo.depth;
+			contactInfo.normal = contactNormal;
 		}
 	}
 	else
@@ -80,14 +90,16 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 	if (aabb1.min.z <= aabb2.max.x && aabb1.max.z >= aabb2.min.z)
 	{
 		currentAxisDepth = std::min(aabb1.max.z, aabb2.max.z) - std::max(aabb1.min.z, aabb2.min.z);
+		contactNormal = glm::vec3(0, 0, 1.f);
+		sign = (aabb2.min.z - aabb1.min.z < 0) ? -1 : 1;
+
+		contactPointA.z = sign * (currentAxisDepth);
+		contactNormal *= sign;
+
 		if (currentAxisDepth < contactInfo.depth)
 		{
 			contactInfo.depth = currentAxisDepth;
-			contactInfo.normal = glm::vec3(0, 0, 1.f);
-			sign = (aabb2.min.z - aabb1.min.z < 0) ? -1 : 1;
-			contactInfo.normal *= sign;
-
-			contactInfo.localPointA = aabb1.max.z - contactInfo.normal * contactInfo.depth;
+			contactInfo.normal = contactNormal;
 		}
 	}
 	else
@@ -96,7 +108,7 @@ bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const Phys
 	if (contactInfo.depth < FLT_EPSILON)
 		return false;
 
-	//contactInfo.localPointA = 
+	contactInfo.localPointA = contactPointA;
 
 	return true;
 }

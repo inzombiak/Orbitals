@@ -40,6 +40,10 @@ void IRigidBody::ApplyImpulse(const glm::vec3& impulse)
 {
 	SetLinearVelocity(m_linearVelocity + impulse * m_invMass);
 }
+void IRigidBody::ApplyTorqueImpulse(const glm::vec3& torque)
+{
+	m_angularVelocity += m_invInertiaTensor * torque;
+}
 
 void IRigidBody::ApplyForce(const glm::vec3& force)
 {

@@ -14,6 +14,7 @@ public:
 
 	void ApplyGravity();
 	void ApplyImpulse(const glm::vec3& impulse);
+	void ApplyTorqueImpulse(const glm::vec3& torque);
 	void ApplyForce(const glm::vec3& force);
 	void ApplyDamping(float timeStep);
 

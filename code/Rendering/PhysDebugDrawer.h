@@ -15,6 +15,7 @@ public:
 
 	void Draw(glm::mat4& mvp);
 	void DrawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
+	void DrawPoint(const glm::vec3& p, float size, const glm::vec3& color);
 	void DrawSphereShape();
 	void DrawBoxShape();
 	void DrawAABB(const glm::vec3& min, const glm::vec3& max, const glm::vec3& color);

@@ -13,62 +13,69 @@ void ConstraintSolverSeqImpulse::SolveConstraints(std::vector<PhysicsDefs::CollP
 	glm::mat4 interpolationTrans2;
 	glm::mat3 invTensor1, invTensor2;
 
-	float m1, m2, invM1, invM2, totalInvMass, friction, minRest;
+	PhysicsDefs::ContactInfo* contact;
+
+	float invM1, invM2, totalInvMass, friction, minRest, invDt = 1.f/dt;
 	float JV, JinvMJ;
 	float lambda, oldLambda;
 	float bias;
 	glm::vec3 invMJ;
 	glm::vec3 impulse1, impulse2, torque1, torque2, relativeVel;
+	glm::vec3 startingVel1, startingVel2;
 
-	for (int i = 0; i < 10; ++i)
-	{ 
-		for (int i = 0; i < info.size(); ++i)
+	for (int j = 0; j < 10; ++j)
+	{
+		for (int i = 0; i < info.size(); ++i) 
 		{
-			interpolationTrans1 = info[i].first.first->GetInterpolationTransform();;
+
+			contact = &info[i].second;
+			startingVel1 = info[i].first.first->GetLinearVelocity();
+			startingVel2 = info[i].first.second->GetLinearVelocity();
+			interpolationTrans1 = info[i].first.first->GetInterpolationTransform();
 			interpolationTrans2 = info[i].first.second->GetInterpolationTransform();
-
-			vel1 = info[i].first.first->GetLinearVelocity();
-			vel2 = info[i].first.second->GetLinearVelocity();
-
-			aVel1 = info[i].first.first->GetAngularVelocity();
-			aVel2 = info[i].first.second->GetAngularVelocity();
-
 			invM1 = info[i].first.first->GetInverseMass();
 			invM2 = info[i].first.second->GetInverseMass();
-
-			m1 = info[i].first.first->GetMass();
-			m2 = info[i].first.second->GetMass();
 
 			totalInvMass = invM1 + invM2;
 
 			invTensor1 = info[i].first.first->GetInverseInertiaTensor();
 			invTensor2 = info[i].first.second->GetInverseInertiaTensor();
 
-			localANorm = glm::cross(info[i].second.localPointA, info[i].second.normal);
-			localBNorm = glm::cross(info[i].second.localPointB, info[i].second.normal);
+			localANorm = glm::cross(contact->localPointA, contact->normal);
+			localBNorm = glm::cross(contact->localPointB, contact->normal);
 
-			JV = -glm::dot(vel1, info[i].second.normal) - glm::dot(localANorm, aVel1)
-				+ glm::dot(vel2, info[i].second.normal) + glm::dot(localBNorm, aVel2);
-			
-			JinvMJ = totalInvMass + glm::dot(localANorm * invTensor1, localANorm) +
-				  glm::dot(localBNorm * invTensor2, localBNorm);
-
-			bias = -0.4f / dt * std::max(0.f, info[i].second.depth - 0.001f);
-			minRest = std::min(info[i].first.first->GetRestitution(), info[i].first.second->GetRestitution());
 			relativeVel = vel2 - vel1;
-			bias += minRest * glm::dot(relativeVel, info[i].second.normal);
 
-			lambda = -(JV + bias) / JinvMJ;
+			minRest = std::min(info[i].first.first->GetRestitution(), info[i].first.second->GetRestitution());
+
+			JinvMJ = totalInvMass + glm::dot(localANorm * invTensor1, localANorm) +
+					glm::dot(localBNorm * invTensor2, localBNorm);
+			
+			vel1 = info[i].first.first->GetLinearVelocity();
+			vel2 = info[i].first.second->GetLinearVelocity();
+			relativeVel = vel2 - vel1;
+			aVel1 = info[i].first.first->GetAngularVelocity();
+			aVel2 = info[i].first.second->GetAngularVelocity();
+
+			JV = -glm::dot(vel1, contact->normal) - glm::dot(localANorm, aVel1)
+				+ glm::dot(vel2, contact->normal) + glm::dot(localBNorm, aVel2);
+			//bias = 0;
+			bias = 0.3f / dt * std::max(0.f, contact->depth - 0.01f);
+			auto test = minRest * JV;
+			//bias -= 200 * std::abs(glm::dot(relativeVel, info[i].second.normal));//;
+			//bias += test;
+			//bias += test;
+			lambda = (-JV + bias + test) / JinvMJ;
 
 			{
-				oldLambda = info[i].second.prevNormalImp;
-				info[i].second.prevNormalImp = std::max(info[i].second.prevNormalImp + lambda, 0.f);
-
-				lambda = info[i].second.prevNormalImp - oldLambda;
+				oldLambda = contact->prevNormalImp;
+				contact->prevNormalImp = std::max(oldLambda + lambda, 0.f);
+				lambda = contact->prevNormalImp - oldLambda;
 			}
 
-			impulse1 = info[i].second.normal * lambda;
-			impulse2 = info[i].second.normal * lambda;
+			//lambda -= bias / JinvMJ;
+			impulse1 = contact->normal * lambda;
+			impulse2 = contact->normal * lambda;
 
 			info[i].first.first->ApplyImpulse(-impulse1);
 			info[i].first.second->ApplyImpulse(impulse2);
@@ -78,27 +85,6 @@ void ConstraintSolverSeqImpulse::SolveConstraints(std::vector<PhysicsDefs::CollP
 
 			vel1 = info[i].first.first->GetLinearVelocity();
 			vel2 = info[i].first.second->GetLinearVelocity();
-
-			//dv = vel2 + glm::cross(aVel2, info[i].second.localPointB) -
-			//	vel1 - glm::cross(aVel1, info[i].second.localPointA);
-			//friction = info[i].first.first->GetFriction()*info[i].first.second->GetFriction();
-			//tangent = glm::cross(info[i].second.normal, glm::vec3(1.0f));
-			//localATang = glm::cross(info[i].second.localPointA, tangent);
-			//localBTang = glm::cross(info[i].second.localPointB, tangent);
-			//massTangent = totalInvMass + glm::dot(localATang * invTensor1, localATang) +
-			//							 glm::dot(localBTang * invTensor2, localBTang);
-
-			////massTangent = totalInvMass + (glm::dot(info[i].second.localPointA, info[i].second.localPointA) - localATang*localATang) +
-			////	(glm::dot(info[i].second.localPointB, info[i].second.localPointB) - localBTang*localBTang);
-			////massTangent = 1.f / massTangent;
-			//massTangent = 1;
-			//impTang = glm::dot(dv, tangent);
-			//dImpTang = massTangent * -impTang;
-
-			//float maxPt = friction * info[i].second.prevNormalImp;
-			//float oldTangentImpulse = info[i].second.prevTangImp;
-			//info[i].second.prevTangImp = std::max(-maxPt, std::min(oldTangentImpulse + dImpTang, maxPt));
-			//dImpTang = info[i].second.prevTangImp - oldTangentImpulse;
 
 			//// Apply contact impulse
 			//impulseTangent = dImpTang * tangent;

@@ -121,6 +121,24 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 		}
 	}
 
+	PhysicsDefs::ContactInfo info;
+	PhysicsDefs::CollisionPair bodies;
+	if (m_narrowphaseResult.size() > 0)
+	{
+		for (unsigned int i = 0; i < m_narrowphaseResult.size(); ++i)
+		{
+			info = m_narrowphaseResult[i].second;
+			bodies = m_narrowphaseResult[i].first;
+
+			//m_physDebugDrawer->DrawPoint(info.worldPos, 2, glm::vec3(0, 1, 1));
+			m_physDebugDrawer->DrawPoint(info.worldPointA, 1, glm::vec3(0, 1, 1));
+			//m_physDebugDrawer->DrawPoint(info.worldPointB, 2, glm::vec3(1, 0, 1));
+			//m_physDebugDrawer->DrawPoint(glm::vec3(bodies.first->GetTransform() * glm::vec4(info.localPointA, 1)), 3, glm::vec3(1, 1, 0));
+			m_physDebugDrawer->DrawPoint(glm::vec3(bodies.second->GetTransform() * glm::vec4(info.localPointB, 1)), 4, glm::vec3(1, 0, 0));
+
+		}
+	}
+
 	ClearForces();
 }
 
@@ -177,14 +195,14 @@ void PhysicsWorld::PerformCollisionCheck(float dt)
 	if (collidingPairs.size() == 0)
 		return;
 
-	auto narrowPhaseResult = m_narrowphase->PerformCollisionResolution(collidingPairs, NarrowphaseErrorCalback);
+	m_narrowphaseResult = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
 
 	//TODO: THIS RESULT MIGHT NOT HAVE THE RIGHT LOCAL AND WORLD POINTS IN A AND B, TEST IT
 
-	if (narrowPhaseResult.size() < 1)
+	if (m_narrowphaseResult.size() < 1)
 		return;
 
-	m_constraintSolver->SolveConstraints(narrowPhaseResult, dt);
+	m_constraintSolver->SolveConstraints(m_narrowphaseResult, dt);
 }
 
 void PhysicsWorld::NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult)

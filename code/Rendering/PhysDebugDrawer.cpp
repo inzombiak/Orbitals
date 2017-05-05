@@ -72,7 +72,23 @@ void PhysDebugDrawer::DrawLine(const glm::vec3& from, const glm::vec3& to, const
 	m_colors.push_back(color);
 	m_colors.push_back(color);
 }
+void PhysDebugDrawer::DrawPoint(const glm::vec3& p, float size, const glm::vec3& color)
+{
+	m_vertices.push_back(p - glm::vec3(1, 0, 0) * size);
+	m_vertices.push_back(p + glm::vec3(1, 0, 0) * size);
+	m_vertices.push_back(p - glm::vec3(0, 1, 0) * size);
+	m_vertices.push_back(p + glm::vec3(0, 1, 0) * size);
+	m_vertices.push_back(p - glm::vec3(0, 0, 1) * size);
+	m_vertices.push_back(p + glm::vec3(0, 0, 1) * size);
 
+	m_colors.push_back(color);
+	m_colors.push_back(color);
+	m_colors.push_back(color);
+	m_colors.push_back(color);
+	m_colors.push_back(color);
+	m_colors.push_back(color);
+
+}
 void PhysDebugDrawer::DrawSphereShape()
 {
 	//TODO Implement
@@ -88,15 +104,15 @@ void PhysDebugDrawer::DrawAABB(const glm::vec3& min, const glm::vec3& max, const
 
 	glm::vec3 currentVertex(-1, -1, -1);
 	glm::vec3 from, to;
-
+	static const glm::vec3 OFFSET(-0.01f, -0.01f, -0.01f);
 	for (unsigned int i = 0; i < 4; ++i)
 	{ 
-		from = (currentVertex * halfExtents) + center;
+		from = (currentVertex * (halfExtents - OFFSET)) + center;
 		for (unsigned int j = 0; j < 3; ++j)
 		{
 			to = from;
-			to[j] -= 2 * (currentVertex[j] * halfExtents[j]);
-
+			to[j] -= 2 * (currentVertex[j] * (halfExtents[j] - OFFSET[j]));
+			
 			DrawLine(from, to, color);
 		}
 

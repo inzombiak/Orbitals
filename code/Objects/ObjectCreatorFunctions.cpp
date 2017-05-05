@@ -85,7 +85,7 @@ EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 	bcd->rbci.angularDamping = 0.f;
 	bcd->rbci.friction = 0.3f;
 	bcd->rbci.rollingFriction = 0.3f;
-	bcd->rbci.resititution = 8.f;
+	bcd->rbci.resititution = 1.f;
 
 	glm::mat4 translationMat = glm::translate(data->position);
 	glm::mat4 scalingMat = glm::scale(data->scale);

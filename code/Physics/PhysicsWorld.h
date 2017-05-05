@@ -38,7 +38,8 @@ private:
 	static void NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult);
 	// Stores error
 	static std::vector<glm::vec3> m_narrowphaseError;
-
+	std::vector<PhysicsDefs::CollPairContactInfo> m_narrowphaseResult;
+	
 	float m_fixedTimeStep = 0;
 	float m_localTime = 0;
 
@@ -51,6 +52,7 @@ private:
 	IBroadphase* m_broadphase = 0;
 	INarrowphase* m_narrowphase = 0;
 	IConstraintSolver* m_constraintSolver;
+
 };
 
 #endif
