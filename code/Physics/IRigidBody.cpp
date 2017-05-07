@@ -1,5 +1,7 @@
 #include "IRigidBody.h"
 
+#include <glm\gtc\matrix_transform.hpp>
+
 IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 {
 	m_gravity = glm::vec3(0.f);
@@ -19,9 +21,9 @@ IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 	m_localInertia		= rbci.localInertia;
 	m_collisionShape	= rbci.collisionShape;
 
-	m_aabb = m_collisionShape->GetAABB();
-	m_aabb.body = this;
-	m_aabb.worldTransfrom = m_transform;
+	m_obb = m_collisionShape->GetLocalOBB();
+	UpdateInterpolationTransform(m_transform);
+
 	if (m_mass == 0)
 		m_invInertiaTensor = glm::mat3(0.f);
 	else
@@ -63,13 +65,20 @@ void IRigidBody::SetGravity(const glm::vec3& gravity)
 	}
 }
 
-PhysicsDefs::AABB& IRigidBody::GetAABB()
+PhysicsDefs::AABB IRigidBody::GetAABB()
 {
-	//TODO Add assert
-	if (m_collisionShape)
-	{
-		return m_aabb;
-	}
+	PhysicsDefs::AABB aabb;
+
+	aabb = m_obb.GetAABB();
+	aabb.body = this;
+	aabb.worldTransfrom = m_interpolationTransform;
+
+	return aabb;
+}
+
+PhysicsDefs::OBB IRigidBody::GetOBB()
+{
+	return m_obb;
 }
 
 glm::vec3 IRigidBody::GetTotalForce() const
@@ -110,7 +119,7 @@ glm::mat3  IRigidBody::GetInverseInertiaTensor() const
 void IRigidBody::UpdateTransform(const glm::mat4& predictedTrans)
 {
 	m_transform = predictedTrans;
-	m_aabb.worldTransfrom = m_transform;
+	UpdateInterpolationTransform(m_transform);
 }
 const glm::mat4& IRigidBody::GetTransform() const
 {
@@ -118,8 +127,12 @@ const glm::mat4& IRigidBody::GetTransform() const
 }
 void IRigidBody::UpdateInterpolationTransform(const glm::mat4& predictedTrans)
 {
-	m_aabb.worldTransfrom = predictedTrans;
 	m_interpolationTransform = predictedTrans;
+	glm::mat4 tempMat;
+	tempMat = glm::translate(m_interpolationTransform, glm::vec3(0, 0, 0));
+	m_obb.localX = glm::vec3(tempMat * glm::vec4(1, 0, 0, 0));
+	m_obb.localY = glm::vec3(tempMat * glm::vec4(0, 1, 0, 0));
+	m_obb.pos = glm::vec3(m_interpolationTransform[3]);
 }
 const glm::mat4& IRigidBody::GetInterpolationTransform()
 {

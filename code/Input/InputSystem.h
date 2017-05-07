@@ -1,7 +1,7 @@
 #ifndef INPUT_SYSTEM_H
 #define INPUT_SYSTEM_H
 
-#include "X:\code\ISystem.h"
+#include "../ISystem.h"
 #include <unordered_map>
 
 class InputSystem :

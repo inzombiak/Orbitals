@@ -20,7 +20,7 @@ public:
 	}
 
 	virtual glm::mat3 GetTensor(float mass) = 0;
-	virtual PhysicsDefs::AABB GetAABB() = 0;
+	virtual PhysicsDefs::OBB GetLocalOBB() = 0;
 	CollisionShapeType GetType();
 	virtual glm::vec3 GetSupportPoint(const glm::vec3& dir) const = 0;
 

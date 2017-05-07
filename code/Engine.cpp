@@ -141,10 +141,11 @@ void Engine::Test()
 	
 	
 	boxData.extents = glm::vec3(2, 2, 2);
+	boxData.rotation = glm::vec3(0, -M_PI_2 /3, 0);
 	boxData.position = glm::vec3(0, 18, 0);
 	//boxData.position = glm::vec3(6, 5, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
-	boxED->GetData()->rigidBodyData->rbci.mass = 20;
+	boxED->GetData()->rigidBodyData->rbci.mass = 0;
 	EventSystem::GetInstance()->QueueEvent(boxED, false);
 	/*//boxData.position = glm::vec3(4.2, 10, -5);
 	boxData.position = glm::vec3(6, 10, -5);

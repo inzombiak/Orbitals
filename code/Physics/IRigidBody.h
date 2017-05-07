@@ -20,7 +20,8 @@ public:
 
 	void SetGravity(const glm::vec3& m_gravity);
 
-	PhysicsDefs::AABB& GetAABB();
+	PhysicsDefs::AABB GetAABB();
+	PhysicsDefs::OBB GetOBB();
 
 	glm::vec3 GetTotalForce() const;
 	glm::vec3 GetLinearVelocity() const;
@@ -67,7 +68,7 @@ private:
 
 	glm::vec3 m_totalForce;
 
-	PhysicsDefs::AABB m_aabb;
+	PhysicsDefs::OBB m_obb;
 
 	ICollisionShape* m_collisionShape;
 };

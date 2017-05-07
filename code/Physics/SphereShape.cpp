@@ -13,14 +13,15 @@ glm::mat3 SphereShape::GetTensor(float mass)
 	return result;
 }
 
-
-PhysicsDefs::AABB SphereShape::GetAABB()
+PhysicsDefs::OBB SphereShape::GetLocalOBB()
 {
 	//glm::vec3 origin(transform[3]);
-	PhysicsDefs::AABB result;
+	PhysicsDefs::OBB result;
 
-	result.max = glm::vec3(m_radius, m_radius, m_radius);
-	result.min = -result.max;
+	result.halfExtents = glm::vec3(m_radius, m_radius, m_radius);
+	result.pos = glm::vec3(0.f);
+	result.localX = glm::vec3(1.f, 0.f, 0.f);
+	result.localY = glm::vec3(0.f, 1.f, 0.f);
 
 	return result;
 }

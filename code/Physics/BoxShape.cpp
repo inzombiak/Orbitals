@@ -18,12 +18,15 @@ glm::mat3 BoxShape::GetTensor(float mass)
 	return result;
 }
 
-PhysicsDefs::AABB BoxShape::GetAABB()
+PhysicsDefs::OBB BoxShape::GetLocalOBB()
 {
 	//glm::vec3 origin(transform[3]);
-	PhysicsDefs::AABB result;
-	result.max = m_extents * 0.5f;
-	result.min = - m_extents * 0.5f;
+	PhysicsDefs::OBB result;
+
+	result.halfExtents = m_extents * 0.5f;
+	result.pos = glm::vec3(0.f);
+	result.localX = glm::vec3(1.f, 0.f, 0.f);
+	result.localY = glm::vec3(0.f, 1.f, 0.f);
 
 	return result;
 }

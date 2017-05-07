@@ -38,13 +38,13 @@ std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::CheckCollision(con
 	return result;
 	
 }
+//
+//bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo)
+//{
+//
+//}
 
 bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo)
-{
-
-}
-
-/*bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo)
 {
 	contactInfo.depth = FLT_MAX;
 	float currentAxisDepth = 0;

@@ -100,17 +100,43 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 
 	//TODO: ADD FLAG TO DISABLE DRAWING
 	PhysicsDefs::AABB aabb;
-	glm::vec4 aabbMin4, aabbMax4;
-	glm::vec3 color(1.f, 0.f, 0.f);
+	PhysicsDefs::OBB obb;
+	glm::vec3 color(1.f, 0.f, 0.f), colorOBB(0.f, 0.f, 1.f);
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		aabb = m_nonStaticRigidBodies[i]->GetAABB();
 		auto transform = m_nonStaticRigidBodies[i]->GetTransform();
-		aabbMin4 = transform * glm::vec4(aabb.min, 1.f);
-		aabbMax4 = transform * glm::vec4(aabb.max, 1.f);
-		aabb.min = glm::vec3(aabbMin4);
-		aabb.max = glm::vec3(aabbMax4);
+		aabb.min = glm::vec3(transform[3]) + aabb.min;
+		aabb.max = glm::vec3(transform[3]) + aabb.max;
 		m_physDebugDrawer->DrawAABB(aabb.min, aabb.max, color);
+
+		obb = m_nonStaticRigidBodies[i]->GetOBB();
+
+		glm::vec3 currentVertex(-1, -1, -1);
+		glm::vec3 x, y, z;
+		glm::vec3 from, to;
+		glm::mat3 axes(obb.localX, obb.localY, glm::cross(obb.localX, obb.localY));
+		static const glm::vec3 OFFSET(-0.01f, -0.01f, -0.01f);
+		for (unsigned int i = 0; i < 4; ++i)
+		{
+			x = obb.localX * obb.halfExtents.x * currentVertex.x;
+			y = obb.localY * obb.halfExtents.y * currentVertex.y;
+			z = axes[2] * obb.halfExtents.z * currentVertex.z;
+
+			from = x + y + z;
+			from += obb.pos;
+
+			for (unsigned int j = 0; j < 3; ++j)
+			{
+				to = from;
+				to -= 2.f * (currentVertex[j] * obb.halfExtents[j] * axes[j]);
+
+				m_physDebugDrawer->DrawLine(from, to, colorOBB);
+			}
+
+			currentVertex[(i % 2) + 1] *= -1;
+			currentVertex[((i + 1) % 2) * 2] *= -1;
+		}
 	}
 
 	if (m_narrowphaseError.size() > 1)
