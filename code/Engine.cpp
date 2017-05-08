@@ -153,8 +153,8 @@ void Engine::Test()
 	std::shared_ptr<PhysicsComponent> pc;
 	if (Orbitals::CheckConvertAndCastPtr<IObjectComponent, PhysicsComponent>(boxED->GetData()->createdObject->GetComponent(PhysicsComponent::COMPONENT_ID), pc))
 	{
-		pc->ApplyTorqueImpulse(glm::vec3(2.f, 2.f, 0.f));
-		pc->ApplyImpulse(glm::vec3(2.f, 0.f, 0.f));
+		//pc->ApplyTorqueImpulse(glm::vec3(2.f, 2.f, 0.f));
+		//pc->ApplyImpulse(glm::vec3(2.f, 0.f, 0.f));
 	}
 	/*//boxData.position = glm::vec3(4.2, 10, -5);
 	boxData.position = glm::vec3(6, 10, -5);

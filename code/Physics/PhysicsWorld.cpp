@@ -117,13 +117,13 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 		glm::vec3 currentVertex(-1, -1, -1);
 		glm::vec3 x, y, z;
 		glm::vec3 from, to;
-		glm::mat3 axes(obb.localX, obb.localY, glm::cross(obb.localX, obb.localY));
+	
 		static const glm::vec3 OFFSET(-0.01f, -0.01f, -0.01f);
 		for (unsigned int i = 0; i < 4; ++i)
 		{
-			x = obb.localX * obb.halfExtents.x * currentVertex.x;
-			y = obb.localY * obb.halfExtents.y * currentVertex.y;
-			z = axes[2] * obb.halfExtents.z * currentVertex.z;
+			x = obb.localAxes[0] * obb.halfExtents.x * currentVertex.x;
+			y = obb.localAxes[1] * obb.halfExtents.y * currentVertex.y;
+			z = obb.localAxes[2] * obb.halfExtents.z * currentVertex.z;
 
 			from = x + y + z;
 			from += obb.pos;
@@ -131,7 +131,7 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 			for (unsigned int j = 0; j < 3; ++j)
 			{
 				to = from;
-				to -= 2.f * (currentVertex[j] * obb.halfExtents[j] * axes[j]);
+				to -= 2.f * (currentVertex[j] * obb.halfExtents[j] * obb.localAxes[j]);
 
 				m_physDebugDrawer->DrawLine(from, to, colorOBB);
 			}
@@ -193,15 +193,17 @@ void PhysicsWorld::PredictMotion(float timeStep)
 		if (m_nonStaticRigidBodies[i]->GetMass() != 0)
 			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
 
+		trans = m_nonStaticRigidBodies[i]->GetTransform();
+
 		if (angMag != 0)
 		{
+			rot = glm::rotate(trans, glm::radians(angMag), glm::normalize(angVel));
 			trans = glm::translate(glm::mat4(1.f), linVel *timeStep);
-			rot = glm::rotate(m_nonStaticRigidBodies[i]->GetTransform(), glm::radians(angMag), glm::normalize(angVel));
 		}
 		else
 		{
 			rot = glm::mat4(1.f);
-			trans = glm::translate(m_nonStaticRigidBodies[i]->GetTransform(), linVel *timeStep);
+			trans = glm::translate(trans, linVel *timeStep);
 		}
 
 		predictedTrans = trans * rot;
@@ -224,15 +226,17 @@ void PhysicsWorld::PerformMovement(float timeStep)
 		angMag = glm::length(angVel);
 		//totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
 
+		trans = m_nonStaticRigidBodies[i]->GetTransform();
+
 		if (angMag != 0)
 		{
+			rot = glm::rotate(trans, glm::radians(angMag), glm::normalize(angVel));
 			trans = glm::translate(glm::mat4(1.f), linVel *timeStep);
-			rot = glm::rotate(m_nonStaticRigidBodies[i]->GetTransform(), glm::radians(angMag), glm::normalize(angVel));
 		}
 		else
 		{
 			rot = glm::mat4(1.f);
-			trans = glm::translate(m_nonStaticRigidBodies[i]->GetTransform(), linVel *timeStep);
+			trans = glm::translate(trans, linVel *timeStep);
 		}
 		
 		predictedTrans = trans * rot;

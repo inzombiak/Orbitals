@@ -82,7 +82,7 @@ namespace PhysicsDefs
 		glm::vec3 min;
 		glm::vec3 max;
 
-		glm::mat4 worldTransfrom;
+		glm::mat4 worldTransform;
 		IRigidBody* body = 0;
 
 		bool Intersects(const AABB& other) const
@@ -101,8 +101,7 @@ namespace PhysicsDefs
 	struct OBB
 	{
 		glm::vec3 pos;
-		glm::vec3 localX;
-		glm::vec3 localY;
+		glm::vec3 localAxes[3];
 		glm::vec3 halfExtents;
 
 		PhysicsDefs::AABB aabb;
@@ -115,9 +114,9 @@ namespace PhysicsDefs
 			aabb.max = glm::vec3(FLT_MIN);
 			glm::vec3 x, y, z;
 			
-			x = (halfExtents.x + OFFSET.x) * localX;
-			y = (halfExtents.y + OFFSET.y) * localY;
-			z = (halfExtents.z + OFFSET.z) * glm::cross(localX, localY);
+			x = (halfExtents.x + OFFSET.x) * localAxes[0];
+			y = (halfExtents.y + OFFSET.y) * localAxes[1];
+			z = (halfExtents.z + OFFSET.z) * localAxes[2];
 			
 			/*aabb.min = -(x + y + z);
 			aabb.max = (x + y + z);*/

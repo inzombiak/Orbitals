@@ -129,11 +129,12 @@ void IRigidBody::UpdateInterpolationTransform(const glm::mat4& predictedTrans)
 	m_interpolationTransform = predictedTrans;
 	glm::mat4 tempMat;
 	tempMat = glm::translate(m_interpolationTransform, glm::vec3(0, 0, 0));
-	m_obb.localX = glm::vec3(tempMat * glm::vec4(1, 0, 0, 0));
-	m_obb.localY = glm::vec3(tempMat * glm::vec4(0, 1, 0, 0));
+	m_obb.localAxes[0] = glm::vec3(tempMat * glm::vec4(1, 0, 0, 0));
+	m_obb.localAxes[1] = glm::vec3(tempMat * glm::vec4(0, 1, 0, 0));
+	m_obb.localAxes[2] = glm::cross(m_obb.localAxes[0], m_obb.localAxes[1]);
 	m_obb.pos = glm::vec3(m_interpolationTransform[3]);
 	m_obb.UpdateAABB();
-	m_obb.aabb.worldTransfrom = m_interpolationTransform;
+	m_obb.aabb.worldTransform = glm::translate(glm::mat4(1.f), m_obb.pos);
 }
 const glm::mat4& IRigidBody::GetInterpolationTransform()
 {

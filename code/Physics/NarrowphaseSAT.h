@@ -10,7 +10,8 @@ public:
 
 private:
 
-	bool SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo);
+	bool SATDetectionAABB(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& contactInfo);
+	bool SATDetectionOBB(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& contactInfo);
 };
 
 #endif

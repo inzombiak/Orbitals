@@ -25,8 +25,9 @@ PhysicsDefs::OBB BoxShape::GetLocalOBB()
 
 	result.halfExtents = m_extents * 0.5f;
 	result.pos = glm::vec3(0.f);
-	result.localX = glm::vec3(1.f, 0.f, 0.f);
-	result.localY = glm::vec3(0.f, 1.f, 0.f);
+	result.localAxes[0] = glm::vec3(1.f, 0.f, 0.f);
+	result.localAxes[1] = glm::vec3(0.f, 1.f, 0.f);
+	result.localAxes[2] = glm::vec3(0.f, 0.f, 1.f);
 
 	return result;
 }
