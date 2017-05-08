@@ -222,6 +222,9 @@
     <ClInclude Include="..\..\code\Physics\ConstraintSolverSeqImpulse.h">
       <Filter>Header Files\Physics\Solvers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Physics\Manifold.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\VertexShader.glsl">
@@ -309,6 +312,9 @@
     </ClCompile>
     <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp">
       <Filter>Source Files\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Physics\Manifold.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

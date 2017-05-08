@@ -6,15 +6,14 @@
 class Manifold
 {
 public:
-
 	Manifold(IRigidBody* a, IRigidBody* b);
 	
 	void Solve();
 	void Update(PhysicsDefs::ContactInfo* newContacts, int newContactCount);
 
 private:
-	static const int MIN_POINTS = 2;
-	PhysicsDefs::ContactInfo m_contacts[4];
+	static const int MIN_POINTS = 4;
+	PhysicsDefs::ContactInfo m_contacts[6];
 	int m_contactCount = 0;
 
 	IRigidBody* m_bodyA = 0;

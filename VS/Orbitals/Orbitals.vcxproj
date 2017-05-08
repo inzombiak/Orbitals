@@ -39,6 +39,7 @@
     <ClInclude Include="..\..\code\Physics\IConstraintSolver.h" />
     <ClInclude Include="..\..\code\Physics\INarrowphase.h" />
     <ClInclude Include="..\..\code\Physics\IRigidBody.h" />
+    <ClInclude Include="..\..\code\Physics\Manifold.h" />
     <ClInclude Include="..\..\code\Physics\NarrowphaseGJK_EPA.h" />
     <ClInclude Include="..\..\code\Physics\NarrowphaseSAT.h" />
     <ClInclude Include="..\..\code\Physics\PhysicsComponent.h" />
@@ -77,6 +78,7 @@
     <ClCompile Include="..\..\code\Physics\ConstriantSolverSeqImpulse.cpp" />
     <ClCompile Include="..\..\code\Physics\ICollisionShape.cpp" />
     <ClCompile Include="..\..\code\Physics\IRigidBody.cpp" />
+    <ClCompile Include="..\..\code\Physics\Manifold.cpp" />
     <ClCompile Include="..\..\code\Physics\NarrowphaseGJK_EPA.cpp" />
     <ClCompile Include="..\..\code\Physics\NarrowphaseSAT.cpp" />
     <ClCompile Include="..\..\code\Physics\PhysicsComponent.cpp" />
