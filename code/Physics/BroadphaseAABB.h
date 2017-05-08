@@ -4,7 +4,7 @@ class BroadphaseAABB : public IBroadphase
 {
 public:
 
-	virtual void AddAABB(PhysicsDefs::AABB *aabb)
+	virtual void AddAABB(const PhysicsDefs::AABB *aabb)
 	{
 		m_aabbs.push_back(aabb);
 	}
@@ -17,7 +17,7 @@ public:
 	virtual const std::vector<PhysicsDefs::CollisionPair>& GetCollisionPairs();
 
 protected:
-	typedef std::vector<PhysicsDefs::AABB*> AABBVector;
+	typedef std::vector<const PhysicsDefs::AABB*> AABBVector;
 	AABBVector m_aabbs;
 
 };

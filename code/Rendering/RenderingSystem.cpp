@@ -185,10 +185,10 @@ void RenderingSystem::CreateRenderComponent(IEventData* eventData)
 				
 	newComponent.SetProgram(m_program);
 	newComponent.SetDrawPrimitive(renderCompED->GetData()->drawType);
-	newComponent.SetOwner(renderCompED->GetData()->owner);
+	
 
 	m_renderComponents.push_back(newComponent);
-
+	m_renderComponents[m_renderComponents.size() - 1].SetOwner(renderCompED->GetData()->owner);
 	eventData->SetDelete(true);
 }
 

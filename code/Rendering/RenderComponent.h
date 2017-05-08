@@ -38,9 +38,13 @@ public:
 	{
 		return COMPONENT_NAME;
 	}
+	ObjComponentID GetComponentID() override
+	{
+		return COMPONENT_ID;
+	}
 private:
 	const static char* COMPONENT_NAME;
-
+	const static ObjComponentID COMPONENT_ID;
 
 	//Number of vertices to be drawn
 	int m_numVertices;

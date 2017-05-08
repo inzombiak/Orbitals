@@ -9,7 +9,7 @@ class IBroadphase
 public:
 	virtual ~IBroadphase() {}
 
-	virtual void AddAABB(PhysicsDefs::AABB *aabb) = 0;
+	virtual void AddAABB(const PhysicsDefs::AABB *aabb) = 0;
 	virtual void Update() = 0;
 
 	virtual const std::vector<PhysicsDefs::CollisionPair>& GetCollisionPairs() = 0;

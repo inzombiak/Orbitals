@@ -36,10 +36,10 @@ void Manifold::Update(PhysicsDefs::ContactInfo* newContacts, int newContactCount
 		for (int j = 0; j < m_contactCount; ++j)
 		{
 			oldC = m_contacts + j;
-			if ()
+	//		if ()
 			{
-				k = j;
-				break;
+		//		k = j;
+			//	break;
 			}
 		}
 

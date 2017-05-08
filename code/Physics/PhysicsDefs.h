@@ -39,6 +39,8 @@ namespace PhysicsDefs
 		glm::mat4 transform;
 		glm::vec3 localInertia;
 
+		bool enableGravity;
+
 		ICollisionShape* collisionShape = 0;
 	};
 
@@ -85,14 +87,14 @@ namespace PhysicsDefs
 
 		bool Intersects(const AABB& other) const
 		{
-			if (min.x <= other.max.x && max.x >= other.min.x &&
-				min.y <= other.max.y && max.y >= other.min.y &&
-				min.z <= other.max.z && max.z >= other.min.z)
-			{
-				return true;
-			}
+			if (max.x <= other.min.x || min.x >= other.max.x)
+				return false;
+			if (max.y <= other.min.y || min.y >= other.max.y)
+				return false;
+			if (max.z <= other.min.z || min.z >= other.max.z)
+				return false;
 
-			return false;
+			return true;
 		}
 	};
 
@@ -103,21 +105,22 @@ namespace PhysicsDefs
 		glm::vec3 localY;
 		glm::vec3 halfExtents;
 
+		PhysicsDefs::AABB aabb;
+
 		//TODO: SPEED THIS UP
-		PhysicsDefs::AABB GetAABB()
+		void UpdateAABB()
 		{
 			static const glm::vec3 OFFSET(0.01f);
-			PhysicsDefs::AABB result;
-			result.min = glm::vec3(FLT_MAX);
-			result.max = glm::vec3(FLT_MIN);
+			aabb.min = glm::vec3(FLT_MAX);
+			aabb.max = glm::vec3(FLT_MIN);
 			glm::vec3 x, y, z;
 			
 			x = (halfExtents.x + OFFSET.x) * localX;
 			y = (halfExtents.y + OFFSET.y) * localY;
 			z = (halfExtents.z + OFFSET.z) * glm::cross(localX, localY);
 			
-			/*result.min = -(x + y + z);
-			result.max = (x + y + z);*/
+			/*aabb.min = -(x + y + z);
+			aabb.max = (x + y + z);*/
 			glm::vec3 currentVertex, currMultipliers(-1, -1, -1);
 			for (int i = 0; i < 8; ++i)
 			{
@@ -127,20 +130,20 @@ namespace PhysicsDefs
 				currentVertex = x*currMultipliers.x + y*currMultipliers.y + z*currMultipliers.z;
 
 
-				if (result.min.x > currentVertex.x)
-					result.min.x = currentVertex.x;
-				if (result.max.x < currentVertex.x)
-					result.max.x = currentVertex.x;
+				if (aabb.min.x > currentVertex.x)
+					aabb.min.x = currentVertex.x;
+				if (aabb.max.x < currentVertex.x)
+					aabb.max.x = currentVertex.x;
 
-				if (result.min.y > currentVertex.y)
-					result.min.y = currentVertex.y;
-				if (result.max.y < currentVertex.y)
-					result.max.y = currentVertex.y;
+				if (aabb.min.y > currentVertex.y)
+					aabb.min.y = currentVertex.y;
+				if (aabb.max.y < currentVertex.y)
+					aabb.max.y = currentVertex.y;
 
-				if (result.min.z > currentVertex.z)
-					result.min.z = currentVertex.z;
-				if (result.max.z < currentVertex.z)
-					result.max.z = currentVertex.z;
+				if (aabb.min.z > currentVertex.z)
+					aabb.min.z = currentVertex.z;
+				if (aabb.max.z < currentVertex.z)
+					aabb.max.z = currentVertex.z;
 
 				if (i % 2 == 0)
 					currMultipliers.x *= -1;
@@ -149,7 +152,6 @@ namespace PhysicsDefs
 
 			}
 
-			return result;
 		}
 	};
 

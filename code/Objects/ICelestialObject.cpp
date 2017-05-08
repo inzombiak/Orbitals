@@ -54,7 +54,7 @@ WeakObjComponentPtr ICelestialObject::GetComponent(ObjComponentID compType)
 
 bool ICelestialObject::AddComponent(StrongObjComponentPtr component)
 {
-	ObjComponentID compID = component->GetID();
+	ObjComponentID compID = component->GetComponentID();
 
 	ComponentMap::iterator findComp = m_components.find(compID);
 

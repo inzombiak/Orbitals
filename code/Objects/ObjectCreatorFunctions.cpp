@@ -40,6 +40,7 @@ EDCreateObject* ObjectCreators::CreateSphereEventData(IDefaultShapeData* data)
 	scd->rbci.friction = 0.3f;
 	scd->rbci.rollingFriction = 0.3f;
 	scd->rbci.resititution = 0.5f;
+	scd->rbci.enableGravity - true;
 
 	glm::mat4 translationMat = glm::translate(data->position);
 	glm::mat4 scalingMat = glm::scale(data->scale);
@@ -86,6 +87,7 @@ EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 	bcd->rbci.friction = 0.3f;
 	bcd->rbci.rollingFriction = 0.3f;
 	bcd->rbci.resititution = 1.f;
+	bcd->rbci.enableGravity - true;
 
 	glm::mat4 translationMat = glm::translate(data->position);
 	glm::mat4 scalingMat = glm::scale(data->scale);

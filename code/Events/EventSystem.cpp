@@ -58,7 +58,7 @@ void EventSystem::QueueEvent(IEventData* data, bool isSynchronous)
 	}
 
 	auto& callBackList = callBackListIt->second;
-
+	data->SetIsSynchrnous(isSynchronous);
 	for (auto it = callBackList.begin(); it != callBackList.end(); ++it)
 		(*it)(data);
 

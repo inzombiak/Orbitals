@@ -156,3 +156,4 @@ void RenderComponent::SetDrawPrimitive(GLuint type)
 }
 
 const char*  RenderComponent::COMPONENT_NAME = "RENDER_COMPONENT";
+const ObjComponentID RenderComponent::COMPONENT_ID = Orbitals::HashedString::hash_name(RenderComponent::COMPONENT_NAME);

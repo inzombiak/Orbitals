@@ -7,6 +7,9 @@
 class PhysicsComponent : public IObjectComponent
 {
 public:
+	const static char* COMPONENT_NAME;
+	const static ObjComponentID COMPONENT_ID;
+
 	PhysicsComponent(unsigned int id)
 	{
 		m_id = id;
@@ -15,13 +18,31 @@ public:
 	void Update(float dt) override;
 
 	void SetBody(IRigidBody* body);
+
+	void ApplyImpulse(const glm::vec3& impulse)
+	{
+		m_rigidBody->ApplyImpulse(impulse);
+	}
+	void ApplyTorqueImpulse(const glm::vec3& torque)
+	{
+		m_rigidBody->ApplyTorqueImpulse(torque);
+	}
+	void ApplyForce(const glm::vec3& force)
+	{
+		m_rigidBody->ApplyForce(force);
+	}
+
 	const char* GetName() override
 	{
 		return COMPONENT_NAME;
 	}
 
+	ObjComponentID GetComponentID()
+	{
+		return COMPONENT_ID;
+	}
+
 private:
-	const static char* COMPONENT_NAME;
 
 	IRigidBody* m_rigidBody;
 };

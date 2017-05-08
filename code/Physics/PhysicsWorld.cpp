@@ -1,9 +1,11 @@
 #include "PhysicsWorld.h"
-#include "glm\gtc\matrix_transform.hpp"
 #include "../Rendering/PhysDebugDrawer.h"
 #include "IBroadphase.h"
 #include "INarrowphase.h"
 #include "IConstraintSolver.h"
+
+#include "glm\gtc\matrix_transform.hpp"
+#include "glm\gtx\quaternion.hpp"
 
 PhysicsWorld::PhysicsWorld(IBroadphase* broadphase, INarrowphase* narrowphase, IConstraintSolver* constraintSolver)
 {
@@ -178,19 +180,33 @@ void PhysicsWorld::ApplyGravity()
 
 void PhysicsWorld::PredictMotion(float timeStep)
 {
+	float angMag;
 	glm::vec3 linVel, angVel, totalF;
+	glm::mat4 trans, rot, predictedTrans;
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
 		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
 		totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
-
+		angMag = glm::length(angVel);
 		//TODO MOVE TO RIGID BODY
 		if (m_nonStaticRigidBodies[i]->GetMass() != 0)
 			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
 
-		m_nonStaticRigidBodies[i]->UpdateInterpolationTransform( 
-			glm::translate(m_nonStaticRigidBodies[i]->GetTransform(), linVel *timeStep));
+		if (angMag != 0)
+		{
+			trans = glm::translate(glm::mat4(1.f), linVel *timeStep);
+			rot = glm::rotate(m_nonStaticRigidBodies[i]->GetTransform(), glm::radians(angMag), glm::normalize(angVel));
+		}
+		else
+		{
+			rot = glm::mat4(1.f);
+			trans = glm::translate(m_nonStaticRigidBodies[i]->GetTransform(), linVel *timeStep);
+		}
+
+		predictedTrans = trans * rot;
+
+		m_nonStaticRigidBodies[i]->UpdateInterpolationTransform(predictedTrans);
 		m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
 
 	}
@@ -198,17 +214,29 @@ void PhysicsWorld::PredictMotion(float timeStep)
 
 void PhysicsWorld::PerformMovement(float timeStep)
 {
-	glm::vec3 linVel, angVel, totalF;
-	glm::mat4 trans, predictedTrans;
+	float angMag;
+	glm::vec3 linVel, angVel;// , totalF;
+	glm::mat4 trans, rot, predictedTrans;
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
 		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
-		totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
+		angMag = glm::length(angVel);
+		//totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
 
-		trans = m_nonStaticRigidBodies[i]->GetTransform();
+		if (angMag != 0)
+		{
+			trans = glm::translate(glm::mat4(1.f), linVel *timeStep);
+			rot = glm::rotate(m_nonStaticRigidBodies[i]->GetTransform(), glm::radians(angMag), glm::normalize(angVel));
+		}
+		else
+		{
+			rot = glm::mat4(1.f);
+			trans = glm::translate(m_nonStaticRigidBodies[i]->GetTransform(), linVel *timeStep);
+		}
 		
-		predictedTrans = glm::translate(trans, linVel *timeStep);
+		predictedTrans = trans * rot;
+
 		m_nonStaticRigidBodies[i]->UpdateTransform(predictedTrans);
 	}
 }

@@ -2,8 +2,8 @@
 #define I_OBJECT_COMPONENT_H
 
 #include "../Utilities/OrbitalsDefs.h"
+#include "ICelestialObject.h"
 
-class ICelestialObject;
 class IObjectComponent
 {
 public:
@@ -19,6 +19,7 @@ public:
 	void SetOwner(ICelestialObject* owner)
 	{
 		m_owner = owner;
+		m_owner->AddComponent(std::shared_ptr<IObjectComponent>(this));
 	};
 
 	void SetInUse(bool inUse)
@@ -32,6 +33,7 @@ public:
 
 	ICelestialObject* GetOwner() const { return m_owner;  };
 	virtual const char* GetName() = 0;
+	virtual ObjComponentID GetComponentID() = 0;
 	virtual unsigned int GetID() { return m_id; }
 
 protected:

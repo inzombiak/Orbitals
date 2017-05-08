@@ -65,7 +65,7 @@ namespace Orbitals
 
 	typedef unsigned int CelestialObjID;
 	typedef unsigned int SystemID;
-	typedef unsigned int ObjComponentID;
+	typedef unsigned long ObjComponentID;
 
 	template<class Base, class Derived>
 	bool CheckConvertAndCastPtr(std::weak_ptr<Base> weakPtr, std::shared_ptr<Derived>& result)//ConvertToStrongPtr and CastComponentToDerived in one function!
@@ -124,7 +124,7 @@ namespace Orbitals
 		unsigned long getHashValue(void) const
 		{
       
-			return reinterpret_cast<unsigned long>(m_ident);
+			return m_ident;
 		}
 
 		const std::string & getStr() const
@@ -132,7 +132,7 @@ namespace Orbitals
 			return m_identStr;
 		}
     
-		static	void * hash_name(char const *  pIdentStr)
+		static	unsigned long hash_name(char const *  pIdentStr)
 		{
 			// Relatively simple hash of arbitrary text string into a
 			// 32-bit identifier Output value is
@@ -195,7 +195,7 @@ namespace Orbitals
 		#pragma warning(push)
 		#pragma warning(disable : 4312)
 
-		return reinterpret_cast<void *>((s2 << 16) | s1);
+		return ((s2 << 16) | s1);
 
 		#pragma warning(pop)
 		#undef DO1
@@ -225,7 +225,7 @@ namespace Orbitals
 		// we're doing here and makes it easy to allow external code
 		// to assign event types as desired.
 
-		void *             m_ident;
+		unsigned long           m_ident;
 		std::string                m_identStr;
 	};
 

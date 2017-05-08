@@ -21,7 +21,10 @@ IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 	m_localInertia		= rbci.localInertia;
 	m_collisionShape	= rbci.collisionShape;
 
+	m_enableGravity		= rbci.enableGravity;
+
 	m_obb = m_collisionShape->GetLocalOBB();
+	m_obb.aabb.body = this;
 	UpdateInterpolationTransform(m_transform);
 
 	if (m_mass == 0)
@@ -36,6 +39,8 @@ void IRigidBody::ClearForces()
 }
 void IRigidBody::ApplyGravity()
 {
+	if (!m_enableGravity)
+		return;
 	m_totalForce += m_gravity;
 }
 void IRigidBody::ApplyImpulse(const glm::vec3& impulse)
@@ -65,18 +70,12 @@ void IRigidBody::SetGravity(const glm::vec3& gravity)
 	}
 }
 
-PhysicsDefs::AABB IRigidBody::GetAABB()
+PhysicsDefs::AABB& IRigidBody::GetAABB()
 {
-	PhysicsDefs::AABB aabb;
-
-	aabb = m_obb.GetAABB();
-	aabb.body = this;
-	aabb.worldTransfrom = m_interpolationTransform;
-
-	return aabb;
+	return m_obb.aabb;
 }
 
-PhysicsDefs::OBB IRigidBody::GetOBB()
+PhysicsDefs::OBB& IRigidBody::GetOBB()
 {
 	return m_obb;
 }
@@ -133,6 +132,8 @@ void IRigidBody::UpdateInterpolationTransform(const glm::mat4& predictedTrans)
 	m_obb.localX = glm::vec3(tempMat * glm::vec4(1, 0, 0, 0));
 	m_obb.localY = glm::vec3(tempMat * glm::vec4(0, 1, 0, 0));
 	m_obb.pos = glm::vec3(m_interpolationTransform[3]);
+	m_obb.UpdateAABB();
+	m_obb.aabb.worldTransfrom = m_interpolationTransform;
 }
 const glm::mat4& IRigidBody::GetInterpolationTransform()
 {

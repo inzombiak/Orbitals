@@ -114,8 +114,10 @@ void PhysicsSystem::CreatePhysicsComponent(IEventData* eventData)
 	m_rigidBodies.push_back(rb);
 
 	newComponent.SetBody(rb);
-	newComponent.SetOwner(physCompED->GetData()->owner);
+	
+
 	m_physComponents.push_back(newComponent);
+	m_physComponents[m_physComponents.size() - 1].SetOwner(physCompED->GetData()->owner);
 	m_physWorld->AddRigidBody(rb);
 	eventData->SetDelete(true);
 }
