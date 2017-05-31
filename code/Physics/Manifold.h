@@ -11,7 +11,6 @@ public:
 	void Solve();
 	void Update(PhysicsDefs::ContactInfo* newContacts, int newContactCount);
 
-private:
 	static const int MIN_POINTS = 4;
 	PhysicsDefs::ContactInfo m_contacts[6];
 	int m_contactCount = 0;

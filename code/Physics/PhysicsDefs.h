@@ -1,7 +1,10 @@
-#pragma once
+#ifndef PHYSICS_DEFS_H
+#define PHYSICS_DEFS_H
 
 #include <array>
 #include <vector>
+#define _USE_MATH_DEFINES
+#include <math.h> 
 
 #include "../Utilities/GameDefs.h"
 
@@ -157,8 +160,6 @@ namespace PhysicsDefs
 	typedef std::pair<IRigidBody*, IRigidBody*> CollisionPair;
 	typedef std::pair<CollisionPair, ContactInfo> CollPairContactInfo;
 	
-	
-
 	class ICreationData
 	{
 	public:
@@ -234,5 +235,144 @@ namespace PhysicsDefs
 			ICreationData::bodyType = PhysicsBodyType::RigidBody;
 		}
 	};
+
+	struct Edge
+	{
+		Edge(const glm::vec2& s, const glm::vec2 e)
+		{
+			start = s;
+			end = e;
+			normal.x = -e.y + s.y;
+			normal.y = e.x - s.x;
+		}
+
+		bool IsInFront(glm::vec2 point)
+		{
+			return glm::dot(normal, point - start) < 0;
+		}
+
+		glm::vec2 start, end, normal;
+	};
+	
+	struct Ray
+	{
+		Ray()
+		{}
+		Ray(const glm::vec2& o, const glm::vec2& d)
+		{
+			origin = o;
+			direction = d;
+		}
+
+		glm::vec2 origin;
+		glm::vec2 direction;
+	};
+	
+	inline float Cross2D(const glm::vec2& a, const glm::vec2& b)
+	{
+		return a.x * b.y - b.x * a.y;
+	}
+
+	inline bool InfLineInfLineIntersect(const Ray& rayA, const Ray& rayB, glm::vec2& intersectPoint)
+	{
+		//Cross product of the directions
+		float dirCross = Cross2D(rayA.direction, rayB.direction);
+		if (dirCross == 0)
+			return false;
+
+		glm::vec2 originDiff = rayB.origin - rayA.origin;
+		float t = (Cross2D(originDiff, rayB.direction)) / dirCross;
+		float u = (Cross2D(originDiff, rayA.direction)) / dirCross;
+
+		t = roundf(t * 100) / 100;
+		intersectPoint = rayA.origin + (float)t * rayA.direction;
+		return true;
+	}
+
+
+	inline std::vector<glm::vec2> ClipPolygon(const std::vector<glm::vec2>& polygon, const std::vector<glm::vec2>& clippingPlane)
+	{
+		std::vector<glm::vec2> currShape = polygon;
+		std::vector<glm::vec2> result;
+		glm::vec2 s, e, intersectionPoint;
+
+		for (int i = 0; i < clippingPlane.size() - 1; ++i)
+		{
+			result.clear();
+			
+			//TODO:: ??????
+			if (currShape.size() == 0)
+				return result;
+
+			Edge clipEdge(clippingPlane[i], clippingPlane[i + 1]);
+			s = currShape.back();
+
+			bool test = false;
+
+			for (int j = 0; j < currShape.size(); ++j)
+			{
+				e = currShape[j];
+				//IsOnRight = true means point is "inside" plane
+				if (clipEdge.IsInFront(s))
+				{
+					if (!clipEdge.IsInFront(e))
+					{
+						/*if (sfmath::RayLineIntersect(sfmath::Ray(clipEdge.start, clipEdge.end- clipEdge.start), s, e, intersectionPoint))
+						result.push_back(intersectionPoint);*/
+						if (InfLineInfLineIntersect(Ray(s, e - s), Ray(clipEdge.start, clipEdge.end - clipEdge.start), intersectionPoint))
+							result.push_back(intersectionPoint);
+					}
+					else
+						result.push_back(e);
+					test = true;
+				}
+				else if (clipEdge.IsInFront(e))
+				{
+					if (InfLineInfLineIntersect(Ray(s, e - s), Ray(clipEdge.start, clipEdge.end - clipEdge.start), intersectionPoint))
+						result.push_back(intersectionPoint);
+					result.push_back(e);
+					test = true;
+				}
+				s = e;
+
+				if (!test)
+					printf("TEST FLASE \n");
+
+			}
+			if (result.size() < 4)
+				printf("TE2ST FLASE \n");
+			currShape = result;
+		}
+
+		//result.clear();
+		//Edge clipEdge(clippingPlane.back(), clippingPlane[0]);
+		//s = currShape.back();
+		//for (int j = 0; j < currShape.size(); ++j)
+		//{
+		//	e = currShape[j];
+		//	//IsOnRight = true means point is "inside" plane
+		//	if (clipEdge.IsInFront(s))
+		//	{
+		//		if (!clipEdge.IsInFront(e))
+		//		{
+		//			if (InfLineInfLineIntersect(Ray(s, e - s), Ray(clipEdge.start, clipEdge.end - clipEdge.start), intersectionPoint))
+		//				result.push_back(intersectionPoint);
+		//		}
+		//		else
+		//			result.push_back(e);
+		//	}
+		//	else if (clipEdge.IsInFront(e))
+		//	{
+		//		if (InfLineInfLineIntersect(Ray(s, e - s), Ray(clipEdge.start, clipEdge.end - clipEdge.start), intersectionPoint))
+		//			result.push_back(intersectionPoint);
+		//		result.push_back(e);
+		//	}
+		//	s = e;
+		//}
+
+		return result;
+	}
+
 }
 
+#endif

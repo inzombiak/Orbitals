@@ -254,13 +254,13 @@ void PhysicsWorld::PerformCollisionCheck(float dt)
 		return;
 
 	m_narrowphaseResult = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
+	auto manifolds = m_narrowphase->CheckCollision2(collidingPairs, NarrowphaseErrorCalback);
 
 	//TODO: THIS RESULT MIGHT NOT HAVE THE RIGHT LOCAL AND WORLD POINTS IN A AND B, TEST IT
-
 	if (m_narrowphaseResult.size() < 1)
 		return;
-
-	m_constraintSolver->SolveConstraints(m_narrowphaseResult, dt);
+	//m_constraintSolver->SolveConstraints(m_narrowphaseResult, dt);
+	m_constraintSolver->SolveConstraints2(manifolds, dt);
 }
 
 void PhysicsWorld::NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult)

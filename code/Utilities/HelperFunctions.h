@@ -21,7 +21,7 @@ struct CarInfo
 };
 
 
-//Shader compliation helped funcitons
+//Shader compliation helper funcitons
 //Reads a file to a std::string
 std::string ReadFileToString(const char* filePath);
 //Creates a GLenum type shader from a string

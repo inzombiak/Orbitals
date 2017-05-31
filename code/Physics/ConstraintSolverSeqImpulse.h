@@ -6,8 +6,11 @@
 class ConstraintSolverSeqImpulse : public IConstraintSolver
 {
 public:
-
 	void SolveConstraints(std::vector<PhysicsDefs::CollPairContactInfo>& info, float dt) override;
+	void SolveConstraints2(std::vector<Manifold>& info, float dt) override;
+
+private:
+	void SolveContact(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& info, float dt);
 
 };
 
