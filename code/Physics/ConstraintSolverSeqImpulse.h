@@ -10,6 +10,7 @@ public:
 	void SolveConstraints2(std::vector<Manifold>& info, float dt) override;
 
 private:
+	void PreStep(std::vector<Manifold>& info, float dt);
 	void SolveContact(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& info, float dt);
 
 };

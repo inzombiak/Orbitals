@@ -45,7 +45,6 @@ void PhysicsWorld::SetGravity(const glm::vec3& grav)
 
 void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTimeStep)
 {
-
 	int numSimulationSubSteps = 0;
 
 	if (maxSubSteps)

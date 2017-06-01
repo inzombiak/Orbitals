@@ -70,6 +70,12 @@ namespace PhysicsDefs
 		//TODO: Maybe move it out
 		float prevNormalImp = 0.f;
 		float prevTangImp = 0.f;
+
+		//Calculated in prestep
+		float massNormal;
+		float massTangent;
+		float bias;
+
 	};
 
 	struct SupportPoint

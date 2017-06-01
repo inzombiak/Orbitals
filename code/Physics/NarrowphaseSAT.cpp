@@ -338,7 +338,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		if (depth > 0.00001f && depth < contactInfo.depth)
 		{
 			contactInfo.depth = depth;
-			contactInfo.normal = -obb1.localAxes[i];
+			contactInfo.normal = obb1.localAxes[i];
 			featureID = i + 1;
 		}
 	}
@@ -357,7 +357,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		if (depth > 0.00001f && depth < contactInfo.depth)
 		{
 			contactInfo.depth = depth;
-			contactInfo.normal = obb2.localAxes[i];
+			contactInfo.normal = -obb2.localAxes[i];
 			featureID = i + 4;
 		}
 	}
@@ -538,7 +538,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		return false;
 
 	//Reference face is on body1
-	if (featureID > 3)
+	if (featureID <= 3)
 	{
 		rot1[0] = obb1.localAxes[0];
 		rot1[1] = obb1.localAxes[1];
@@ -778,9 +778,6 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 			contacts[j].worldPos = point[iret[j]] + pos1;
 			contacts[j].depth = dep[iret[j]];
 			contacts[j].normal = faceNorm;
-
-
-
 		}
 		count = maxc;
 	}
@@ -790,7 +787,9 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	for (int i = 0; i < count; ++i)
 	{
 		contacts[i].localPointA = glm::vec3(invTrans1 * glm::vec4(contacts[i].worldPos, 1.f));
+		//contacts[i].worldPointA = glm::vec3(body1->GetInterpolationTransform() * glm::vec4(contacts[i].localPointA, 1.f));
 		contacts[i].localPointB = glm::vec3(invTrans2 * glm::vec4(contacts[i].worldPos, 1.f));
+		//contacts[i].worldPointB = contacts[i].localPointB + obb2.pos;
 	}
 
 	manifold.Update(contacts, count);
