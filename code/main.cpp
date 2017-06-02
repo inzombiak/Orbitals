@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 //Include GLEW. Used for handling OpenGL extensions. http://glew.sourceforge.net/
 #define GLEW_STATIC
@@ -33,29 +34,35 @@ Engine m_engine;
 static TCHAR szWindowClass[] = _T("orbitalsApp");
 static TCHAR szTitle[] = _T("Orbitals");
 
-double m_clockFreq = 0;
-__int64 m_lastClockTime;
+//LARGE_INTEGER m_lastClockTime;
+//LARGE_INTEGER m_frequency;
+std::chrono::time_point<std::chrono::system_clock> m_lastTime;
 //Timer function
 void StartCounter()
 {
-	LARGE_INTEGER li;
-	if (!QueryPerformanceFrequency(&li))
+	/*if (!QueryPerformanceFrequency(&m_frequency))
 		std::cout << "QueryPerformanceFrequency failed!\n";
-	std::cout << "Freq " << li.QuadPart << std::endl;
-	m_clockFreq = double(li.QuadPart);// / 1000.0;
 
+	LARGE_INTEGER li;
 	QueryPerformanceCounter(&li);
-	m_lastClockTime = li.QuadPart;
+	m_lastClockTime = li;*/
+	m_lastTime = std::chrono::system_clock::now();
 }
 
 double GetCounter()
 {
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
 
-	double result = double(li.QuadPart - m_lastClockTime) / m_clockFreq;
-	m_lastClockTime = li.QuadPart;
-	return result;
+	//double result = li.QuadPart - m_lastClockTime.QuadPart;
+	//result /= m_frequency.QuadPart;
+	//m_lastClockTime = li;
+	////printf("TIME %lf \n", result);
+	//return result;
+	auto now = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed_seconds = now - m_lastTime;
+	m_lastTime = now;
+	return elapsed_seconds.count();
 }
 
 void EnableConsole()
@@ -291,7 +298,7 @@ int WINAPI WinMain(		 //https://msdn.microsoft.com/library/windows/desktop/ms633
 		GLfloat bg[3] = {255, 0, 0 };
 		glClearBufferfv(GL_COLOR, 0, bg); // clear the color buffer to color bg, which we set to red
 		m_engine.Step(GetCounter());
-      
+ 
 		SwapBuffers(hdc);  //Swap buffers to new display
 		DispatchMessage(&msg);  //Sends message to the window  procedure
 	}

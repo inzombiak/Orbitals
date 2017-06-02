@@ -111,17 +111,14 @@ void Engine::Test()
 
 	EDCreateObject* boxED;
 	ObjectCreators::BoxShapeData boxData;
-	boxData.extents = glm::vec3(20, 3, 20);
-	boxData.position = glm::vec3(0, 0, 0);
 	boxData.rotation = glm::vec3(0, 0, 0);
 	boxData.scale = glm::vec3(1, 1, 1);
 	boxData.color = glm::vec3(0.f, 1.f, 0.f);
-
-
+	boxData.extents = glm::vec3(20, 3, 20);
+	boxData.position = glm::vec3(0, 0, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.enableGravity = false;
-	EventSystem::GetInstance()->QueueEvent(boxED, false);
-	
+	EventSystem::GetInstance()->QueueEvent(boxED, true);
 	/*
 	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Sphere, static_cast<ObjectCreators::IDefaultShapeData*>(&sphereData)), false);
 	sphereData.position = glm::vec3(3, 8, -5);
@@ -154,20 +151,26 @@ void Engine::Test()
 	std::shared_ptr<PhysicsComponent> pc;
 	if (Orbitals::CheckConvertAndCastPtr<IObjectComponent, PhysicsComponent>(boxED->GetData()->createdObject->GetComponent(PhysicsComponent::COMPONENT_ID), pc))
 	{
-//		pc->ApplyTorqueImpulse(glm::vec3(2.f, 2.f, 0.f));
+		//pc->ApplyTorqueImpulse(glm::vec3(2.f, 2.f, 0.f));
 		//pc->ApplyImpulse(glm::vec3(2.f, 0.f, 0.f));
 	}
-	//boxData.position = glm::vec3(4.2, 10, -5);
+	//boxData.extents = glm::vec3(20, 3, 20);
+	//boxData.position = glm::vec3(0, 0, 0);
+	//boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
+	//boxED->GetData()->rigidBodyData->rbci.enableGravity = false;
+	//EventSystem::GetInstance()->QueueEvent(boxED, false);
+
+	//boxData.position = glm::vec3(4.2, 10,-5);
 	//boxData.extents = glm::vec3(3, 3, 3);
 	/*boxData.position = glm::vec3(0, 10, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 1;
-	EventSystem::GetInstance()->QueueEvent(boxED, false);*/
+	EventSystem::GetInstance()->QueueEvent(boxED, false);
 	boxData.color = glm::vec3(1.f, 0.f, 0.f);
 	boxData.position = glm::vec3(0, 30, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 1;
-	EventSystem::GetInstance()->QueueEvent(boxED, false);
+	EventSystem::GetInstance()->QueueEvent(boxED, false);*/
 
 	/*boxData.position = glm::vec3(6, 20, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
@@ -187,20 +190,39 @@ void Engine::Test()
 
 }
 
-void Engine::Step(double dt)
+void Engine::ClearRender()
+{
+	auto it = m_systemMap.find(Orbitals::SystemPriority::SRendering);
+	if (it == m_systemMap.end())
+		return;
+
+	std::shared_ptr<RenderingSystem> ptr;
+	if (CheckConvertAndCastPtr<ISystem, RenderingSystem>(it->second, ptr))
+		ptr->ClearRender();
+}
+
+void Engine::Step(double elapsedTime)
 {
 	if (m_engineState != Running)
 		return;
-
-	auto it = m_systemMap.begin();
-
-	while (it != m_systemMap.end())
+	//printf("TIME: %lf \n", elapsedTime);
+	int frames = 0;
+	m_accumulator += elapsedTime;
+	while (m_accumulator >= DELTA_T)
 	{
-		it->second->Update(dt);
-		it++;
+		ClearRender();
+		auto it = m_systemMap.begin();
+		while (it != m_systemMap.end())
+		{
+			it->second->Update(DELTA_T);
+			it++;
+		}
+		m_accumulator -= DELTA_T;
+		ORB_DBG::Instance().DisplayFPS(DELTA_T);
+		frames++;
 	}
+//	printf("FRAMES %i \n", frames);
 
-	ORB_DBG::Instance().DisplayFPS(dt);
 	Draw();
 }
 

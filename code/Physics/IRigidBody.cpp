@@ -50,6 +50,10 @@ void IRigidBody::ApplyImpulse(const glm::vec3& impulse)
 void IRigidBody::ApplyTorqueImpulse(const glm::vec3& torque)
 {
 	m_angularVelocity += m_invInertiaTensor * torque;
+
+	if (glm::dot(m_angularVelocity, m_angularVelocity) < 0.01f)
+		m_angularVelocity = glm::vec3(0);
+
 }
 
 void IRigidBody::ApplyForce(const glm::vec3& force)
@@ -93,6 +97,11 @@ void IRigidBody::SetLinearVelocity(const glm::vec3& newLinVel)
 	m_linearVelocity = newLinVel;
 	if (glm::dot(m_linearVelocity, m_linearVelocity) < 0.01f)
 		m_linearVelocity = glm::vec3(0);
+	else if (glm::dot(m_linearVelocity, m_linearVelocity) > 1000.f)
+	{
+		float fraction = glm::dot(m_linearVelocity, m_linearVelocity) / 1000.f;
+		m_linearVelocity /= fraction;
+	}
 }
 glm::vec3 IRigidBody::GetAngularVelocity() const
 {

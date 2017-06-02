@@ -59,11 +59,12 @@ private:
 	void InitSim();
 	void Reset();
 	void UpdateCameraRotation(float xRotate, float yRotate);
-
+	void ClearRender();
 	//WeakSystemPtr GetSystemWithByID
 	Input::MouseStatus m_mouseStatus;
 	int m_screenWidth, m_screenHeight;
-	float m_timeStep = 1.f / 240.f;
+	const double DELTA_T = 1.f / 30.f;
+	double m_accumulator = 0;
 	int m_numberOfSubSteps = 10;
 	EngineState m_engineState;
 	std::map<Orbitals::SystemPriority, StrongSystemPtr> m_systemMap;

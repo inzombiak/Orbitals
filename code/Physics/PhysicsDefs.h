@@ -304,14 +304,14 @@ namespace PhysicsDefs
 
 		for (int i = 0; i < clippingPlane.size() - 1; ++i)
 		{
-			result.clear();
+			result.resize(0);
 			
 			//TODO:: ??????
 			if (currShape.size() == 0)
 				return result;
 
 			Edge clipEdge(clippingPlane[i], clippingPlane[i + 1]);
-			s = currShape.back();
+			s = currShape[currShape.size() - 1];
 
 			bool test = false;
 
@@ -375,8 +375,43 @@ namespace PhysicsDefs
 		//	}
 		//	s = e;
 		//}
-
 		return result;
+	}
+
+	inline float Clamp(float n, float min, float max)
+	{
+		if (n < min)
+			return min;
+		if (n > max)
+			return max;
+
+		return n;
+	}
+
+
+	inline void RayClosestApproach(const glm::vec3& pointA, const glm::vec3& dirA,
+								   const glm::vec3& pointB, const glm::vec3& dirB,
+								   float& alpha, float& beta)
+	{
+		glm::vec3 r = pointA - pointB;
+
+		//Squared lengths
+		float ab = glm::dot(dirA, dirB);
+		float q1 = glm::dot(dirA, r);
+		float q2 = -glm::dot(dirB, r);
+		float d = 1 - ab - ab;
+		if (d <= -.0001)
+		{
+			alpha = 0;
+			beta = 0;
+		}
+		else
+		{
+			d = 1.f / d;
+			alpha = (q1 + ab * q2) * d;
+			beta = (ab * q1 + q2) * d;
+		}
+
 	}
 
 }

@@ -16,7 +16,7 @@ private:
 	bool SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Manifold& manifold);
 
 	//Used for culling manifold points
-	void CullPoints(const std::vector<glm::vec2>& points, int finalCount, int firstEntry, int culledPoints[]);
+	void CullPoints(std::vector<glm::vec2> points, int finalCount, int firstEntry, int culledPoints[]);
 };
 
 #endif

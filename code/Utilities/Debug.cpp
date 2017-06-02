@@ -41,7 +41,7 @@ void Debug::DisplayFPS(float dt)
 	m_time += dt;
 	if (m_time >= 1)
 	{
-		std::cout << "FPS: " << m_frames << std::endl;
+		std::cout << "FPS: " << m_frames - 1 << std::endl;
 		m_frames = 0;
 		m_time = 0;
 	}

@@ -357,7 +357,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		if (depth > 0.00001f && depth < contactInfo.depth)
 		{
 			contactInfo.depth = depth;
-			contactInfo.normal = -obb2.localAxes[i];
+			contactInfo.normal = obb2.localAxes[i];
 			featureID = i + 4;
 		}
 	}
@@ -481,6 +481,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	{
 		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[2], obb2.localAxes[0]);
+
 		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
 		{
 			contactInfo.depth = depth;
@@ -534,8 +535,58 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	glm::vec3 pos1, pos2, extents1, extents2;
 	glm::vec3 rot1[3], rot2[3];
 
+	glm::vec3 faceNorm = contactInfo.normal, referenceNormal, absReferenceNormal;
+	//printf("NORM: %lf, %lf, %lf", faceNorm.x, faceNorm.y, faceNorm.z);
+
+	//In this case the normal will be pointing from 2 to 1 so we flip it
+	if (featureID > 3)
+	{
+		faceNorm = -contactInfo.normal;
+	}
+
+
 	if (featureID > 6)
-		return false;
+	{
+		glm::vec3 pa;
+		float sign;
+
+		pa = obb1.pos;
+		for (int i = 0; i < 3; ++i)
+		{
+			sign = glm::dot(faceNorm, obb1.localAxes[i]) > 0 ? 1.f : -1.f;
+			for (int j = 0; j < 3; ++j)
+			{
+				pa[i] += sign * obb1.halfExtents[j] * obb1.localAxes[i][j];
+			}
+		}
+
+		glm::vec3 pb;
+		pb = obb2.pos;
+		for (int i = 0; i < 3; ++i)
+		{
+			sign = glm::dot(faceNorm, obb2.localAxes[i]) > 0 ? 1.f : -1.f;
+			for (int j = 0; j < 3; ++j)
+			{
+				pb[i] += sign * obb2.halfExtents[j] * obb2.localAxes[i][j];
+			}
+		}
+
+		float alpha, beta;
+		glm::vec3 ua, ub;
+		ua = obb1.localAxes[(featureID - 7) / 3];
+		ub = obb2.localAxes[(featureID - 7) / 3];
+		
+		PhysicsDefs::RayClosestApproach(pa, ua, pb, ub, alpha, beta);
+		pa += ua * alpha;
+		pb += ub * beta;
+
+		contactInfo.worldPos = 0.5f * (pa + pb);
+		glm::mat4 invTrans1 = glm::inverse(body1->GetInterpolationTransform()), invTrans2 = glm::inverse(body2->GetInterpolationTransform());
+		contactInfo.localPointA = glm::vec3(invTrans1 * glm::vec4(contactInfo.worldPos, 1.f));
+		contactInfo.localPointB = glm::vec3(invTrans2 * glm::vec4(contactInfo.worldPos, 1.f));
+		manifold.Update(&contactInfo, 1);
+		return true;
+	}
 
 	//Reference face is on body1
 	if (featureID <= 3)
@@ -563,13 +614,6 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		pos2 = obb1.pos;
 		extents1 = obb2.halfExtents;
 		extents2 = obb1.halfExtents;
-	}
-
-	glm::vec3 faceNorm = contactInfo.normal, referenceNormal, absReferenceNormal;
-	//In this case the normal will be pointing from 2 to 1 so we flip it
-	if (featureID > 3)
-	{
-		faceNorm = -contactInfo.normal;
 	}
 
 	//Rotate the norm
@@ -696,9 +740,9 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	if (ret.size() < 1)
 		return false;
-
-	glm::vec3 point[4];
-	float dep[4];
+	ret.resize(ret.size());
+	glm::vec3 point[16];
+	float dep[16];
 	float det1 = 1.0f / (m11 * m22 - m12 * m21);
 
 	m11 *= det1;
@@ -708,12 +752,13 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	//Number of penetrating contact points found
 	int cnum = 0;
-
+	glm::vec2 GG;
 	for (int j = 0; j < ret.size(); ++j)
 	{
 		float k1 = m22*(ret[j].x - c1) - m12*(ret[j].y - c2);
 		float k2 = -m21*(ret[j].x - c1) + m11*(ret[j].y - c2);
-
+		if (ret.size() > 4)
+			GG = ret[4];
 		point[cnum] = center + k1 * rot2[incFace1] + k2 * rot2[incFace2];
 		dep[cnum]	= extents1[codeN] - glm::dot(faceNorm, point[cnum]);
 		
@@ -724,6 +769,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 			cnum++;
 		}
+
 	}
 
 	//TODO: ERROR
@@ -793,14 +839,15 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	}
 
 	manifold.Update(contacts, count);
-
-
+	
 	delete [] contacts;
-
+	ret = std::vector<glm::vec2>();
+	quad.clear();
+	rect.clear();
 	return true;
 }
 
-void NarrowphaseSAT::CullPoints(const std::vector<glm::vec2>& points, int finalCount, int firstEntry, int culledPoints[])
+void NarrowphaseSAT::CullPoints(std::vector<glm::vec2> points, int finalCount, int firstEntry, int culledPoints[])
 {
 	// Compute centroid
 	int i, j, pointCount = points.size();

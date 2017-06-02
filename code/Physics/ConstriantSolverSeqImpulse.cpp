@@ -162,12 +162,7 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 
 	glm::vec3 invMJ;
 	glm::vec3 impulse1, impulse2, torque1, torque2, relativeVel;
-	glm::vec3 startingVel1, startingVel2;
 
-	startingVel1 = body1->GetLinearVelocity();
-	startingVel2 = body2->GetLinearVelocity();
-	//interpolationTrans1 = body1->GetInterpolationTransform();
-	//interpolationTrans2 = body2->GetInterpolationTransform();
 	invM1 = body1->GetInverseMass();
 	invM2 = body1->GetInverseMass();
 	localANorm = glm::cross(contact.localPointA, normal);
@@ -189,7 +184,7 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 	lambda = -(JV + contact.bias + restitution) / contact.massNormal;
 	{
 		oldLambda = contact.prevNormalImp;
-		contact.prevNormalImp = std::min(oldLambda + lambda, 0.f);
+		contact.prevNormalImp = std::max(oldLambda + lambda, 0.f);
 		lambda = oldLambda - contact.prevNormalImp;
 	}
 
@@ -197,10 +192,11 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 	torque1 = glm::cross(contact.localPointA, impulse);
 	torque2 = glm::cross(contact.localPointB, impulse);
 
-	body1->ApplyImpulse(impulse);
+	body1->ApplyImpulse(-impulse);
 	body2->ApplyImpulse(impulse);
-	body1->ApplyTorqueImpulse(torque1);
-	body2->ApplyTorqueImpulse(torque2);
+
+	//body1->ApplyTorqueImpulse(torque1);
+	//body2->ApplyTorqueImpulse(-torque2);
 	//body1->SetAngularVelocity(aVel1 + invM1 * glm::cross(contact.localPointA, impulse));
 	//body2->SetAngularVelocity(aVel2 - invM2 * glm::cross(contact.localPointB, impulse));
 	//// Apply contact impulse

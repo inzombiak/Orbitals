@@ -72,7 +72,7 @@ void RenderingSystem::Clear()
 
 void RenderingSystem::ClearRender()
 {
-	
+	m_physDebugDrawer.Clear();
 }
 
 void RenderingSystem::Update(float dt)
@@ -168,7 +168,6 @@ void RenderingSystem::Draw()
 	}
 
 	m_physDebugDrawer.Draw(MVP);
-	m_physDebugDrawer.Clear();
 }
 
 void RenderingSystem::CreateRenderComponent(IEventData* eventData)
