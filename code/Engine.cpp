@@ -114,7 +114,7 @@ void Engine::Test()
 	boxData.rotation = glm::vec3(0, 0, 0);
 	boxData.scale = glm::vec3(1, 1, 1);
 	boxData.color = glm::vec3(0.f, 1.f, 0.f);
-	boxData.extents = glm::vec3(20, 3, 20);
+	boxData.extents = glm::vec3(20, 2, 20);
 	boxData.position = glm::vec3(0, 0, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.enableGravity = false;
@@ -142,7 +142,7 @@ void Engine::Test()
 	
 	boxData.extents = glm::vec3(2, 2, 2);
 	//boxData.rotation = glm::vec3(0, -M_PI_2 /3, 0);
-	boxData.position = glm::vec3(0, 14, 0);
+	boxData.position = glm::vec3(0, 20, 0);
 	//boxData.position = glm::vec3(6, 5, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 1;
@@ -208,19 +208,19 @@ void Engine::Step(double elapsedTime)
 	//printf("TIME: %lf \n", elapsedTime);
 	int frames = 0;
 	m_accumulator += elapsedTime;
-	while (m_accumulator >= DELTA_T)
-	{
+	//while (m_accumulator >= DELTA_T)
+	//{
 		ClearRender();
 		auto it = m_systemMap.begin();
 		while (it != m_systemMap.end())
 		{
-			it->second->Update(DELTA_T);
+			it->second->Update(elapsedTime);
 			it++;
 		}
 		m_accumulator -= DELTA_T;
-		ORB_DBG::Instance().DisplayFPS(DELTA_T);
+		ORB_DBG::Instance().DisplayFPS(elapsedTime);
 		frames++;
-	}
+	//}
 //	printf("FRAMES %i \n", frames);
 
 	Draw();

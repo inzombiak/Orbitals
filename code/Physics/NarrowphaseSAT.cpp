@@ -731,12 +731,12 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	std::vector<glm::vec2> rect;
 	rect.resize(4, glm::vec2(0, 0));
 	rect[0] = glm::vec2(0, 0);
-	rect[1] = glm::vec2(0, extents1[code2]);
-	rect[2] = glm::vec2(extents1[code1], extents1[code2]);
-	rect[3] = glm::vec2(extents1[code1], 0);
+	rect[1] = glm::vec2(0, 2*extents1[code2]);
+	rect[2] = glm::vec2(2*extents1[code1], 2*extents1[code2]);
+	rect[3] = glm::vec2(2*extents1[code1], 0);
 	
 	//Intersect faces
-	std::vector<glm::vec2> ret = PhysicsDefs::ClipPolygon(rect, quad);
+	std::vector<glm::vec2> ret = PhysicsDefs::ClipPolygon(quad, rect);
 
 	if (ret.size() < 1)
 		return false;

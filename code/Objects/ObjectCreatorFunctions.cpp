@@ -86,7 +86,7 @@ EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 	bcd->rbci.angularDamping = 0.f;
 	bcd->rbci.friction = 0.3f;
 	bcd->rbci.rollingFriction = 0.3f;
-	bcd->rbci.resititution = 0.f;
+	bcd->rbci.resititution = 1.f;
 	bcd->rbci.enableGravity = true;
 
 	glm::mat4 translationMat = glm::translate(data->position);

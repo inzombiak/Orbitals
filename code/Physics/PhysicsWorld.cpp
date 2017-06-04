@@ -148,21 +148,20 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 		}
 	}
 
-	PhysicsDefs::ContactInfo info;
-	PhysicsDefs::CollisionPair bodies;
-	if (m_narrowphaseResult.size() > 0)
+	glm::vec3 pos1, pos2;
+
+	if (m_manifolds.size() > 0)
 	{
-		for (unsigned int i = 0; i < m_narrowphaseResult.size(); ++i)
+		for (unsigned int i = 0; i < m_manifolds.size(); ++i)
 		{
-			info = m_narrowphaseResult[i].second;
-			bodies = m_narrowphaseResult[i].first;
-
-			//m_physDebugDrawer->DrawPoint(info.worldPos, 2, glm::vec3(0, 1, 1));
-			m_physDebugDrawer->DrawPoint(info.worldPointA, 1, glm::vec3(0, 1, 1));
-			//m_physDebugDrawer->DrawPoint(info.worldPointB, 2, glm::vec3(1, 0, 1));
-			//m_physDebugDrawer->DrawPoint(glm::vec3(bodies.first->GetTransform() * glm::vec4(info.localPointA, 1)), 3, glm::vec3(1, 1, 0));
-			m_physDebugDrawer->DrawPoint(glm::vec3(bodies.second->GetTransform() * glm::vec4(info.localPointB, 1)), 4, glm::vec3(1, 0, 0));
-
+			pos1 = glm::vec3(m_manifolds[i].m_bodyA->GetInterpolationTransform()[3]);
+			pos2 = glm::vec3(m_manifolds[i].m_bodyB->GetInterpolationTransform()[3]);
+			for (int j = 0; j < m_manifolds[i].m_contactCount; ++j)
+			{
+				m_physDebugDrawer->DrawPoint(m_manifolds[i].m_contacts[j].worldPos, 0.2, glm::vec3(0, 1, 1));
+				m_physDebugDrawer->DrawLine(pos1, pos1 + m_manifolds[i].m_contacts[j].localPointA, glm::vec3(0.5, 0.5, 0.5));
+				m_physDebugDrawer->DrawLine(pos2, pos2 + m_manifolds[i].m_contacts[j].localPointB, glm::vec3(0.5, 0.5, 0.5));
+			}
 		}
 	}
 
@@ -197,7 +196,7 @@ void PhysicsWorld::PredictMotion(float timeStep)
 		if (angMag != 0)
 		{
 			rot = glm::rotate(trans, glm::radians(angMag), glm::normalize(angVel));
-			trans = glm::translate(glm::mat4(1.f), linVel *timeStep);
+			trans = glm::translate(glm::mat4(1.f), linVel);
 		}
 		else
 		{
@@ -230,12 +229,12 @@ void PhysicsWorld::PerformMovement(float timeStep)
 		if (angMag != 0)
 		{
 			rot = glm::rotate(trans, glm::radians(angMag), glm::normalize(angVel));
-			trans = glm::translate(glm::mat4(1.f), linVel *timeStep);
+			trans = glm::translate(glm::mat4(1.f), linVel);
 		}
 		else
 		{
 			rot = glm::mat4(1.f);
-			trans = glm::translate(trans, linVel *timeStep);
+			trans = glm::translate(trans, linVel * timeStep);
 		}
 		
 		predictedTrans = trans * rot;
@@ -253,13 +252,13 @@ void PhysicsWorld::PerformCollisionCheck(float dt)
 		return;
 
 	m_narrowphaseResult = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
-	auto manifolds = m_narrowphase->CheckCollision2(collidingPairs, NarrowphaseErrorCalback);
+	m_manifolds = m_narrowphase->CheckCollision2(collidingPairs, NarrowphaseErrorCalback);
 
 	//TODO: THIS RESULT MIGHT NOT HAVE THE RIGHT LOCAL AND WORLD POINTS IN A AND B, TEST IT
 	if (m_narrowphaseResult.size() < 1)
 		return;
 	//m_constraintSolver->SolveConstraints(m_narrowphaseResult, dt);
-	m_constraintSolver->SolveConstraints2(manifolds, dt);
+	m_constraintSolver->SolveConstraints2(m_manifolds, dt);
 }
 
 void PhysicsWorld::NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult)

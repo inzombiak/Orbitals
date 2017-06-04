@@ -6,6 +6,7 @@
 #include <glm\glm.hpp>
 
 #include "IRigidBody.h"
+#include "Manifold.h"
 
 class PhysDebugDrawer;
 class IBroadphase;
@@ -39,7 +40,8 @@ private:
 	// Stores error
 	static std::vector<glm::vec3> m_narrowphaseError;
 	std::vector<PhysicsDefs::CollPairContactInfo> m_narrowphaseResult;
-	
+	std::vector<Manifold> m_manifolds;
+
 	float m_fixedTimeStep = 0;
 	float m_localTime = 0;
 

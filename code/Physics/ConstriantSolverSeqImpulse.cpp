@@ -101,7 +101,7 @@ void ConstraintSolverSeqImpulse::SolveConstraints(std::vector<PhysicsDefs::CollP
 void ConstraintSolverSeqImpulse::SolveConstraints2(std::vector<Manifold>& manifolds, float dt)
 {
 	PreStep(manifolds, dt);
-	for (int j = 0; j < 10; ++j)
+	for (int j = 0; j < 1; ++j)
 	{
 		for (int i = 0; i < manifolds.size(); ++i)
 		{
@@ -116,30 +116,37 @@ void ConstraintSolverSeqImpulse::SolveConstraints2(std::vector<Manifold>& manifo
 void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float dt)
 {
 	PhysicsDefs::ContactInfo* contact;
-	float invM1, invM2, totalInvMass;
-	glm::vec3 localANorm, localBNorm;
+	float invM1, invM2, totalInvMass, minRest;
+	glm::vec3 localANorm, localBNorm, vel1, vel2, aVel1, aVel2;
 	glm::mat3 invTensor1, invTensor2;
+	float JV;
 	for (int i = 0; i < manifolds.size(); ++i)
 	{
 		invM1 = manifolds[i].m_bodyA->GetInverseMass();
 		invM2 = manifolds[i].m_bodyB->GetInverseMass();
 		invTensor1 = manifolds[i].m_bodyA->GetInverseInertiaTensor();
 		invTensor2 = manifolds[i].m_bodyB->GetInverseInertiaTensor();
+		vel1 = manifolds[i].m_bodyA->GetLinearVelocity();
+		vel2 = manifolds[i].m_bodyB->GetLinearVelocity();
+		aVel1 = manifolds[i].m_bodyA->GetAngularVelocity();
+		aVel2 = manifolds[i].m_bodyB->GetAngularVelocity();
+		minRest = std::min(manifolds[i].m_bodyA->GetRestitution(), manifolds[i].m_bodyB->GetRestitution());
 		totalInvMass = invM1 + invM2;
 		for (int k = 0; k < manifolds[i].m_contactCount; ++k)
 		{
 			contact = &manifolds[i].m_contacts[k];
-
 			//Normal Mass
 			localANorm = glm::cross(contact->localPointA, contact->normal);
 			localBNorm = glm::cross(contact->localPointB, contact->normal);
+			JV = -glm::dot(vel1, contact->normal) - glm::dot(localANorm, aVel1)
+				+ glm::dot(vel2, contact->normal) + glm::dot(localBNorm, aVel2);
 			contact->massNormal = (totalInvMass + glm::dot(localANorm * invTensor1, localANorm) +
 				glm::dot(localBNorm * invTensor2, localBNorm));
 
 			//TODO: TANGENT
 
 			//Bias
-			contact->bias = 0.2f / dt * std::max(0.0f, contact->depth - 0.01f);
+			contact->bias = 0.1f / dt * std::max(0.0f, contact->depth - 0.001f) + minRest * JV;
 		}
 	}
 }
@@ -156,19 +163,17 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 	//glm::mat4 interpolationTrans1;
 	//glm::mat4 interpolationTrans2;
 
-	float friction, minRest, invDt = 1.f / dt;
+	float friction, invDt = 1.f / dt;
 	float JV;
 	float lambda, oldLambda;
 
 	glm::vec3 invMJ;
-	glm::vec3 impulse1, impulse2, torque1, torque2, relativeVel;
+	glm::vec3 impulse1, impulse2, torque1, torque2;
 
 	invM1 = body1->GetInverseMass();
 	invM2 = body1->GetInverseMass();
 	localANorm = glm::cross(contact.localPointA, normal);
 	localBNorm = glm::cross(contact.localPointB, normal);
-
-	minRest = std::min(body1->GetRestitution(), body2->GetRestitution());
 
 	vel1 = body1->GetLinearVelocity();
 	vel2 = body2->GetLinearVelocity();
@@ -180,20 +185,20 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 	JV = -glm::dot(vel1, normal) - glm::dot(localANorm, aVel1)
 		+ glm::dot(vel2, normal) + glm::dot(localBNorm, aVel2);
 
-	auto restitution = minRest * JV;
-	lambda = -(JV + contact.bias + restitution) / contact.massNormal;
+	//auto restitution = minRest * JV;
+	lambda = -(JV + contact.bias) * contact.massNormal;
 	{
 		oldLambda = contact.prevNormalImp;
 		contact.prevNormalImp = std::max(oldLambda + lambda, 0.f);
 		lambda = oldLambda - contact.prevNormalImp;
 	}
 
-	impulse = normal * lambda;
+	impulse = normal * lambda /4.f;
 	torque1 = glm::cross(contact.localPointA, impulse);
 	torque2 = glm::cross(contact.localPointB, impulse);
 
-	body1->ApplyImpulse(-impulse);
-	body2->ApplyImpulse(impulse);
+	body1->ApplyImpulse(impulse);
+	body2->ApplyImpulse(-impulse);
 
 	//body1->ApplyTorqueImpulse(torque1);
 	//body2->ApplyTorqueImpulse(-torque2);
