@@ -98,8 +98,8 @@ void IRigidBody::SetLinearVelocity(const glm::vec3& newLinVel)
 		m_linearVelocity = glm::vec3(0);
 	else if (glm::dot(m_linearVelocity, m_linearVelocity) > 1000.f)
 	{
-		//float fraction = glm::dot(m_linearVelocity, m_linearVelocity) / 1000.f;
-		//m_linearVelocity /= fraction;
+		float fraction = glm::dot(m_linearVelocity, m_linearVelocity) / 1000.f;
+		m_linearVelocity /= fraction;
 	}
 }
 glm::vec3 IRigidBody::GetAngularVelocity() const

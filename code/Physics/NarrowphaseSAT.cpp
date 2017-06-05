@@ -354,7 +354,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 		depth = std::abs(rb - std::abs((ra - std::abs(trans[i]))));
 
-		if (depth > 0.00001f && depth < contactInfo.depth)
+		if (depth > 0.00001f && depth <= contactInfo.depth)
 		{
 			contactInfo.depth = depth;
 			contactInfo.normal = obb2.localAxes[i];
@@ -615,14 +615,14 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		extents1 = obb2.halfExtents;
 		extents2 = obb1.halfExtents;
 	}
-
+	
 	//Rotate the norm
 	//TODO: IS THIS RIGHT?
 	glm::mat3 rotator;
 	rotator[0] = rot2[0];
 	rotator[1] = rot2[1];
 	rotator[2] = rot2[2];
-	referenceNormal = R * faceNorm;
+	referenceNormal = rotator * faceNorm;
 
 	//Calculate absolute normal
 	absReferenceNormal.x = fabs(referenceNormal.x);
@@ -730,10 +730,10 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Find size of reference face
 	std::vector<glm::vec2> rect;
 	rect.resize(4, glm::vec2(0, 0));
-	rect[0] = glm::vec2(0, 0);
-	rect[1] = glm::vec2(0, 2*extents1[code2]);
-	rect[2] = glm::vec2(2*extents1[code1], 2*extents1[code2]);
-	rect[3] = glm::vec2(2*extents1[code1], 0);
+	rect[0] = glm::vec2(-extents1[code1], -extents1[code2]);
+	rect[1] = glm::vec2(-extents1[code1], extents1[code2]);
+	rect[2] = glm::vec2(extents1[code1], extents1[code2]);
+	rect[3] = glm::vec2(extents1[code1], -extents1[code2]);
 	
 	//Intersect faces
 	std::vector<glm::vec2> ret = PhysicsDefs::ClipPolygon(quad, rect);
@@ -832,9 +832,9 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	glm::mat4 invTrans1 = glm::inverse(body1->GetInterpolationTransform()), invTrans2 = glm::inverse(body2->GetInterpolationTransform());
 	for (int i = 0; i < count; ++i)
 	{
-		contacts[i].localPointA = glm::vec3(invTrans1 * glm::vec4(contacts[i].worldPos, 1.f));
+		contacts[i].localPointA = contacts[i].worldPos - obb1.pos;
 		//contacts[i].worldPointA = glm::vec3(body1->GetInterpolationTransform() * glm::vec4(contacts[i].localPointA, 1.f));
-		contacts[i].localPointB = glm::vec3(invTrans2 * glm::vec4(contacts[i].worldPos, 1.f));
+		contacts[i].localPointB = contacts[i].worldPos - obb2.pos;
 		//contacts[i].worldPointB = contacts[i].localPointB + obb2.pos;
 	}
 

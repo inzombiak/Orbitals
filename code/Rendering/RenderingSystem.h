@@ -67,7 +67,7 @@ private:
 	glm::vec3 m_up = glm::vec3(0, 1, 0);
 	glm::vec3 m_direction = glm::vec3(1, 0, 0);
 	glm::mat4 m_projection;
-	float m_speed = .4f;
+	float m_speed = .04f;
 	float m_mouseSpeed = 0.005f;
 	bool m_trackingMouse = false;
 	float m_xRotate = 2.515f, m_yRotate = -0.475f;

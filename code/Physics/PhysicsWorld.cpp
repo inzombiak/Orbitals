@@ -149,18 +149,21 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 	}
 
 	glm::vec3 pos1, pos2;
-
+	PhysicsDefs::ContactInfo ci;
 	if (m_manifolds.size() > 0)
 	{
 		for (unsigned int i = 0; i < m_manifolds.size(); ++i)
 		{
 			pos1 = glm::vec3(m_manifolds[i].m_bodyA->GetInterpolationTransform()[3]);
 			pos2 = glm::vec3(m_manifolds[i].m_bodyB->GetInterpolationTransform()[3]);
+			m_physDebugDrawer->DrawPoint(pos1, 0.2, glm::vec3(0, 1, 0));
+			m_physDebugDrawer->DrawPoint(pos2, 0.5, glm::vec3(0, 0, 1));
 			for (int j = 0; j < m_manifolds[i].m_contactCount; ++j)
 			{
-				m_physDebugDrawer->DrawPoint(m_manifolds[i].m_contacts[j].worldPos, 0.2, glm::vec3(0, 1, 1));
-				m_physDebugDrawer->DrawLine(pos1, pos1 + m_manifolds[i].m_contacts[j].localPointA, glm::vec3(0.5, 0.5, 0.5));
-				m_physDebugDrawer->DrawLine(pos2, pos2 + m_manifolds[i].m_contacts[j].localPointB, glm::vec3(0.5, 0.5, 0.5));
+				ci = m_manifolds[i].m_contacts[j];
+				m_physDebugDrawer->DrawPoint(ci.worldPos, 0.2, glm::vec3(0, 1, 1));
+				m_physDebugDrawer->DrawLine(pos1, pos1 + ci.localPointA, glm::vec3(0.5, 0.5, 0.5));
+				m_physDebugDrawer->DrawLine(pos2, pos2 + ci.localPointB, glm::vec3(0.5, 0.f, 0.5));
 			}
 		}
 	}

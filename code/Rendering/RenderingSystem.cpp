@@ -158,7 +158,7 @@ void RenderingSystem::Draw()
 	//glDisableVertexAttribArray(0);
 	//glDisableVertexAttribArray(1);
 	
-	//for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
+//	for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
 	//	m_renderComponents[i].Draw(view, projection, m_position);
 
 	GLenum err;

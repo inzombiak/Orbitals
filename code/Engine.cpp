@@ -115,7 +115,7 @@ void Engine::Test()
 	boxData.scale = glm::vec3(1, 1, 1);
 	boxData.color = glm::vec3(0.f, 1.f, 0.f);
 	boxData.extents = glm::vec3(20, 2, 20);
-	boxData.position = glm::vec3(0, 0, 0);
+	boxData.position = glm::vec3(0, 0, 4);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.enableGravity = false;
 	EventSystem::GetInstance()->QueueEvent(boxED, true);
@@ -142,10 +142,10 @@ void Engine::Test()
 	
 	boxData.extents = glm::vec3(2, 2, 2);
 	//boxData.rotation = glm::vec3(0, -M_PI_2 /3, 0);
-	boxData.position = glm::vec3(0, 20, 0);
+	boxData.position = glm::vec3(0, 10, 0);
 	//boxData.position = glm::vec3(6, 5, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
-	boxED->GetData()->rigidBodyData->rbci.mass = 1;
+	boxED->GetData()->rigidBodyData->rbci.mass = 25;
 	//boxED->GetData()->rigidBodyData->rbci.enableGravity = false;
 	EventSystem::GetInstance()->QueueEvent(boxED, true);
 	std::shared_ptr<PhysicsComponent> pc;
@@ -162,16 +162,20 @@ void Engine::Test()
 
 	//boxData.position = glm::vec3(4.2, 10,-5);
 	//boxData.extents = glm::vec3(3, 3, 3);
-	/*boxData.position = glm::vec3(0, 10, 0);
+	boxData.position = glm::vec3(0, 14, 0);
+	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
+	boxED->GetData()->rigidBodyData->rbci.mass = 25;
+	EventSystem::GetInstance()->QueueEvent(boxED, false);
+	boxData.color = glm::vec3(1.f, 0.f, 0.f);
+	boxData.position = glm::vec3(0, 18, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 1;
 	EventSystem::GetInstance()->QueueEvent(boxED, false);
 	boxData.color = glm::vec3(1.f, 0.f, 0.f);
-	boxData.position = glm::vec3(0, 30, 0);
+	boxData.position = glm::vec3(0, 22, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 1;
-	EventSystem::GetInstance()->QueueEvent(boxED, false);*/
-
+	EventSystem::GetInstance()->QueueEvent(boxED, false);/**/
 	/*boxData.position = glm::vec3(6, 20, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 20;
