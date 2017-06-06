@@ -42,6 +42,7 @@
     <ClInclude Include="..\..\code\Physics\Manifold.h" />
     <ClInclude Include="..\..\code\Physics\NarrowphaseGJK_EPA.h" />
     <ClInclude Include="..\..\code\Physics\NarrowphaseSAT.h" />
+    <ClInclude Include="..\..\code\Physics\OTransform.h" />
     <ClInclude Include="..\..\code\Physics\PhysicsComponent.h" />
     <ClInclude Include="..\..\code\Physics\PhysicsDefs.h" />
     <ClInclude Include="..\..\code\Physics\PhysicsHelpers.h" />

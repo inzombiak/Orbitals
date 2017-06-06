@@ -32,10 +32,10 @@ public:
 	float GetInverseMass() const;
 	glm::mat3 GetInverseInertiaTensor() const;
 
-	void UpdateTransform(const glm::mat4& predictedTrans);
-	const glm::mat4& GetTransform() const;
-	void UpdateInterpolationTransform(const glm::mat4& predictedTrans);
-	const glm::mat4& GetInterpolationTransform();
+	void UpdateTransform(const OTransform& predictedTrans);
+	const OTransform& GetTransform() const;
+	void UpdateInterpolationTransform(const OTransform& predictedTrans);
+	const OTransform& GetInterpolationTransform();
 
 	float GetFriction() const;
 	float GetRollingFriction() const;
@@ -54,8 +54,10 @@ private:
 	glm::vec3 m_linearVelocity = glm::vec3(0.f);
 	glm::vec3 m_angularVelocity = glm::vec3(0.f);
 
-	glm::mat4 m_transform;
-	glm::mat4 m_interpolationTransform;
+	//glm::mat4 m_transform;
+	//glm::mat4 m_interpolationTransform;
+	OTransform m_transform;
+	OTransform m_interpolationTransform;
 	glm::mat3 m_invInertiaTensor;
 	glm::vec3 m_localInertia;
 

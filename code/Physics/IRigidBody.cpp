@@ -123,28 +123,29 @@ glm::mat3  IRigidBody::GetInverseInertiaTensor() const
 {
 	return m_invInertiaTensor;
 }
-void IRigidBody::UpdateTransform(const glm::mat4& predictedTrans)
+void IRigidBody::UpdateTransform(const OTransform& predictedTrans)
 {
 	m_transform = predictedTrans;
 	UpdateInterpolationTransform(m_transform);
 }
-const glm::mat4& IRigidBody::GetTransform() const
+const OTransform& IRigidBody::GetTransform() const
 {
 	return m_transform;
 }
-void IRigidBody::UpdateInterpolationTransform(const glm::mat4& predictedTrans)
+void IRigidBody::UpdateInterpolationTransform(const OTransform& predictedTrans)
 {
 	m_interpolationTransform = predictedTrans;
-	glm::mat4 tempMat;
-	tempMat = glm::translate(m_interpolationTransform, glm::vec3(0, 0, 0));
-	m_obb.localAxes[0] = glm::vec3(tempMat * glm::vec4(1, 0, 0, 0));
-	m_obb.localAxes[1] = glm::vec3(tempMat * glm::vec4(0, 1, 0, 0));
+	//glm::mat4 tempMat;
+	//tempMat = glm::translate(m_interpolationTransform.GetBasis(), glm::vec3(0, 0, 0));
+	glm::mat3 rot = m_interpolationTransform.GetBasis();
+	m_obb.localAxes[0] = glm::vec3(rot * glm::vec3(1, 0, 0));
+	m_obb.localAxes[1] = glm::vec3(rot * glm::vec3(0, 1, 0));
 	m_obb.localAxes[2] = glm::cross(m_obb.localAxes[0], m_obb.localAxes[1]);
-	m_obb.pos = glm::vec3(m_interpolationTransform[3]);
+	m_obb.pos = m_interpolationTransform.GetOrigin();
 	m_obb.UpdateAABB();
 	m_obb.aabb.worldTransform = glm::translate(glm::mat4(1.f), m_obb.pos);
 }
-const glm::mat4& IRigidBody::GetInterpolationTransform()
+const OTransform& IRigidBody::GetInterpolationTransform()
 {
 	return m_interpolationTransform;
 }

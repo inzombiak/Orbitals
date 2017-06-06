@@ -6,8 +6,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h> 
 
-#include "../Utilities/GameDefs.h"
+#include <glm/gtc/quaternion.hpp>
 
+#include "../Utilities/GameDefs.h"
+#include "OTransform.h"
 class ICelestialObject;
 class ICollisionShape;
 class IRigidBody;
@@ -28,23 +30,6 @@ namespace PhysicsDefs
 		RigidBody= 1,
 		CompoundBody = 2,
 		NULLBody = 4,
-	};
-	
-	struct RigidBodyConstructionInfo
-	{
-		float mass;
-		float linearDamping;
-		float angularDamping;
-		float friction;
-		float rollingFriction;
-		float resititution;
-
-		glm::mat4 transform;
-		glm::vec3 localInertia;
-
-		bool enableGravity;
-
-		ICollisionShape* collisionShape = 0;
 	};
 
 	struct ContactInfo
@@ -76,6 +61,23 @@ namespace PhysicsDefs
 		float massTangent;
 		float bias;
 
+	};
+
+	struct RigidBodyConstructionInfo
+	{
+		float mass;
+		float linearDamping;
+		float angularDamping;
+		float friction;
+		float rollingFriction;
+		float resititution;
+
+		OTransform transform;
+		glm::vec3 localInertia;
+
+		bool enableGravity;
+
+		ICollisionShape* collisionShape = 0;
 	};
 
 	struct SupportPoint

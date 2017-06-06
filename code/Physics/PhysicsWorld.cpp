@@ -107,8 +107,8 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 	{
 		aabb = m_nonStaticRigidBodies[i]->GetAABB();
 		auto transform = m_nonStaticRigidBodies[i]->GetTransform();
-		aabb.min = glm::vec3(transform[3]) + aabb.min;
-		aabb.max = glm::vec3(transform[3]) + aabb.max;
+		aabb.min = transform.GetOrigin() + aabb.min;
+		aabb.max = transform.GetOrigin() + aabb.max;
 		m_physDebugDrawer->DrawAABB(aabb.min, aabb.max, color);
 
 		obb = m_nonStaticRigidBodies[i]->GetOBB();
@@ -154,8 +154,8 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 	{
 		for (unsigned int i = 0; i < m_manifolds.size(); ++i)
 		{
-			pos1 = glm::vec3(m_manifolds[i].m_bodyA->GetInterpolationTransform()[3]);
-			pos2 = glm::vec3(m_manifolds[i].m_bodyB->GetInterpolationTransform()[3]);
+			pos1 = m_manifolds[i].m_bodyA->GetInterpolationTransform().GetOrigin();
+			pos2 = m_manifolds[i].m_bodyB->GetInterpolationTransform().GetOrigin();
 			m_physDebugDrawer->DrawPoint(pos1, 0.2, glm::vec3(0, 1, 0));
 			m_physDebugDrawer->DrawPoint(pos2, 0.5, glm::vec3(0, 0, 1));
 			for (int j = 0; j < m_manifolds[i].m_contactCount; ++j)
@@ -182,8 +182,9 @@ void PhysicsWorld::ApplyGravity()
 void PhysicsWorld::PredictMotion(float timeStep)
 {
 	float angMag;
-	glm::vec3 linVel, angVel, totalF;
-	glm::mat4 trans, rot, predictedTrans;
+	glm::vec3 linVel, angVel, totalF, pos;
+	OTransform trans, finalTrans;
+	glm::quat rot;
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
@@ -195,21 +196,16 @@ void PhysicsWorld::PredictMotion(float timeStep)
 			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
 
 		trans = m_nonStaticRigidBodies[i]->GetTransform();
-
+		rot = trans.GetRotation();
+		pos = trans.GetOrigin();
 		if (angMag != 0)
-		{
-			rot = glm::rotate(trans, glm::radians(angMag), glm::normalize(angVel));
-			trans = glm::translate(glm::mat4(1.f), linVel);
-		}
-		else
-		{
-			rot = glm::mat4(1.f);
-			trans = glm::translate(trans, linVel *timeStep);
-		}
+			rot = glm::rotate(rot, glm::radians(angMag), glm::normalize(angVel));
 
-		predictedTrans = trans * rot;
+		pos += linVel * timeStep;
+		trans.SetOrigin(pos);
+		trans.SetRotation(rot);
 
-		m_nonStaticRigidBodies[i]->UpdateInterpolationTransform(predictedTrans);
+		m_nonStaticRigidBodies[i]->UpdateInterpolationTransform(trans);
 		m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
 
 	}
@@ -218,8 +214,9 @@ void PhysicsWorld::PredictMotion(float timeStep)
 void PhysicsWorld::PerformMovement(float timeStep)
 {
 	float angMag;
-	glm::vec3 linVel, angVel;// , totalF;
-	glm::mat4 trans, rot, predictedTrans;
+	glm::vec3 linVel, angVel, pos;// , totalF;
+	OTransform trans, finalTrans;
+	glm::quat rot;
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
@@ -228,21 +225,15 @@ void PhysicsWorld::PerformMovement(float timeStep)
 		//totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
 
 		trans = m_nonStaticRigidBodies[i]->GetTransform();
-
+		rot = trans.GetRotation();
+		pos = trans.GetOrigin();
 		if (angMag != 0)
-		{
-			rot = glm::rotate(trans, glm::radians(angMag), glm::normalize(angVel));
-			trans = glm::translate(glm::mat4(1.f), linVel);
-		}
-		else
-		{
-			rot = glm::mat4(1.f);
-			trans = glm::translate(trans, linVel * timeStep);
-		}
-		
-		predictedTrans = trans * rot;
+			rot = glm::rotate(rot, glm::radians(angMag), glm::normalize(angVel));
 
-		m_nonStaticRigidBodies[i]->UpdateTransform(predictedTrans);
+		pos += linVel * timeStep;
+		trans.SetOrigin(pos);
+		trans.SetRotation(rot);
+		m_nonStaticRigidBodies[i]->UpdateTransform(trans);
 	}
 }
 

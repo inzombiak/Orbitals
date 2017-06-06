@@ -225,6 +225,9 @@
     <ClInclude Include="..\..\code\Physics\Manifold.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Physics\OTransform.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\VertexShader.glsl">

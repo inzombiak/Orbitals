@@ -42,10 +42,8 @@ EDCreateObject* ObjectCreators::CreateSphereEventData(IDefaultShapeData* data)
 	scd->rbci.resititution = 0.5f;
 	scd->rbci.enableGravity - true;
 
-	glm::mat4 translationMat = glm::translate(data->position);
-	glm::mat4 scalingMat = glm::scale(data->scale);
-	glm::mat4 rotationMat = glm::toMat4(glm::quat(data->rotation));
-	scd->rbci.transform = translationMat * rotationMat * scalingMat;
+	scd->rbci.transform.SetRotation(glm::quat(data->rotation));
+	scd->rbci.transform.SetOrigin(data->position);
 	scd->rbci.localInertia = glm::vec3(0, 0, 0); //TODO: INCORRECT, add calculator funciton;
 
 	ballData->rigidBodyData = scd;
@@ -89,10 +87,8 @@ EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 	bcd->rbci.resititution = 0.5f;
 	bcd->rbci.enableGravity = true;
 
-	glm::mat4 translationMat = glm::translate(data->position);
-	glm::mat4 scalingMat = glm::scale(data->scale);
-	glm::mat4 rotationMat = glm::toMat4(glm::quat(data->rotation));
-	bcd->rbci.transform = translationMat * rotationMat * scalingMat;
+	bcd->rbci.transform.SetRotation(glm::quat(data->rotation));
+	bcd->rbci.transform.SetOrigin(data->position);
 	bcd->rbci.localInertia = glm::vec3(0, 0, 0); //TODO: INCORRECT, add calculator funciton;
 
 	boxData->rigidBodyData = bcd;

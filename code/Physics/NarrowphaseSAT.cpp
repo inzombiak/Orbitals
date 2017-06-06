@@ -373,6 +373,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	else
 	{
 		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
+		auto test = ra + rb - TL;
 		normal = glm::cross(obb1.localAxes[0], obb2.localAxes[0]);
 		if (depth > 0.00001f && depth < contactInfo.depth && normal != glm::vec3(0.f))
 		{
@@ -581,9 +582,9 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		pb += ub * beta;
 
 		contactInfo.worldPos = 0.5f * (pa + pb);
-		glm::mat4 invTrans1 = glm::inverse(body1->GetInterpolationTransform()), invTrans2 = glm::inverse(body2->GetInterpolationTransform());
-		contactInfo.localPointA = glm::vec3(invTrans1 * glm::vec4(contactInfo.worldPos, 1.f));
-		contactInfo.localPointB = glm::vec3(invTrans2 * glm::vec4(contactInfo.worldPos, 1.f));
+		OTransform invTrans1 = body1->GetInterpolationTransform().Inverse(), invTrans2 = body2->GetInterpolationTransform().Inverse();
+		contactInfo.localPointA = invTrans1 * contactInfo.worldPos;
+		contactInfo.localPointB = invTrans2 * contactInfo.worldPos;
 		manifold.Update(&contactInfo, 1);
 		return true;
 	}
@@ -829,7 +830,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	}
 
 	//"Initalize" the contacts by setting the position in local-space for each body
-	glm::mat4 invTrans1 = glm::inverse(body1->GetInterpolationTransform()), invTrans2 = glm::inverse(body2->GetInterpolationTransform());
+	OTransform invTrans1 = body1->GetInterpolationTransform().Inverse(), invTrans2 = body2->GetInterpolationTransform().Inverse();
 	for (int i = 0; i < count; ++i)
 	{
 		contacts[i].localPointA = contacts[i].worldPos - obb1.pos;

@@ -18,7 +18,7 @@ void PhysicsComponent::Update(float dt)
 
 	m_owner->SetPosition(translation);
 	m_owner->SetRotation(glm::conjugate(rotation));*/
-	m_owner->SetOpenGLMatrix(m_rigidBody->GetTransform());
+	m_owner->SetOpenGLMatrix(m_rigidBody->GetTransform().GetOpenGLMatrix());
 }
 
 void PhysicsComponent::SetBody(IRigidBody* body)

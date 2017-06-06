@@ -24,8 +24,8 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 	int iterations = 0;
 
 	glm::vec3 dir;
-	glm::mat4 bodyAtoWorld = bodyA->GetInterpolationTransform();
-	glm::mat4 bodyBtoWorld = bodyB->GetInterpolationTransform();
+	OTransform bodyAtoWorld = bodyA->GetInterpolationTransform();
+	OTransform bodyBtoWorld = bodyB->GetInterpolationTransform();
 	PhysicsDefs::SupportPoint nextSupportPoint;
 	m_faceList.clear();
 
@@ -34,8 +34,8 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 	//Init simplex
 	dir = glm::vec3(1, 0, 0);
 
-	nextSupportPoint.originA = glm::vec3(bodyAtoWorld * glm::vec4(bodyA->GetSupportPoint(dir), 1));
-	nextSupportPoint.originB = glm::vec3(bodyBtoWorld * glm::vec4(bodyB->GetSupportPoint(-dir), 1));
+	nextSupportPoint.originA = bodyAtoWorld * glm::vec3(bodyA->GetSupportPoint(dir));
+	nextSupportPoint.originB = bodyBtoWorld * glm::vec3(bodyB->GetSupportPoint(-dir));
 	nextSupportPoint.position = nextSupportPoint.originA - nextSupportPoint.originB;
 	nextSupportPoint.dir = dir;
 
@@ -47,8 +47,8 @@ bool NarrowphaseGJK_EPA::RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, Physic
 
 	while (iterations < MAX_ITERATIONS)
 	{
-		nextSupportPoint.originA = glm::vec3(bodyAtoWorld * glm::vec4(bodyA->GetSupportPoint(dir), 1));
-		nextSupportPoint.originB = glm::vec3(bodyBtoWorld * glm::vec4(bodyB->GetSupportPoint(-dir), 1));
+		nextSupportPoint.originA = bodyAtoWorld * glm::vec3(bodyA->GetSupportPoint(dir));
+		nextSupportPoint.originB = bodyBtoWorld * glm::vec3(bodyB->GetSupportPoint(-dir));
 		nextSupportPoint.position = nextSupportPoint.originA - nextSupportPoint.originB;
 		nextSupportPoint.dir = dir;
 		iterations++;
@@ -125,8 +125,8 @@ PhysicsDefs::ContactInfo NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, I
 	PhysicsDefs::ContactInfo result;
 	PhysicsDefs::SupportPoint nextSupportPoint;
 	FaceListIterator closestFaceIt;
-	glm::mat4 bodyAtoWorld = bodyA->GetInterpolationTransform();
-	glm::mat4 bodyBtoWorld = bodyB->GetInterpolationTransform();
+	OTransform bodyAtoWorld = bodyA->GetInterpolationTransform();
+	OTransform bodyBtoWorld = bodyB->GetInterpolationTransform();
 	
 	//Construct initial faces
 	m_faceList.emplace_back(Face(simplex[3], simplex[1], simplex[2]));
@@ -143,8 +143,8 @@ PhysicsDefs::ContactInfo NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, I
 		closestFaceIt = FindClosestFace();
 
 		//Get next point
-		nextSupportPoint.originA = glm::vec3(bodyAtoWorld *  glm::vec4(bodyA->GetSupportPoint(closestFaceIt->normal), 1));
-		nextSupportPoint.originB = glm::vec3(bodyBtoWorld * glm::vec4(bodyB->GetSupportPoint(-closestFaceIt->normal), 1));
+		nextSupportPoint.originA = bodyAtoWorld * bodyA->GetSupportPoint(closestFaceIt->normal);
+		nextSupportPoint.originB = bodyBtoWorld * bodyB->GetSupportPoint(-closestFaceIt->normal);
 		nextSupportPoint.position = nextSupportPoint.originA - nextSupportPoint.originB;
 		nextSupportPoint.dir = closestFaceIt->normal;
 
@@ -207,8 +207,8 @@ PhysicsDefs::ContactInfo NarrowphaseGJK_EPA::GetContactInfo(IRigidBody* bodyA, I
 	result.worldPointA = u * f.a.originA + v * f.b.originA + w * f.c.originA;
 	result.worldPointB = u * f.a.originB + v * f.b.originB + w * f.c.originB;
 
-	result.localPointA = glm::vec3(glm::inverse(bodyAtoWorld) * glm::vec4(result.worldPointA, 1));
-	result.localPointB = glm::vec3(glm::inverse(bodyBtoWorld) * glm::vec4(result.worldPointB, 1));
+	result.localPointA = bodyAtoWorld.Inverse() * result.worldPointA;
+	result.localPointB = bodyBtoWorld.Inverse() * result.worldPointB;
 
 	result.worldPos = f.a.position;
 	// From "Game Physics", pg. 531

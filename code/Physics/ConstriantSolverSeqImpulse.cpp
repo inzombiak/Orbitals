@@ -9,8 +9,8 @@ void ConstraintSolverSeqImpulse::SolveConstraints(std::vector<PhysicsDefs::CollP
 	
 	float massNormal, massTangent;
 	glm::vec3 localANorm, localBNorm, localATang, localBTang;
-	glm::mat4 interpolationTrans1;
-	glm::mat4 interpolationTrans2;
+	OTransform interpolationTrans1;
+	OTransform interpolationTrans2;
 	glm::mat3 invTensor1, invTensor2;
 
 	PhysicsDefs::ContactInfo* contact;
