@@ -45,6 +45,7 @@ public:
 	glm::vec3 GetSupportPoint(glm::vec3 dir) const;
 
 private:
+
 	bool m_enableGravity;
 	glm::vec3 m_gravity;
 

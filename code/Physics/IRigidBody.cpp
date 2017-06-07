@@ -140,7 +140,10 @@ void IRigidBody::UpdateInterpolationTransform(const OTransform& predictedTrans)
 	glm::mat3 rot = m_interpolationTransform.GetBasis();
 	m_obb.localAxes[0] = glm::vec3(rot * glm::vec3(1, 0, 0));
 	m_obb.localAxes[1] = glm::vec3(rot * glm::vec3(0, 1, 0));
-	m_obb.localAxes[2] = glm::cross(m_obb.localAxes[0], m_obb.localAxes[1]);
+	if (glm::dot(m_obb.localAxes[0], m_obb.localAxes[1]) <= 0)
+		m_obb.localAxes[2] = glm::cross(m_obb.localAxes[0], m_obb.localAxes[1]);
+	else
+		m_obb.localAxes[2] = glm::cross(m_obb.localAxes[1], m_obb.localAxes[0]);
 	m_obb.pos = m_interpolationTransform.GetOrigin();
 	m_obb.UpdateAABB();
 	m_obb.aabb.worldTransform = glm::translate(glm::mat4(1.f), m_obb.pos);

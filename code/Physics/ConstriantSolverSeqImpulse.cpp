@@ -1,5 +1,5 @@
 #include "ConstraintSolverSeqImpulse.h"
-
+#include "../Utilities/HelperFunctions.h"
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtx\norm.hpp"
 
@@ -116,8 +116,8 @@ void ConstraintSolverSeqImpulse::SolveConstraints2(std::vector<Manifold>& manifo
 void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float dt)
 {
 	PhysicsDefs::ContactInfo* contact;
-	float invM1, invM2, totalInvMass, minRest;
-	glm::vec3 localANorm, localBNorm, vel1, vel2, aVel1, aVel2;
+	float invM1, invM2, totalInvMass, minRest, friction;
+	glm::vec3 localANorm, localBNorm, localATangent, localBTangent, vel1, vel2, aVel1, aVel2;
 	glm::mat3 invTensor1, invTensor2;
 	float JV;
 	for (int i = 0; i < manifolds.size(); ++i)
@@ -131,6 +131,7 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 		aVel1 = manifolds[i].m_bodyA->GetAngularVelocity();
 		aVel2 = manifolds[i].m_bodyB->GetAngularVelocity();
 		minRest = std::min(manifolds[i].m_bodyA->GetRestitution(), manifolds[i].m_bodyB->GetRestitution());
+		friction = manifolds[i].m_bodyA->GetFriction() * manifolds[i].m_bodyB->GetFriction();
 		totalInvMass = invM1 + invM2;
 		for (int k = 0; k < manifolds[i].m_contactCount; ++k)
 		{
@@ -138,15 +139,35 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 			//Normal Mass
 			localANorm = glm::cross(contact->localPointA, contact->normal);
 			localBNorm = glm::cross(contact->localPointB, contact->normal);
-			JV = -glm::dot(vel1, contact->normal) - glm::dot(localANorm, aVel1)
-				+ glm::dot(vel2, contact->normal) + glm::dot(localBNorm, aVel2);
-			contact->massNormal = 1/(totalInvMass + glm::dot(localANorm * invTensor1, localANorm) +
+			contact->massNormal = 1.f/(totalInvMass + glm::dot(localANorm * invTensor1, localANorm) +
 				glm::dot(localBNorm * invTensor2, localBNorm));
 
-			//TODO: TANGENT
+			////TODO: TANGENT
+			//Based on Errin Catto's "Computing a Basis" article
+			if (std::abs(contact->normal.x) >= 0.57735f)
+				contact->tangent1 = glm::vec3(-contact->normal.y, contact->normal.x, 0.0f);
+			else
+				contact->tangent1 = glm::vec3(0.0f, contact->normal.z, -contact->normal.y);
+			contact->tangent1 = glm::normalize(contact->tangent1);
+			contact->tangent2 = glm::cross(contact->normal, contact->tangent1);
+
+			//Mass tangent 1
+			localATangent = glm::cross(contact->localPointA, contact->tangent1);
+			localBTangent = glm::cross(contact->localPointB, contact->tangent1);
+			contact->massTangent1 = 1.f / (totalInvMass + glm::dot(localATangent * invTensor1, localATangent) +
+				glm::dot(localBTangent * invTensor2, localBTangent));
+			
+			//Mass tangent 2
+			localATangent = glm::cross(contact->localPointA, contact->tangent2);
+			localBTangent = glm::cross(contact->localPointB, contact->tangent2);
+			contact->massTangent2 = 1.f / (totalInvMass + glm::dot(localATangent * invTensor1, localATangent) +
+				glm::dot(localBTangent * invTensor2, localBTangent));
 
 			//Bias
-			contact->bias = -0.1f / dt * std::max(0.0f, contact->depth - 0.001f) - minRest * JV;
+			JV = -glm::dot(vel1, contact->normal) - glm::dot(localANorm, aVel1)
+				+ glm::dot(vel2, contact->normal) + glm::dot(localBNorm, aVel2);
+			contact->bias = 0.1f / dt * std::max(0.0f, contact->depth) - minRest * JV;
+			contact->friction = friction;
 		}
 	}
 }
@@ -158,7 +179,7 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 
 	glm::vec3 dv, impulse, impulseTangent, tangent, vel1, vel2, aVel1, aVel2, correction;;
 
-	float massNormal, massTangent, invM1, invM2;
+	float massNormal, massTangent, invM1, invM2, f;
 	glm::vec3 localANorm, localBNorm, localATang, localBTang;
 	//glm::mat4 interpolationTrans1;
 	//glm::mat4 interpolationTrans2;
@@ -172,46 +193,70 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 
 	invM1 = body1->GetInverseMass();
 	invM2 = body1->GetInverseMass();
-	localANorm = glm::cross(contact.localPointA, normal);
-	localBNorm = glm::cross(contact.localPointB, normal);
+	//localANorm = glm::cross(contact.localPointA, normal);
+	//localBNorm = glm::cross(contact.localPointB, normal);
 
 	vel1 = body1->GetLinearVelocity();
 	vel2 = body2->GetLinearVelocity();
 	//relativeVel = vel2 - vel1;
 	aVel1 = body1->GetAngularVelocity();
 	aVel2 = body2->GetAngularVelocity();
-
+	localANorm = glm::cross(contact.localPointA, aVel1);
+	localBNorm = glm::cross(contact.localPointB, aVel2);
 	//auto bb = ()
-	JV = -glm::dot(vel1, normal) - glm::dot(localANorm, aVel1)
-		+ glm::dot(vel2, normal) + glm::dot(localBNorm, aVel2);
+	JV = -glm::dot(vel1, normal) - glm::dot(localANorm, normal)
+		+ glm::dot(vel2, normal) + glm::dot(localBNorm, normal);
 
 	//auto restitution = minRest * JV;
 	lambda = (-JV + contact.bias) * contact.massNormal;
-	/*{
+	{
 		oldLambda = contact.prevNormalImp;
 		contact.prevNormalImp = std::max(oldLambda + lambda, 0.f);
 		lambda = contact.prevNormalImp - oldLambda;
-	}*/
+	}
 
 	impulse = normal * lambda;
 	torque1 = glm::cross(contact.localPointA, impulse);
 	torque2 = glm::cross(contact.localPointB, impulse);
-
 	body1->ApplyImpulse(-impulse);
 	body2->ApplyImpulse(impulse);
-	//body1->SetLinearVelocity(glm::vec3(0.f));
-	//body2->SetLinearVelocity(glm::vec3(0.f));
-	//body1->ApplyTorqueImpulse(torque1);
-	//body2->ApplyTorqueImpulse(-torque2);
-	//body1->SetAngularVelocity(aVel1 + invM1 * glm::cross(contact.localPointA, impulse));
-	//body2->SetAngularVelocity(aVel2 - invM2 * glm::cross(contact.localPointB, impulse));
-	//// Apply contact impulse
-	//impulseTangent = dImpTang * tangent;
-	//body1->ApplyImpulse(-impulse1);
-	//body2->ApplyImpulse(impulse2);
+	body1->ApplyTorqueImpulse(torque1);
+	body2->ApplyTorqueImpulse(-torque2);
+	//return;
+	float coeff = contact.prevNormalImp * contact.friction;
+	//Apply friction for tangent1
+	JV = -glm::dot(vel1, contact.tangent1) - glm::dot(localANorm, contact.tangent1)
+		+ glm::dot(vel2, contact.tangent1) + glm::dot(localBNorm, contact.tangent1);
+	lambda = -JV * contact.massTangent1;
+	{
+		oldLambda = contact.prevTangImp1;
+		contact.prevTangImp1 = Clamp(oldLambda + lambda, -coeff, coeff);
+		lambda = contact.prevTangImp1 - oldLambda;
+	}
+	impulse = contact.tangent1 * lambda;
+	torque1 = glm::cross(contact.localPointA, impulse);
+	torque2 = glm::cross(contact.localPointB, impulse);
+	body1->ApplyImpulse(-impulse);
+	body2->ApplyImpulse(impulse);
+	body1->ApplyTorqueImpulse(torque1);
+	body2->ApplyTorqueImpulse(-torque2);
 
-	//info[i].first.first->SetAngularVelocity(aVel1 + invM1 * glm::cross(info[i].second.worldPointA, impulse));
-	//info[i].first.second->SetAngularVelocity(aVel2 - invM2 * glm::cross(info[i].second.worldPointB, impulse));
+	//Apply friction for tangent2
+	JV = -glm::dot(vel1, contact.tangent2) - glm::dot(localANorm, contact.tangent2)
+		+ glm::dot(vel2, contact.tangent2) + glm::dot(localBNorm, contact.tangent2);
+	lambda = -JV * contact.massTangent2;
+	{
+		oldLambda = contact.prevTangImp2;
+		contact.prevTangImp2 = Clamp(oldLambda + lambda, -coeff, coeff);
+		lambda = contact.prevTangImp2 - oldLambda;
+	}
+	impulse = contact.tangent2 * lambda;
+	torque1 = glm::cross(contact.localPointA, impulse);
+	torque2 = glm::cross(contact.localPointB, impulse);
+	body1->ApplyImpulse(-impulse);
+	body2->ApplyImpulse(impulse);
+	body1->ApplyTorqueImpulse(torque1);
+	body2->ApplyTorqueImpulse(-torque2);
 }
 
 

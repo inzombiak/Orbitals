@@ -287,9 +287,12 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 {
 	PhysicsDefs::ContactInfo contactInfo;
 	float ra, rb, depth;
-	contactInfo.depth = FLT_MAX;
+	const float fudge_factor = 1.05f;
+	contactInfo.depth = -FLT_MAX;
 	glm::mat3 R, absR;
-
+	glm::vec3 rot = glm::eulerAngles(body2->GetTransform().GetRotation());
+	glm::vec3 axisRot = glm::normalize(rot);
+	float angle = glm::length(rot);
 	PhysicsDefs::OBB obb1 = body1->GetOBB();
 	PhysicsDefs::OBB obb2 = body2->GetOBB();
 
@@ -301,8 +304,8 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	0: No collision
 	*/
-	int featureID = 0;
-
+ 	int featureID = 0;
+	bool invertNormal = false;
 	//TODO: WHY?
 	for (int i = 0; i < 3; ++i)
 	{
@@ -323,20 +326,22 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//		absR[i][j] = std::abs(R[i][j]) + FLT_EPSILON;
 	//	}
 	//}
-
+	float TL;
 	//Text A0, A1 and A2
 	for (int i = 0; i < 3; ++i)
 	{
 		ra = obb1.halfExtents[i];
 		rb = obb2.halfExtents[0] * absR[i][0] + obb2.halfExtents[1] * absR[i][1] + obb2.halfExtents[2] * absR[i][2];
+		TL = trans[i];
 
-		if (std::abs(trans[i]) > ra + rb)
+		depth = std::abs(TL) - (ra + rb);
+		
+		if (depth > 0)
 			return false;
 
-		depth = std::abs(rb - std::abs((ra - std::abs(trans[i]))));
-		auto test = depth - FLT_EPSILON;
-		if (depth > 0.00001f && depth < contactInfo.depth)
+		if (depth < -0.00001f && depth > contactInfo.depth)
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = obb1.localAxes[i];
 			featureID = i + 1;
@@ -346,37 +351,37 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test B0, B1, B2
 	for (int i = 0; i < 3; ++i)
 	{
-		ra = obb1.halfExtents[0] * absR[0][i] + obb1.halfExtents[1] * absR[1][i] + obb1.halfExtents[2] * absR[2][i];
-		rb = obb2.halfExtents[i];
+		ra = obb1.halfExtents[i];
+		rb = obb2.halfExtents[0] * absR[i][0] + obb2.halfExtents[1] * absR[i][1] + obb2.halfExtents[2] * absR[i][2];
+		TL = trans[0] * R[0][i] + trans[1] * R[1][i] + trans[2] * R[2][i];
+		depth = std::abs(TL) - (ra + rb);
 
-		if (std::abs(trans[0] * R[0][i] + trans[1] * R[1][i] + trans[2] * R[2][i]) > ra + rb)
+		if (depth > 0)
 			return false;
 
-		depth = std::abs(rb - std::abs((ra - std::abs(trans[i]))));
-
-		if (depth > 0.00001f && depth <= contactInfo.depth)
+		if (depth < -0.00001f && depth > contactInfo.depth)
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = obb2.localAxes[i];
 			featureID = i + 4;
 		}
 	}
 
-	float TL;
 	glm::vec3 normal;
 	//Test A0 x B0
 	ra = obb1.halfExtents[1] * absR[2][0] + obb1.halfExtents[2] * absR[1][0];
 	rb = obb2.halfExtents[1] * absR[0][2] + obb2.halfExtents[2] * absR[0][1];
-	TL = std::abs(trans[2] * R[1][0] - trans[1] * R[2][0]);
-	if ( TL > ra + rb)
+	TL = trans[2] * R[1][0] - trans[1] * R[2][0];
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
-		auto test = ra + rb - TL;
 		normal = glm::cross(obb1.localAxes[0], obb2.localAxes[0]);
-		if (depth > 0.00001f && depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 7;
@@ -386,15 +391,18 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test A0 x B1
 	ra = obb1.halfExtents[1] * absR[2][1] + obb1.halfExtents[2] * absR[1][1];
 	rb = obb2.halfExtents[0] * absR[0][2] + obb2.halfExtents[2] * absR[0][0];
-	TL = std::abs(trans[2] * R[1][1] - trans[1] * R[2][1]);
-	if (TL > ra + rb)
+	TL = trans[2] * R[1][1] - trans[1] * R[2][1];
+
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
+
 		normal = glm::cross(obb1.localAxes[0], obb2.localAxes[1]);
-		if (depth > 0.00001f && depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 8;
@@ -404,15 +412,17 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test A0 x B2
 	ra = obb1.halfExtents[1] * absR[2][2] + obb1.halfExtents[2] * absR[1][2];
 	rb = obb2.halfExtents[0] * absR[0][1] + obb2.halfExtents[1] * absR[0][0];
-	TL = std::abs(trans[2] * R[1][2] - trans[1] * R[2][2]);
-	if (TL > ra + rb)
+	TL = trans[2] * R[1][2] - trans[1] * R[2][2];
+
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[0], obb2.localAxes[2]);
-		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 9;
@@ -422,15 +432,17 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test A1 x B0
 	ra = obb1.halfExtents[0] * absR[2][0] + obb1.halfExtents[2] * absR[0][0];
 	rb = obb2.halfExtents[1] * absR[1][2] + obb2.halfExtents[2] * absR[1][1];
-	TL = std::abs(trans[0] * R[2][0] - trans[2] * R[0][0]);
-	if (TL > ra + rb)
+	TL = trans[0] * R[2][0] - trans[2] * R[0][0];
+
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[1], obb2.localAxes[0]);
-		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 10;
@@ -440,15 +452,17 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test A1 x B1
 	ra = obb1.halfExtents[0] * absR[2][1] + obb1.halfExtents[2] * absR[0][1];
 	rb = obb2.halfExtents[0] * absR[1][2] + obb2.halfExtents[2] * absR[1][0];
-	TL = std::abs(trans[0] * R[2][1] - trans[2] * R[0][1]);
-	if (TL > ra + rb)
+	TL = trans[0] * R[2][1] - trans[2] * R[0][1];
+
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[1], obb2.localAxes[1]);
-		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 11;
@@ -458,52 +472,56 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test A1 x B2
 	ra = obb1.halfExtents[0] * absR[2][2] + obb1.halfExtents[2] * absR[0][2];
 	rb = obb2.halfExtents[0] * absR[1][1] + obb2.halfExtents[2] * absR[1][0];
-	TL = std::abs(trans[0] * R[2][2] - trans[2] * R[0][2]);
-	if (TL > ra + rb)
+	TL = trans[0] * R[2][2] - trans[2] * R[0][2];
+
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[1], obb2.localAxes[2]);
-		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 12;
 		}
 	}
+
 	//Test A2 x B0
 	ra = obb1.halfExtents[0] * absR[1][0] + obb1.halfExtents[1] * absR[0][0];
 	rb = obb2.halfExtents[1] * absR[2][2] + obb2.halfExtents[2] * absR[2][1];
-	TL = std::abs(trans[1] * R[0][0] - trans[0] * R[1][0]);
-	if (TL > ra + rb)
+	TL = trans[1] * R[0][0] - trans[0] * R[1][0];
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[2], obb2.localAxes[0]);
-
-		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 13;
 		}
 	}
 
-
 	//Test A2 x B1
 	ra = obb1.halfExtents[0] * absR[1][1] + obb1.halfExtents[1] * absR[0][1];
 	rb = obb2.halfExtents[0] * absR[2][2] + obb2.halfExtents[2] * absR[2][0];
-	TL = std::abs(trans[1] * R[0][1] - trans[0] * R[1][1]);
-	if (TL > ra + rb)
+	TL = trans[1] * R[0][1] - trans[0] * R[1][1];
+
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[2], obb2.localAxes[1]);
-		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 14;
@@ -513,19 +531,26 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test A2 x B2
 	ra = obb1.halfExtents[0] * absR[1][2] + obb1.halfExtents[1] * absR[0][2];
 	rb = obb2.halfExtents[0] * absR[2][1] + obb2.halfExtents[1] * absR[2][0];
-	TL = std::abs(trans[1] * R[0][2] - trans[0] * R[1][2]);
-	if (TL > ra + rb)
+	TL = trans[1] * R[0][2] - trans[0] * R[1][2];
+
+	depth = std::abs(TL) - (ra + rb);
+	if (depth > 0)
 		return false;
 	else
 	{
-		depth = std::abs(rb - std::abs((ra - std::abs(TL))));
 		normal = glm::cross(obb1.localAxes[2], obb2.localAxes[2]);
-		if (depth > 0.00001f &&  depth < contactInfo.depth && normal != glm::vec3(0.f))
+		if (depth > 0.00001f && depth * fudge_factor > contactInfo.depth && normal != glm::vec3(0.f))
 		{
+			invertNormal = TL < 0;
 			contactInfo.depth = depth;
 			contactInfo.normal = normal;
 			featureID = 15;
 		}
+	}
+
+	if (invertNormal)
+	{
+		contactInfo.normal *= -1;
 	}
 
 	//Create manifold
@@ -537,14 +562,12 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	glm::vec3 rot1[3], rot2[3];
 
 	glm::vec3 faceNorm = contactInfo.normal, referenceNormal, absReferenceNormal;
-	//printf("NORM: %lf, %lf, %lf", faceNorm.x, faceNorm.y, faceNorm.z);
 
 	//In this case the normal will be pointing from 2 to 1 so we flip it
 	if (featureID > 3)
 	{
 		faceNorm = -contactInfo.normal;
 	}
-
 
 	if (featureID > 6)
 	{
@@ -576,7 +599,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		glm::vec3 ua, ub;
 		ua = obb1.localAxes[(featureID - 7) / 3];
 		ub = obb2.localAxes[(featureID - 7) / 3];
-		
+
 		PhysicsDefs::RayClosestApproach(pa, ua, pb, ub, alpha, beta);
 		pa += ua * alpha;
 		pb += ub * beta;
@@ -616,7 +639,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		extents1 = obb2.halfExtents;
 		extents2 = obb1.halfExtents;
 	}
-	
+
 	//Rotate the norm
 	//TODO: IS THIS RIGHT?
 	glm::mat3 rotator;
@@ -665,14 +688,26 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	}
 
 	//Compute center of the incident face
-	glm::vec3 center;
+	glm::vec3 center = pos2 - pos1;
+	glm::vec3 modifier = extents2[largestAbsNorm] * glm::vec3(rot2[0][largestAbsNorm], rot2[1][largestAbsNorm], rot2[2][largestAbsNorm]);
 	if (referenceNormal[largestAbsNorm] < 0)
 	{
-		center = pos2 - pos1 + rot2[largestAbsNorm] * extents2[largestAbsNorm];
+		//auto test = extents2[largestAbsNorm] * glm::vec3(rot2[0][largestAbsNorm], rot2[1][largestAbsNorm], rot2[2][largestAbsNorm]);
+		center += modifier;
+	/*	float test2 = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			test2 = extents2[largestAbsNorm] * rot2[i][largestAbsNorm];
+			center[i] = pos2[i] - pos1[i] + test2;
+		}
+*/
+		/*test = 
+		auto test2 = rot2[largestAbsNorm];
+		center = pos2 - pos1 + extents2[largestAbsNorm] * rot2[largestAbsNorm];*/
 	}
 	else
 	{
-		center = pos2 - pos1 - rot2[largestAbsNorm] * extents2[largestAbsNorm];
+		center -= modifier;
 	}
 
 	//Find the normal and non-normal axis numbers of the reference box
@@ -703,8 +738,8 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	std::vector<glm::vec2> quad;
 	quad.resize(4, glm::vec2(0, 0));
 	float c1, c2, m11, m12, m21, m22;
-//	c1 = glm::dot(center, glm::vec3(rot1[0][code1], rot1[1][code1], rot1[2][code1]));
-//	c2 = glm::dot(center, glm::vec3(rot1[0][code2], rot1[1][code2], rot1[2][code2]));
+	//	c1 = glm::dot(center, glm::vec3(rot1[0][code1], rot1[1][code1], rot1[2][code1]));
+	//	c2 = glm::dot(center, glm::vec3(rot1[0][code2], rot1[1][code2], rot1[2][code2]));
 
 	c1 = glm::dot(center, rot1[code1]);
 	c2 = glm::dot(center, rot1[code2]);
@@ -727,7 +762,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		quad[3].x = c1 + k1 - k3;
 		quad[3].y = c2 + k2 - k4;
 	}
-
+	glm::vec2 diff = quad[2] - quad[0];
 	//Find size of reference face
 	std::vector<glm::vec2> rect;
 	rect.resize(4, glm::vec2(0, 0));
@@ -735,9 +770,13 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	rect[1] = glm::vec2(-extents1[code1], extents1[code2]);
 	rect[2] = glm::vec2(extents1[code1], extents1[code2]);
 	rect[3] = glm::vec2(extents1[code1], -extents1[code2]);
-	
+
 	//Intersect faces
-	std::vector<glm::vec2> ret = PhysicsDefs::ClipPolygon(quad, rect);
+	std::vector<glm::vec2> ret;
+	if (extents1[code1] * extents1[code2] < std::abs(diff.x * diff.y))
+		ret = PhysicsDefs::ClipPolygon(rect, quad);
+	else
+		ret = PhysicsDefs::ClipPolygon(quad, rect);
 
 	if (ret.size() < 1)
 		return false;
@@ -748,21 +787,18 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	m11 *= det1;
 	m12 *= det1;
-	m21 *= det1; 
+	m21 *= det1;
 	m22 *= det1;
 
 	//Number of penetrating contact points found
 	int cnum = 0;
-	glm::vec2 GG;
 	for (int j = 0; j < ret.size(); ++j)
 	{
 		float k1 = m22*(ret[j].x - c1) - m12*(ret[j].y - c2);
 		float k2 = -m21*(ret[j].x - c1) + m11*(ret[j].y - c2);
-		if (ret.size() > 4)
-			GG = ret[4];
 		point[cnum] = center + k1 * rot2[incFace1] + k2 * rot2[incFace2];
-		dep[cnum]	= extents1[codeN] - glm::dot(faceNorm, point[cnum]);
-		
+		dep[cnum] = extents1[codeN] - glm::dot(faceNorm, point[cnum]);
+
 		if (dep[cnum] >= 0)
 		{
 			ret[cnum].x = ret[j].x;
@@ -816,7 +852,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 				i1 = i;
 			}
 		}
-		
+
 		int iret[8];
 		CullPoints(ret, maxc, i1, iret);
 		contacts = new PhysicsDefs::ContactInfo[maxc];
@@ -840,8 +876,8 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	}
 
 	manifold.Update(contacts, count);
-	
-	delete [] contacts;
+
+	delete[] contacts;
 	ret = std::vector<glm::vec2>();
 	quad.clear();
 	rect.clear();

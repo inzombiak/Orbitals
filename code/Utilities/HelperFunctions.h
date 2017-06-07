@@ -55,4 +55,14 @@ std::vector<glm::vec3> CreateCar(CarInfo carInfo);
 void CreateTriMesh(const std::vector<glm::vec3>& vertices, const std::vector<unsigned short>& triangleIndices,
 	std::vector<glm::vec3>& vertices_out, std::vector<glm::vec3>& normals_out, std::vector<glm::vec3>& cleanVert_out, std::vector<unsigned short> &cleanIndices_out);
 
+inline float Clamp(float val, float minVal, float maxVal)
+{
+	if (val < minVal)
+		val = minVal;
+	else if (val > maxVal)
+		val = maxVal;
+
+	return val;
+}
+
 #endif

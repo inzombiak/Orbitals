@@ -50,8 +50,8 @@ void Manifold::Update(PhysicsDefs::ContactInfo* newContacts, int newContactCount
 			oldC = m_contacts + k;
 
 			c->prevNormalImp = oldC->prevNormalImp;
-			c->prevTangImp = oldC->prevTangImp;
-
+			c->prevTangImp1 = oldC->prevTangImp1;
+			c->prevTangImp2 = oldC->prevTangImp2;
 		}
 		else
 		{
