@@ -42,7 +42,7 @@ EDCreateObject* ObjectCreators::CreateSphereEventData(IDefaultShapeData* data)
 	scd->rbci.resititution = 0.5f;
 	scd->rbci.enableGravity - true;
 
-	scd->rbci.transform.SetRotation(glm::quat(data->rotation));
+	scd->rbci.transform.SetRotation(glm::quat(glm::vec3(-data->rotation.x, -data->rotation.y, data->rotation.z)));
 	scd->rbci.transform.SetOrigin(data->position);
 	scd->rbci.localInertia = glm::vec3(0, 0, 0); //TODO: INCORRECT, add calculator funciton;
 
@@ -53,7 +53,7 @@ EDCreateObject* ObjectCreators::CreateSphereEventData(IDefaultShapeData* data)
 	
 	return eventData;
 }
-
+#include <glm\gtx\euler_angles.hpp>
 EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 {
 	if (data->GetType() != Box)
@@ -82,15 +82,14 @@ EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 	bcd->rbci.mass = 0.f;
 	bcd->rbci.linearDamping = 0.f;
 	bcd->rbci.angularDamping = 0.f;
-	bcd->rbci.friction = 0.4f;
+	bcd->rbci.friction = 0.3f;
 	bcd->rbci.rollingFriction = 0.3f;
-	bcd->rbci.resititution = 0.1f;
+	bcd->rbci.resititution = 0.f;
 	bcd->rbci.enableGravity = true;
 
 	bcd->rbci.transform.SetRotation(glm::quat(data->rotation));
 	bcd->rbci.transform.SetOrigin(data->position);
 	bcd->rbci.localInertia = glm::vec3(0, 0, 0); //TODO: INCORRECT, add calculator funciton;
-
 	boxData->rigidBodyData = bcd;
 
 	boxData->renderCompData->verticesClean = cleanVert;

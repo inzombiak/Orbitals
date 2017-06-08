@@ -190,6 +190,7 @@ void PhysicsWorld::PredictMotion(float timeStep)
 		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
 		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
 		totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
+	//	angVel *= timeStep;
 		angMag = glm::length(angVel);
 		//TODO MOVE TO RIGID BODY
 		if (m_nonStaticRigidBodies[i]->GetMass() != 0)
@@ -220,20 +221,31 @@ void PhysicsWorld::PerformMovement(float timeStep)
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
+
+		//if (glm::dot(linVel, linVel) < 0.001f)
+		//{
+		//	linVel = glm::vec3(0);
+		//}
+		//if (glm::dot(angVel, angVel) < 0.001f)
+		//{
+		//	angVel = glm::vec3(0);
+		//}
+
 		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
 		angMag = glm::length(angVel);
 		//totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
-
 		trans = m_nonStaticRigidBodies[i]->GetTransform();
 		rot = trans.GetRotation();
 		pos = trans.GetOrigin();
 		if (angMag != 0)
-			rot = glm::rotate(rot, glm::radians(angMag), glm::normalize(angVel));
+			rot = glm::rotate(rot, glm::radians(angMag * timeStep), glm::normalize(angVel));
 
 		pos += linVel * timeStep;
 		trans.SetOrigin(pos);
 		trans.SetRotation(rot);
 		m_nonStaticRigidBodies[i]->UpdateTransform(trans);
+		m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
+		m_nonStaticRigidBodies[i]->SetAngularVelocity(angVel);
 	}
 }
 

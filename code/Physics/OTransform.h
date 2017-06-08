@@ -86,9 +86,10 @@ public:
 	glm::mat4 GetOpenGLMatrix() const
 	{
 		glm::mat4 result(1.f);
-		result[0] = glm::vec4(m_basis[0], 0.f);
-		result[1] = glm::vec4(m_basis[1], 0.f);
-		result[2] = glm::vec4(m_basis[2], 0.f);
+		auto basis = glm::transpose(m_basis);
+		result[0] = glm::vec4(basis[0], 0.f);
+		result[1] = glm::vec4(basis[1], 0.f);
+		result[2] = glm::vec4(basis[2], 0.f);
 		result[3] = glm::vec4(m_origin, 1.f);
 		return result;
 	}

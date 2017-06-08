@@ -1,6 +1,6 @@
 #include "NarrowphaseSAT.h"
 #include "glm\gtc\matrix_transform.hpp"
-
+#include "glm\gtx\quaternion.hpp"
 std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 	std::vector<PhysicsDefs::CollPairContactInfo> result;
@@ -41,7 +41,7 @@ std::vector<Manifold> NarrowphaseSAT::CheckCollision2(const std::vector<PhysicsD
 		//	result.push_back(std::make_pair(collisionPairs[i], contactInfo));
 		//}
 		Manifold manifold(collisionPairs[i].first, collisionPairs[i].second);
-		if (SATDetectionOBB2(collisionPairs[i].first, collisionPairs[i].second, manifold))
+		if (SATDetectionOBB2(manifold.m_bodyA, manifold.m_bodyB, manifold))
 		{
 			//Since we moved everything into A's space we neeed to move it out 
 			result.push_back(manifold);
@@ -289,8 +289,9 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	float ra, rb, depth;
 	const float fudge_factor = 1.05f;
 	contactInfo.depth = -FLT_MAX;
-	glm::mat3 R, absR;
+	glm::mat3 R, absR, testR;
 	glm::vec3 rot = glm::eulerAngles(body2->GetTransform().GetRotation());
+	testR = glm::toMat3(body2->GetTransform().GetRotation());
 	glm::vec3 axisRot = glm::normalize(rot);
 	float angle = glm::length(rot);
 	PhysicsDefs::OBB obb1 = body1->GetOBB();
@@ -315,7 +316,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 			absR[i][j] = std::abs(R[i][j]) + FLT_EPSILON;
 		}
 	}
-
+	//R = glm::transpose(R);
 	glm::vec3 trans = obb2.pos - obb1.pos;
 	trans = glm::vec3(glm::dot(trans, obb1.localAxes[0]), glm::dot(trans, obb1.localAxes[1]), glm::dot(trans, obb1.localAxes[2]));
 
@@ -339,7 +340,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		if (depth > 0)
 			return false;
 
-		if (depth < -0.00001f && depth > contactInfo.depth)
+		if (depth < -0.00001f && depth * fudge_factor > contactInfo.depth)
 		{
 			invertNormal = TL < 0;
 			contactInfo.depth = depth;
@@ -351,15 +352,15 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Test B0, B1, B2
 	for (int i = 0; i < 3; ++i)
 	{
-		ra = obb1.halfExtents[i];
-		rb = obb2.halfExtents[0] * absR[i][0] + obb2.halfExtents[1] * absR[i][1] + obb2.halfExtents[2] * absR[i][2];
+		ra = obb1.halfExtents[0] * absR[0][i] + obb1.halfExtents[1] * absR[1][i] + obb1.halfExtents[2] * absR[2][i];
+		rb = obb2.halfExtents[i];
 		TL = trans[0] * R[0][i] + trans[1] * R[1][i] + trans[2] * R[2][i];
 		depth = std::abs(TL) - (ra + rb);
 
 		if (depth > 0)
 			return false;
 
-		if (depth < -0.00001f && depth > contactInfo.depth)
+		if (depth < -0.00001f && depth * fudge_factor > contactInfo.depth)
 		{
 			invertNormal = TL < 0;
 			contactInfo.depth = depth;
@@ -615,12 +616,20 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Reference face is on body1
 	if (featureID <= 3)
 	{
+		
 		rot1[0] = obb1.localAxes[0];
 		rot1[1] = obb1.localAxes[1];
 		rot1[2] = obb1.localAxes[2];
 		rot2[0] = obb2.localAxes[0];
 		rot2[1] = obb2.localAxes[1];
 		rot2[2] = obb2.localAxes[2];
+		
+		/*rot1[0] = glm::vec3(obb1.localAxes[0][0], obb1.localAxes[1][0], obb1.localAxes[2][0]);
+		rot1[1] = glm::vec3(obb1.localAxes[0][1], obb1.localAxes[1][1], obb1.localAxes[2][1]);
+		rot1[2] = glm::vec3(obb1.localAxes[0][2], obb1.localAxes[1][2], obb1.localAxes[2][2]);
+		rot2[0] = glm::vec3(obb2.localAxes[0][0], obb2.localAxes[1][0], obb2.localAxes[2][0]);
+		rot2[1] = glm::vec3(obb2.localAxes[0][1], obb2.localAxes[1][1], obb2.localAxes[2][1]);
+		rot2[2] = glm::vec3(obb2.localAxes[0][2], obb2.localAxes[1][2], obb2.localAxes[2][2]);*/
 		pos1 = obb1.pos;
 		pos2 = obb2.pos;
 		extents1 = obb1.halfExtents;
@@ -643,9 +652,9 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	//Rotate the norm
 	//TODO: IS THIS RIGHT?
 	glm::mat3 rotator;
-	rotator[0] = rot2[0];
-	rotator[1] = rot2[1];
-	rotator[2] = rot2[2];
+	rotator[0] = glm::vec3(rot2[0][0], rot2[1][0], rot2[2][0]);
+	rotator[1] = glm::vec3(rot2[0][1], rot2[1][1], rot2[2][1]);
+	rotator[2] = glm::vec3(rot2[0][2], rot2[1][2], rot2[2][2]);
 	referenceNormal = rotator * faceNorm;
 
 	//Calculate absolute normal
@@ -689,7 +698,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	//Compute center of the incident face
 	glm::vec3 center = pos2 - pos1;
-	glm::vec3 modifier = extents2[largestAbsNorm] * glm::vec3(rot2[0][largestAbsNorm], rot2[1][largestAbsNorm], rot2[2][largestAbsNorm]);
+	glm::vec3 modifier = extents2[largestAbsNorm] * glm::vec3(rot2[largestAbsNorm]);// [], rot2[1][largestAbsNorm], rot2[2][largestAbsNorm]);
 	if (referenceNormal[largestAbsNorm] < 0)
 	{
 		//auto test = extents2[largestAbsNorm] * glm::vec3(rot2[0][largestAbsNorm], rot2[1][largestAbsNorm], rot2[2][largestAbsNorm]);

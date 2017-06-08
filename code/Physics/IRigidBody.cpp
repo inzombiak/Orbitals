@@ -13,7 +13,7 @@ IRigidBody::IRigidBody(const PhysicsDefs::RigidBodyConstructionInfo& rbci)
 		m_invMass		= 1 / m_mass;
 	m_linearDamping		= rbci.linearDamping;
 	m_angularDamping	= rbci.angularDamping;
-	m_friction			= rbci.friction - 0.9;
+	m_friction			= rbci.friction;
 	m_rollingFriction	= rbci.rollingFriction;
 	m_restitution		= rbci.resititution;
 
@@ -49,10 +49,8 @@ void IRigidBody::ApplyImpulse(const glm::vec3& impulse)
 }
 void IRigidBody::ApplyTorqueImpulse(const glm::vec3& torque)
 {
-	m_angularVelocity += m_invInertiaTensor * torque;
+	SetAngularVelocity(m_angularVelocity + m_invInertiaTensor * torque);
 
-	if (glm::dot(m_angularVelocity, m_angularVelocity) < 0.01f)
-		m_angularVelocity = glm::vec3(0);
 }
 
 void IRigidBody::ApplyForce(const glm::vec3& force)
@@ -96,11 +94,11 @@ void IRigidBody::SetLinearVelocity(const glm::vec3& newLinVel)
 	m_linearVelocity = newLinVel;
 	if (glm::dot(m_linearVelocity, m_linearVelocity) < 0.01f)
 		m_linearVelocity = glm::vec3(0);
-	else if (glm::dot(m_linearVelocity, m_linearVelocity) > 1000.f)
-	{
-		float fraction = glm::dot(m_linearVelocity, m_linearVelocity) / 1000.f;
-		m_linearVelocity /= fraction;
-	}
+	//else if (glm::dot(m_linearVelocity, m_linearVelocity) > 1000.f)
+	//{
+	//	float fraction = glm::dot(m_linearVelocity, m_linearVelocity) / 1000.f;
+	//	m_linearVelocity /= fraction;
+	//}
 }
 glm::vec3 IRigidBody::GetAngularVelocity() const
 {
@@ -110,6 +108,9 @@ glm::vec3 IRigidBody::GetAngularVelocity() const
 void IRigidBody::SetAngularVelocity(const glm::vec3& newAngVel)
 {
 	m_angularVelocity = newAngVel;
+
+	if (glm::dot(m_angularVelocity, m_angularVelocity) < 0.000001f)
+		m_angularVelocity = glm::vec3(0);
 }
 float IRigidBody::GetMass() const
 {
@@ -137,13 +138,16 @@ void IRigidBody::UpdateInterpolationTransform(const OTransform& predictedTrans)
 	m_interpolationTransform = predictedTrans;
 	//glm::mat4 tempMat;
 	//tempMat = glm::translate(m_interpolationTransform.GetBasis(), glm::vec3(0, 0, 0));
-	glm::mat3 rot = m_interpolationTransform.GetBasis();
-	m_obb.localAxes[0] = glm::vec3(rot * glm::vec3(1, 0, 0));
-	m_obb.localAxes[1] = glm::vec3(rot * glm::vec3(0, 1, 0));
-	if (glm::dot(m_obb.localAxes[0], m_obb.localAxes[1]) <= 0)
-		m_obb.localAxes[2] = glm::cross(m_obb.localAxes[0], m_obb.localAxes[1]);
-	else
-		m_obb.localAxes[2] = glm::cross(m_obb.localAxes[1], m_obb.localAxes[0]);
+	glm::mat3 rot = glm::transpose(m_interpolationTransform.GetBasis());
+	//m_obb.localAxes[0] = glm::vec3(rot * glm::vec3(1, 0, 0));
+	//m_obb.localAxes[1] = glm::vec3(rot * glm::vec3(0, 1, 0));
+	//if (glm::dot(m_obb.localAxes[0], m_obb.localAxes[1]) <= 0)
+	//	m_obb.localAxes[2] = glm::cross(m_obb.localAxes[0], m_obb.localAxes[1]);
+	//else
+	//	m_obb.localAxes[2] = glm::cross(m_obb.localAxes[1], m_obb.localAxes[0]);
+	m_obb.localAxes[0] = rot[0];
+	m_obb.localAxes[1] = rot[1];
+	m_obb.localAxes[2] = rot[2];
 	m_obb.pos = m_interpolationTransform.GetOrigin();
 	m_obb.UpdateAABB();
 	m_obb.aabb.worldTransform = glm::translate(glm::mat4(1.f), m_obb.pos);
