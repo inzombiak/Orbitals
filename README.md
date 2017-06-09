@@ -16,7 +16,7 @@ Back on track!
 * Narrowphase collision detection using ~~GJK/EPA~~(need to add manifodl generation) or SAT
 * Contact manifold generation
 * Collision resolution using seqential impulse solver
-* Friction/Rrstitution
+* Friction/Restitution
 
 ## Build Requirements:
 GLM for math, GLEW 2.0 or higher for OpenGL
