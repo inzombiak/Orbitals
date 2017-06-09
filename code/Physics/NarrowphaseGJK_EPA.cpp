@@ -3,16 +3,16 @@
 #include "glm\gtx\norm.hpp"
 
 #include "../Utilities/Debug.h"
-std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseGJK_EPA::CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
+std::vector<Manifold> NarrowphaseGJK_EPA::CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 	PhysicsDefs::ContactInfo contactData;
 	PhysicsDefs::AABB aabb1, aabb2;
 	
-	std::vector<PhysicsDefs::CollPairContactInfo> result;
+	std::vector<Manifold> result;
 	for (int i = 0; i < collisionPairs.size(); ++i)
 	{
-		if (RunGJK_EPA(collisionPairs[i].first, collisionPairs[i].second, contactData), ecb)
-			result.push_back(std::make_pair(collisionPairs[i], contactData));	
+		//if (RunGJK_EPA(collisionPairs[i].first, collisionPairs[i].second, contactData), ecb)
+			//result.push_back(std::make_pair(collisionPairs[i], contactData));	
 	}
 	
 	return result;

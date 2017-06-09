@@ -251,26 +251,14 @@ void PhysicsWorld::PerformMovement(float timeStep)
 
 void PhysicsWorld::PerformCollisionCheck(float dt)
 {
-	//ORB_DBG::Instance().StartTimer("Collision Check Start");
-	//Do broadphase
 	auto collidingPairs = m_broadphase->GetCollisionPairs();
 
 	if (collidingPairs.size() != 0)
 	{
-		m_narrowphaseResult = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
-		m_manifolds = m_narrowphase->CheckCollision2(collidingPairs, NarrowphaseErrorCalback);
-
-		//TODO: THIS RESULT MIGHT NOT HAVE THE RIGHT LOCAL AND WORLD POINTS IN A AND B, TEST IT
-		if (m_narrowphaseResult.size() > 0)
-		{
+		m_manifolds = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
+		if (m_manifolds.size() > 0)
 			m_constraintSolver->SolveConstraints2(m_manifolds, dt);
-		}
-		//m_constraintSolver->SolveConstraints(m_narrowphaseResult, dt);
-	
 	}
-
-	
-	//ORB_DBG::Instance().EndTimer("Collision Check End");
 }
 
 void PhysicsWorld::NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult)

@@ -8,7 +8,7 @@
 class NarrowphaseGJK_EPA : public INarrowphase
 {
 public:
-	std::vector<PhysicsDefs::CollPairContactInfo> CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
+	std::vector<Manifold> CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb = 0);
 
 private:
 	bool RunGJK_EPA(IRigidBody* bodyA, IRigidBody* bodyB, PhysicsDefs::ContactInfo& contactData, ErrorCallBack ecb = 0);

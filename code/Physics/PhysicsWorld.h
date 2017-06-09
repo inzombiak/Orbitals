@@ -39,7 +39,6 @@ private:
 	static void NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult);
 	// Stores error
 	static std::vector<glm::vec3> m_narrowphaseError;
-	std::vector<PhysicsDefs::CollPairContactInfo> m_narrowphaseResult;
 	std::vector<Manifold> m_manifolds;
 
 	float m_fixedTimeStep = 0;

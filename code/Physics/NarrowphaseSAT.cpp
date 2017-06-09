@@ -1,47 +1,16 @@
 #include "NarrowphaseSAT.h"
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtx\quaternion.hpp"
-std::vector<PhysicsDefs::CollPairContactInfo> NarrowphaseSAT::CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
-{
-	std::vector<PhysicsDefs::CollPairContactInfo> result;
-	PhysicsDefs::ContactInfo contactInfo;
 
-	float depth, velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
-	for (int i = 0; i < collisionPairs.size(); ++i)
-	{	
-		
-		//if (SATDetectionAABB(collisionPairs[i].first, collisionPairs[i].second, contactInfo))
-		//{
-		//	//Since we moved everything into A's space we neeed to move it out 
-		//	result.push_back(std::make_pair(collisionPairs[i], contactInfo));
-		//}
-
-		if (SATDetectionOBB(collisionPairs[i].first, collisionPairs[i].second, contactInfo))
-		{
-			//Since we moved everything into A's space we neeed to move it out 
-			result.push_back(std::make_pair(collisionPairs[i], contactInfo));
-		}
-	}
-
-	return result;
-}
-
-std::vector<Manifold> NarrowphaseSAT::CheckCollision2(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
+std::vector<Manifold> NarrowphaseSAT::CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 	std::vector<Manifold> result;
-
-
 	float depth, velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
 	for (int i = 0; i < collisionPairs.size(); ++i)
 	{
 
-		//if (SATDetectionAABB(collisionPairs[i].first, collisionPairs[i].second, contactInfo))
-		//{
-		//	//Since we moved everything into A's space we neeed to move it out 
-		//	result.push_back(std::make_pair(collisionPairs[i], contactInfo));
-		//}
 		Manifold manifold(collisionPairs[i].first, collisionPairs[i].second);
-		if (SATDetectionOBB2(manifold.m_bodyA, manifold.m_bodyB, manifold))
+		if (SATDetectionOBB(manifold.m_bodyA, manifold.m_bodyB, manifold))
 		{
 			//Since we moved everything into A's space we neeed to move it out 
 			result.push_back(manifold);
@@ -50,12 +19,6 @@ std::vector<Manifold> NarrowphaseSAT::CheckCollision2(const std::vector<PhysicsD
 
 	return result;
 }
-
-//
-//bool NarrowphaseSAT::SATDetectionAABB(const PhysicsDefs::AABB& aabb1, const PhysicsDefs::AABB& aabb2, PhysicsDefs::ContactInfo& contactInfo)
-//{
-//
-//}
 
 bool NarrowphaseSAT::SATDetectionAABB(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& contactInfo)
 {
@@ -146,155 +109,13 @@ bool NarrowphaseSAT::SATDetectionAABB(IRigidBody* body1, IRigidBody* body2, Phys
 }
 
 //Based on Real-time Collision Detection by Christer Ericson, pg. 103
-bool NarrowphaseSAT::SATDetectionOBB(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& contactInfo)
-{
-
-	float ra, rb, depth;
-	contactInfo.depth = FLT_MAX;
-	glm::mat3 R, absR;
-
-	PhysicsDefs::OBB obb1 = body1->GetOBB();
-	PhysicsDefs::OBB obb2 = body2->GetOBB();
-
-	/*
-	Ranges from 1-15
-	1-3: Face of A
-	4-6: Face of B
-	6-15: Some combinaiton of edges
-
-	0: No collision
-	*/
-	int featureID = 0;
-
-	//TODO: WHY?
-	for (int i = 0; i < 3; ++i)
-	{
-		for (int j = 0; j < 3; ++j)
-		{
-			R[i][j] = glm::dot(obb1.localAxes[i], obb2.localAxes[j]);
-			absR[i][j] = std::abs(R[i][j]) + FLT_EPSILON;
-		}
-	}
-
-	glm::vec3 trans = obb2.pos - obb1.pos;
-	trans = glm::vec3(glm::dot(trans, obb1.localAxes[0]), glm::dot(trans, obb1.localAxes[1]), glm::dot(trans, obb1.localAxes[2]));
-
-	//for (int i = 0; i < 3; ++i)
-	//{
-	//	for (int j = 0; j < 3; ++j)
-	//	{
-	//		absR[i][j] = std::abs(R[i][j]) + FLT_EPSILON;
-	//	}
-	//}
-
-	//Text A0, A1 and A2
-	for (int i = 0; i < 3; ++i)
-	{
-		ra = obb1.halfExtents[i];
-		rb = obb2.halfExtents[0] * absR[i][0] + obb2.halfExtents[1] * absR[i][1] + obb2.halfExtents[2] * absR[i][2];
-
-		if (std::abs(trans[i]) > ra + rb)
-			return false;
-
-		depth = std::abs(rb - std::abs((ra - std::abs(trans[i]))));
-
-		if (depth < contactInfo.depth)
-		{
-			contactInfo.depth = depth;
-			contactInfo.normal = obb2.localAxes[i];
-			featureID = i + 1;
-		}
-	}
-
-	//Test B0, B1, B2
-	for (int i = 0; i < 3; ++i)
-	{
-		ra = obb1.halfExtents[0] * absR[0][i] + obb1.halfExtents[1] * absR[1][i] + obb1.halfExtents[2] * absR[2][i];
-		rb = obb2.halfExtents[i]; 
-
-		if (std::abs(trans[0] * R[0][i] + trans[1] * R[1][i] + trans[2] * R[2][i]) > ra + rb)
-			return false;
-
-		depth = std::abs(rb - std::abs((ra - std::abs(trans[i]))));
-
-		if (depth < contactInfo.depth)
-		{
-			contactInfo.depth = depth;
-			contactInfo.normal = -obb1.localAxes[i];
-			featureID = i + 4;
-		}
-	}
-
-	//Test A0 x B0
-	ra = obb1.halfExtents[1] * absR[2][0] + obb1.halfExtents[2] * absR[1][0];
-	rb = obb2.halfExtents[1] * absR[0][2] + obb2.halfExtents[2] * absR[0][1];
-	if (std::abs(trans[2] * R[1][0] - trans[1] * R[2][0]) > ra + rb)
-		return false;
-
-	//Test A0 x B1
-	ra = obb1.halfExtents[1] * absR[2][1] + obb1.halfExtents[2] * absR[1][1];
-	rb = obb2.halfExtents[0] * absR[0][2] + obb2.halfExtents[2] * absR[0][0];
-	if (std::abs(trans[2] * R[1][1] - trans[1] * R[2][1]) > ra + rb)
-		return false;
-
-	//Test A0 x B2
-	ra = obb1.halfExtents[1] * absR[2][2] + obb1.halfExtents[2] * absR[1][2];
-	rb = obb2.halfExtents[0] * absR[0][1] + obb2.halfExtents[1] * absR[0][0];
-	if (std::abs(trans[2] * R[1][2] - trans[1] * R[2][2]) > ra + rb)
-		return false;
-
-	//Test A1 x B0
-	ra = obb1.halfExtents[0] * absR[2][0] + obb1.halfExtents[2] * absR[0][0];
-	rb = obb2.halfExtents[1] * absR[1][2] + obb2.halfExtents[2] * absR[1][1];
-	if (std::abs(trans[0] * R[2][0] - trans[2] * R[0][0]) > ra + rb)
-		return false;
-
-	//Test A1 x B1
-	ra = obb1.halfExtents[0] * absR[2][1] + obb1.halfExtents[2] * absR[0][1];
-	rb = obb2.halfExtents[0] * absR[1][2] + obb2.halfExtents[2] * absR[1][0];
-	if (std::abs(trans[0] * R[2][1] - trans[2] * R[0][1]) > ra + rb)
-		return false;
-
-	//Test A1 x B2
-	ra = obb1.halfExtents[0] * absR[2][2] + obb1.halfExtents[2] * absR[0][2];
-	rb = obb2.halfExtents[0] * absR[1][1] + obb2.halfExtents[2] * absR[1][0];
-	if (std::abs(trans[0] * R[2][2] - trans[2] * R[0][2]) > ra + rb)
-		return false;
-
-	//Test A2 x B0
-	ra = obb1.halfExtents[0] * absR[1][0] + obb1.halfExtents[1] * absR[0][0];
-	rb = obb2.halfExtents[1] * absR[2][2] + obb2.halfExtents[2] * absR[2][1];
-	if (std::abs(trans[1] * R[0][0] - trans[0] * R[1][0]) > ra + rb)
-		return false;
-
-	//Test A2 x B1
-	ra = obb1.halfExtents[0] * absR[1][1] + obb1.halfExtents[1] * absR[0][1];
-	rb = obb2.halfExtents[0] * absR[2][2] + obb2.halfExtents[2] * absR[2][0];
-	if (std::abs(trans[1] * R[0][1] - trans[0] * R[1][1]) > ra + rb)
-		return false;
-
-	//Test A2 x B2
-	ra = obb1.halfExtents[0] * absR[1][2] + obb1.halfExtents[1] * absR[0][2];
-	rb = obb2.halfExtents[0] * absR[2][1] + obb2.halfExtents[1] * absR[2][0];
-	if (std::abs(trans[1] * R[0][2] - trans[0] * R[1][2]) > ra + rb)
-		return false;
-
-	return true;
-}
-
-//Based on Real-time Collision Detection by Christer Ericson, pg. 103
-bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Manifold& manifold)
+bool NarrowphaseSAT::SATDetectionOBB(IRigidBody* body1, IRigidBody* body2, Manifold& manifold)
 {
 	PhysicsDefs::ContactInfo contactInfo;
 	float ra, rb, depth;
 	const float fudge_factor = 1.05f;
 	contactInfo.depth = -FLT_MAX;
-	glm::mat3 R, absR, testR;
-	glm::vec3 rot = glm::eulerAngles(body2->GetTransform().GetRotation());
-	glm::vec3 rot12 = glm::eulerAngles(body1->GetTransform().GetRotation());
-	testR = glm::toMat3(body2->GetTransform().GetRotation());
-	glm::vec3 axisRot = glm::normalize(rot);
-	float angle = glm::length(rot);
+	glm::mat3 R, absR;
 	PhysicsDefs::OBB obb1 = body1->GetOBB();
 	PhysicsDefs::OBB obb2 = body2->GetOBB();
 
@@ -321,13 +142,6 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	glm::vec3 trans = obb2.pos - obb1.pos;
 	trans = trans * obb1.localAxes;
 
-	//for (int i = 0; i < 3; ++i)
-	//{
-	//	for (int j = 0; j < 3; ++j)
-	//	{
-	//		absR[i][j] = std::abs(R[i][j]) + FLT_EPSILON;
-	//	}
-	//}
 	float TL;
 	//Text A0, A1 and A2
 	for (int i = 0; i < 3; ++i)
@@ -557,7 +371,6 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	//Create manifold
 	//This is based on ODE's dBoxBox function, found in the box.cpp file
-	//TODO: ADD EDGE-EDGE CASES
 
 	//Rotations, positions and side lengths of bodies 1 and 2
 	glm::vec3 pos1, pos2, extents1, extents2;
@@ -624,13 +437,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		rot2[0] = obb2.localAxes[0];
 		rot2[1] = obb2.localAxes[1];
 		rot2[2] = obb2.localAxes[2];
-		
-		/*rot1[0] = glm::vec3(obb1.localAxes[0][0], obb1.localAxes[1][0], obb1.localAxes[2][0]);
-		rot1[1] = glm::vec3(obb1.localAxes[0][1], obb1.localAxes[1][1], obb1.localAxes[2][1]);
-		rot1[2] = glm::vec3(obb1.localAxes[0][2], obb1.localAxes[1][2], obb1.localAxes[2][2]);
-		rot2[0] = glm::vec3(obb2.localAxes[0][0], obb2.localAxes[1][0], obb2.localAxes[2][0]);
-		rot2[1] = glm::vec3(obb2.localAxes[0][1], obb2.localAxes[1][1], obb2.localAxes[2][1]);
-		rot2[2] = glm::vec3(obb2.localAxes[0][2], obb2.localAxes[1][2], obb2.localAxes[2][2]);*/
+
 		pos1 = obb1.pos;
 		pos2 = obb2.pos;
 		extents1 = obb1.halfExtents;
@@ -697,24 +504,9 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	glm::vec3 center = pos2 - pos1;
 	glm::vec3 modifier = extents2[largestAbsNorm] * glm::vec3(rot2[largestAbsNorm]);// [], rot2[1][largestAbsNorm], rot2[2][largestAbsNorm]);
 	if (referenceNormal[largestAbsNorm] < 0)
-	{
-		//auto test = extents2[largestAbsNorm] * glm::vec3(rot2[0][largestAbsNorm], rot2[1][largestAbsNorm], rot2[2][largestAbsNorm]);
 		center += modifier;
-	/*	float test2 = 0;
-		for (int i = 0; i < 3; i++)
-		{
-			test2 = extents2[largestAbsNorm] * rot2[i][largestAbsNorm];
-			center[i] = pos2[i] - pos1[i] + test2;
-		}
-*/
-		/*test = 
-		auto test2 = rot2[largestAbsNorm];
-		center = pos2 - pos1 + extents2[largestAbsNorm] * rot2[largestAbsNorm];*/
-	}
 	else
-	{
 		center -= modifier;
-	}
 
 	//Find the normal and non-normal axis numbers of the reference box
 	//TODO: WHAT?
@@ -876,9 +668,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	for (int i = 0; i < count; ++i)
 	{
 		contacts[i].localPointA = contacts[i].worldPos - obb1.pos;
-		//contacts[i].worldPointA = glm::vec3(body1->GetInterpolationTransform() * glm::vec4(contacts[i].localPointA, 1.f));
 		contacts[i].localPointB = contacts[i].worldPos - obb2.pos;
-		//contacts[i].worldPointB = contacts[i].localPointB + obb2.pos;
 	}
 
 	manifold.Update(contacts, count);

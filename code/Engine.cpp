@@ -166,12 +166,12 @@ void Engine::Test()
 	//boxData.position = glm::vec3(4.2, 10, -5);
 	//boxData.extents = glm::vec3(3, 3, 3);
 	//boxData.extents = glm::vec3(2, 2, 2);
-	boxData.position = glm::vec3(1, 20, 0);
+	boxData.position = glm::vec3(0, 14, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 5;
 	//boxED->GetData()->rigidBodyData->rbci.enableGravity = false;
 	EventSystem::GetInstance()->QueueEvent(boxED, false);
-	/*boxData.color = glm::vec3(1.f, 0.f, 0.f);
+	boxData.color = glm::vec3(1.f, 0.f, 0.f);
 	boxData.position = glm::vec3(0, 18, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 1;
