@@ -3,7 +3,7 @@
 #include "IBroadphase.h"
 #include "INarrowphase.h"
 #include "IConstraintSolver.h"
-
+#include "../Utilities/Debug.h"
 #include "glm\gtc\matrix_transform.hpp"
 #include "glm\gtx\quaternion.hpp"
 
@@ -190,19 +190,18 @@ void PhysicsWorld::PredictMotion(float timeStep)
 		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
 		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
 		totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
-	//	angVel *= timeStep;
 		angMag = glm::length(angVel);
-		//TODO MOVE TO RIGID BODY
+
 		if (m_nonStaticRigidBodies[i]->GetMass() != 0)
 			linVel += totalF / m_nonStaticRigidBodies[i]->GetMass() * timeStep;
 
 		trans = m_nonStaticRigidBodies[i]->GetTransform();
 		rot = trans.GetRotation();
 		pos = trans.GetOrigin();
-		if (angMag != 0)
-			rot = glm::rotate(rot, glm::radians(angMag), glm::normalize(angVel));
 
+		rot *= glm::quat(angVel* timeStep);
 		pos += linVel * timeStep;
+		rot = glm::normalize(rot);
 		trans.SetOrigin(pos);
 		trans.SetRotation(rot);
 
@@ -215,56 +214,63 @@ void PhysicsWorld::PredictMotion(float timeStep)
 void PhysicsWorld::PerformMovement(float timeStep)
 {
 	float angMag;
-	glm::vec3 linVel, angVel, pos;// , totalF;
+	glm::vec3 linVel, angVel, pos;
 	OTransform trans, finalTrans;
 	glm::quat rot;
 	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
-		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity();
-
-		//if (glm::dot(linVel, linVel) < 0.001f)
-		//{
-		//	linVel = glm::vec3(0);
-		//}
-		//if (glm::dot(angVel, angVel) < 0.001f)
-		//{
-		//	angVel = glm::vec3(0);
-		//}
-
+		linVel = m_nonStaticRigidBodies[i]->GetLinearVelocity() ;
 		angVel = m_nonStaticRigidBodies[i]->GetAngularVelocity();
 		angMag = glm::length(angVel);
-		//totalF = m_nonStaticRigidBodies[i]->GetTotalForce();
+
+		if (glm::dot(linVel, linVel) < 0.01)
+		{
+			linVel = glm::vec3(0);
+			m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
+		}
+		if (glm::dot(angVel, angVel) < 0.01)
+		{
+			angVel = glm::vec3(0);
+			m_nonStaticRigidBodies[i]->SetAngularVelocity(angVel);
+		}
+
 		trans = m_nonStaticRigidBodies[i]->GetTransform();
+
 		rot = trans.GetRotation();
 		pos = trans.GetOrigin();
-		if (angMag != 0)
-			rot = glm::rotate(rot, glm::radians(angMag * timeStep), glm::normalize(angVel));
 
+		rot *= glm::quat(angVel* timeStep);
 		pos += linVel * timeStep;
+		rot = glm::normalize(rot);
 		trans.SetOrigin(pos);
 		trans.SetRotation(rot);
+
 		m_nonStaticRigidBodies[i]->UpdateTransform(trans);
-		m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
-		m_nonStaticRigidBodies[i]->SetAngularVelocity(angVel);
 	}
 }
 
 void PhysicsWorld::PerformCollisionCheck(float dt)
 {
+	//ORB_DBG::Instance().StartTimer("Collision Check Start");
 	//Do broadphase
 	auto collidingPairs = m_broadphase->GetCollisionPairs();
 
-	if (collidingPairs.size() == 0)
-		return;
+	if (collidingPairs.size() != 0)
+	{
+		m_narrowphaseResult = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
+		m_manifolds = m_narrowphase->CheckCollision2(collidingPairs, NarrowphaseErrorCalback);
 
-	m_narrowphaseResult = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
-	m_manifolds = m_narrowphase->CheckCollision2(collidingPairs, NarrowphaseErrorCalback);
+		//TODO: THIS RESULT MIGHT NOT HAVE THE RIGHT LOCAL AND WORLD POINTS IN A AND B, TEST IT
+		if (m_narrowphaseResult.size() > 0)
+		{
+			m_constraintSolver->SolveConstraints2(m_manifolds, dt);
+		}
+		//m_constraintSolver->SolveConstraints(m_narrowphaseResult, dt);
+	
+	}
 
-	//TODO: THIS RESULT MIGHT NOT HAVE THE RIGHT LOCAL AND WORLD POINTS IN A AND B, TEST IT
-	if (m_narrowphaseResult.size() < 1)
-		return;
-	//m_constraintSolver->SolveConstraints(m_narrowphaseResult, dt);
-	m_constraintSolver->SolveConstraints2(m_manifolds, dt);
+	
+	//ORB_DBG::Instance().EndTimer("Collision Check End");
 }
 
 void PhysicsWorld::NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult)

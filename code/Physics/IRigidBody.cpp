@@ -92,8 +92,8 @@ glm::vec3 IRigidBody::GetLinearVelocity() const
 void IRigidBody::SetLinearVelocity(const glm::vec3& newLinVel)
 {
 	m_linearVelocity = newLinVel;
-	if (glm::dot(m_linearVelocity, m_linearVelocity) < 0.01f)
-		m_linearVelocity = glm::vec3(0);
+	//if (glm::dot(m_linearVelocity, m_linearVelocity) < 0.01f)
+		//m_linearVelocity = glm::vec3(0);
 	//else if (glm::dot(m_linearVelocity, m_linearVelocity) > 1000.f)
 	//{
 	//	float fraction = glm::dot(m_linearVelocity, m_linearVelocity) / 1000.f;
@@ -108,9 +108,6 @@ glm::vec3 IRigidBody::GetAngularVelocity() const
 void IRigidBody::SetAngularVelocity(const glm::vec3& newAngVel)
 {
 	m_angularVelocity = newAngVel;
-
-	if (glm::dot(m_angularVelocity, m_angularVelocity) < 0.000001f)
-		m_angularVelocity = glm::vec3(0);
 }
 float IRigidBody::GetMass() const
 {
@@ -145,9 +142,7 @@ void IRigidBody::UpdateInterpolationTransform(const OTransform& predictedTrans)
 	//	m_obb.localAxes[2] = glm::cross(m_obb.localAxes[0], m_obb.localAxes[1]);
 	//else
 	//	m_obb.localAxes[2] = glm::cross(m_obb.localAxes[1], m_obb.localAxes[0]);
-	m_obb.localAxes[0] = rot[0];
-	m_obb.localAxes[1] = rot[1];
-	m_obb.localAxes[2] = rot[2];
+	m_obb.localAxes = rot;
 	m_obb.pos = m_interpolationTransform.GetOrigin();
 	m_obb.UpdateAABB();
 	m_obb.aabb.worldTransform = glm::translate(glm::mat4(1.f), m_obb.pos);

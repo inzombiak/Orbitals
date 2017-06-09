@@ -82,9 +82,9 @@ EDCreateObject* ObjectCreators::CreateBoxEventData(IDefaultShapeData* data)
 	bcd->rbci.mass = 0.f;
 	bcd->rbci.linearDamping = 0.f;
 	bcd->rbci.angularDamping = 0.f;
-	bcd->rbci.friction = 0.3f;
+	bcd->rbci.friction = 10.f;
 	bcd->rbci.rollingFriction = 0.3f;
-	bcd->rbci.resititution = 0.f;
+	bcd->rbci.resititution = 0.3f;
 	bcd->rbci.enableGravity = true;
 
 	bcd->rbci.transform.SetRotation(glm::quat(data->rotation));

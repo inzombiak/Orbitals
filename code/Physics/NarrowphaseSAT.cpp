@@ -291,6 +291,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	contactInfo.depth = -FLT_MAX;
 	glm::mat3 R, absR, testR;
 	glm::vec3 rot = glm::eulerAngles(body2->GetTransform().GetRotation());
+	glm::vec3 rot12 = glm::eulerAngles(body1->GetTransform().GetRotation());
 	testR = glm::toMat3(body2->GetTransform().GetRotation());
 	glm::vec3 axisRot = glm::normalize(rot);
 	float angle = glm::length(rot);
@@ -318,7 +319,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 	}
 	//R = glm::transpose(R);
 	glm::vec3 trans = obb2.pos - obb1.pos;
-	trans = glm::vec3(glm::dot(trans, obb1.localAxes[0]), glm::dot(trans, obb1.localAxes[1]), glm::dot(trans, obb1.localAxes[2]));
+	trans = trans * obb1.localAxes;
 
 	//for (int i = 0; i < 3; ++i)
 	//{
@@ -560,7 +561,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	//Rotations, positions and side lengths of bodies 1 and 2
 	glm::vec3 pos1, pos2, extents1, extents2;
-	glm::vec3 rot1[3], rot2[3];
+	glm::mat3 rot1, rot2;
 
 	glm::vec3 faceNorm = contactInfo.normal, referenceNormal, absReferenceNormal;
 
@@ -651,11 +652,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 
 	//Rotate the norm
 	//TODO: IS THIS RIGHT?
-	glm::mat3 rotator;
-	rotator[0] = glm::vec3(rot2[0][0], rot2[1][0], rot2[2][0]);
-	rotator[1] = glm::vec3(rot2[0][1], rot2[1][1], rot2[2][1]);
-	rotator[2] = glm::vec3(rot2[0][2], rot2[1][2], rot2[2][2]);
-	referenceNormal = rotator * faceNorm;
+	referenceNormal = glm::transpose(rot2) * faceNorm;
 
 	//Calculate absolute normal
 	absReferenceNormal.x = fabs(referenceNormal.x);
@@ -841,7 +838,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		{
 			contacts[i].worldPos = point[i] + pos1;
 			contacts[i].depth = dep[i];
-			contacts[i].normal = faceNorm;
+			contacts[i].normal = contactInfo.normal;
 		}
 
 		count = cnum;
@@ -869,7 +866,7 @@ bool NarrowphaseSAT::SATDetectionOBB2(IRigidBody* body1, IRigidBody* body2, Mani
 		{
 			contacts[j].worldPos = point[iret[j]] + pos1;
 			contacts[j].depth = dep[iret[j]];
-			contacts[j].normal = faceNorm;
+			contacts[j].normal = contactInfo.normal;
 		}
 		count = maxc;
 	}

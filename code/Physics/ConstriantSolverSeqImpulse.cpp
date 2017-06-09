@@ -65,13 +65,13 @@ void ConstraintSolverSeqImpulse::SolveConstraints(std::vector<PhysicsDefs::CollP
 			//bias -= 200 * std::abs(glm::dot(relativeVel, info[i].second.normal));//;
 			//bias += test;
 			//bias += test;
-			lambda = (-JV + bias) / JinvMJ;
+			/*lambda = (-JV + bias) / JinvMJ;
 
 			{
 				oldLambda = contact->prevNormalImp;
 				contact->prevNormalImp = std::max(oldLambda + lambda, 0.f);
 				lambda = contact->prevNormalImp - oldLambda;
-			}
+			}*/
 
 			//lambda -= bias / JinvMJ;
 			impulse1 = contact->normal * lambda;
@@ -113,6 +113,31 @@ void ConstraintSolverSeqImpulse::SolveConstraints2(std::vector<Manifold>& manifo
 	}
 }
 
+float CalcJV(const glm::vec3& normal,
+	const glm::vec3& r1, const glm::vec3& lVel1, const glm::vec3& aVel1,
+	const glm::vec3& r2, const glm::vec3& lVel2, const glm::vec3& aVel2
+	)
+{
+	float JV;
+	//glm::vec3 localANorm = ;
+	//glm::vec3 localBNorm = glm::cross(r2, normal);
+	//float lComp1 = glm::dot(normal, lVel1);
+	//float lComp2 = glm::dot(normal, lVel2);
+	float lComp1 = glm::dot(normal, lVel1);
+	float lComp2 = glm::dot(normal, lVel2);
+	//float aComp1 = 0;
+	//float aComp2 = 0;
+	//float aComp1 = glm::dot(aVel1, glm::cross(r1, normal));
+	//float aComp2 = glm::dot(aVel2, glm::cross(r2, normal));
+	float aComp1 = glm::dot(aVel1, glm::cross(normal, r1));
+	float aComp2 = glm::dot(aVel2, glm::cross(normal, r2));
+
+
+	JV = -lComp1 - aComp1 + lComp2 + aComp2;
+
+	return JV;
+
+}
 void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float dt)
 {
 	PhysicsDefs::ContactInfo* contact;
@@ -164,9 +189,8 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 				glm::dot(localBTangent * invTensor2, localBTangent));
 
 			//Bias
-			JV = -glm::dot(vel1, contact->normal) - glm::dot(localANorm, aVel1)
-				+ glm::dot(vel2, contact->normal) + glm::dot(localBNorm, aVel2);
-			contact->bias = -0.1f / dt * std::max(0.0f, contact->depth) - minRest * JV;
+			JV = CalcJV(contact->normal, contact->localPointA, vel1, aVel1, contact->localPointB, vel2, aVel2);
+			contact->bias = -0.1f / dt * std::max(0.0f, contact->depth -0.001f) + minRest * JV;
 			contact->friction = friction;
 		}
 	}
@@ -175,11 +199,12 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& contact, float dt)
 {
 	//TODO: FIND ERROR
-	glm::vec3 normal = contact.normal;
+	//glm::vec3 normal = contact.normal;
 
 	glm::vec3 dv, impulse, impulseTangent, tangent, vel1, vel2, aVel1, aVel2;
-	/*body1->SetLinearVelocity(glm::vec3(0.f));
-	body2->SetLinearVelocity(glm::vec3(0.f));*/
+	//body1->SetLinearVelocity(glm::vec3(0.f));
+	//body2->SetLinearVelocity(glm::vec3(0.f));
+	
 	float massNormal, massTangent, invM1, invM2, f;
 	glm::vec3 localANorm, localBNorm, localATang, localBTang;
 	//glm::mat4 interpolationTrans1;
@@ -204,26 +229,25 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 	aVel2 = body2->GetAngularVelocity();
 	localANorm = glm::cross(contact.localPointA, aVel1);
 	localBNorm = glm::cross(contact.localPointB, aVel2);
-	//auto bb = ()
-	JV = -glm::dot(vel1, normal) - glm::dot(localANorm, normal)
-		+ glm::dot(vel2, normal) + glm::dot(localBNorm, normal);
+	JV = CalcJV(contact.normal, contact.localPointA, vel1, aVel1, contact.localPointB, vel2, aVel2);
 
-	//auto restitution = minRest * JV;
-	lambda = (-JV + contact.bias) * contact.massNormal;
+	lambda = -(JV + contact.bias) * contact.massNormal;
+
 	{
 		oldLambda = contact.prevNormalImp;
-		contact.prevNormalImp = std::min(oldLambda + lambda, 0.f);
+		contact.prevNormalImp = std::max(oldLambda + lambda, 0.f);
 		lambda = contact.prevNormalImp - oldLambda;
 	}
 
-	impulse = normal * lambda;
+
+	impulse = contact.normal * lambda;
 	torque1 = glm::cross(contact.localPointA, impulse);
 	torque2 = glm::cross(contact.localPointB, impulse);
 	body1->ApplyImpulse(-impulse);
 	body2->ApplyImpulse(impulse);
-	//body1->ApplyTorqueImpulse(torque1);
-	//body2->ApplyTorqueImpulse(-torque2);
-	return;
+	body1->ApplyTorqueImpulse(torque1);
+	body2->ApplyTorqueImpulse(-torque2);
+	
 	float coeff = contact.prevNormalImp * contact.friction;
 	vel1 = body1->GetLinearVelocity();
 	vel2 = body2->GetLinearVelocity();

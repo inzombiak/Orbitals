@@ -115,7 +115,7 @@ namespace PhysicsDefs
 	struct OBB
 	{
 		glm::vec3 pos;
-		glm::vec3 localAxes[3];
+		glm::mat3 localAxes;
 		glm::vec3 halfExtents;
 
 		PhysicsDefs::AABB aabb;
