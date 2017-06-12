@@ -12,6 +12,15 @@ class IObjectComponent;
 
 namespace Orbitals
 {
+
+	enum DrawingType
+	{
+		PHYSICS = 1,
+		COMPONENTS = 2,
+		TEXTURE = 4,
+		SHADOW_MAP = 8
+	};
+
   //Input enums, used for various purposes.
   //We use enums instead of system defined values to make core of
   //engine more portable

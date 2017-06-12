@@ -1,11 +1,12 @@
 #include "RenderComponent.h"
 #include "../Objects/ICelestialObject.h"
 
-void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos)
+void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos, GLuint program, bool assignUniforms)
 {
 	//Set program
-	glUseProgram(m_program);
-
+	//glUseProgram(m_program);
+	if (program == -1)
+		program = m_program;
 	//Enable attributes for use
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
@@ -52,19 +53,16 @@ void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos)
 	m_model = m_owner->GetOpenGLMatrix();
 
 	glm::mat4 mvp = proj * view * m_model;
-
+	GLuint err;
 	//Pass in MVP
-	GLuint MVPMatID = glGetUniformLocation(m_program, "MVP");
-	glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &mvp[0][0]);
+	if (assignUniforms)
+	{
+		GLuint MVPMatID = glGetUniformLocation(program, "MVP");
+		glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &mvp[0][0]);
+		GLuint MMatID = glGetUniformLocation(program, "M");
+		glUniformMatrix4fv(MMatID, 1, GL_FALSE, &m_model[0][0]);
+	}
 
-	GLuint VMatID = glGetUniformLocation(m_program, "V");
-	glUniformMatrix4fv(VMatID, 1, GL_FALSE, &view[0][0]);
-
-	GLuint MMatID = glGetUniformLocation(m_program, "M");
-	glUniformMatrix4fv(MMatID, 1, GL_FALSE, &m_model[0][0]);
-
-	GLuint lightPosID = glGetUniformLocation(m_program, "LightPosition_worldspace");
-	glUniform3f(lightPosID, lightPos.x, lightPos.y, lightPos.z);
 
 	//Draw
 	if (m_numIndicies >= 0)
@@ -78,6 +76,11 @@ void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos)
 	}
 	else
 		glDrawArrays(m_drawPrimitive, 0, m_numVertices);
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+
 }
 
 void RenderComponent::Update(float dt)

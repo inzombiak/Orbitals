@@ -190,7 +190,7 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 
 			//Bias
 			JV = CalcJV(contact->normal, contact->localPointA, vel1, aVel1, contact->localPointB, vel2, aVel2);
-			contact->bias = -0.1f / dt * std::max(0.0f, contact->depth -0.001f) + minRest * JV;
+			contact->bias = -0.2f / dt * std::max(0.0f, contact->depth -0.1f) + minRest * JV;
 			contact->friction = friction;
 		}
 	}

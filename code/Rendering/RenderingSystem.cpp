@@ -10,10 +10,24 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include "RenderingSystem.h"
 #include "RenderComponent.h"
+
+#include "RenderToTexture.h"
+#include "Shadowmap.h"
+
 #include "../Utilities/HelperFunctions.h"
 #include "../Events/EventSystem.h"
 #include "../Events/EDCreateRenderComp.h"
 #include "../Input/InputSystem.h"
+//
+//static const GLfloat g_quad_vertex_buffer_data[] =
+//{
+//	-1.0f, -1.0f, 0.0f,
+//	1.0f, -1.0f, 0.0f,
+//	-1.0f, 1.0f, 0.0f,
+//	-1.0f, 1.0f, 0.0f,
+//	1.0f, -1.0f, 0.0f,
+//	1.0f, 1.0f, 0.0f,
+//};
 
 
 RenderingSystem::~RenderingSystem()
@@ -43,6 +57,28 @@ bool RenderingSystem::Init()
 	GLuint program = CreateProgram(shaderList);
 	m_physDebugDrawer.SetProgram(program);
 
+	//Render to texture program
+	IRendererType* newRenderer = new RenderToTexture();
+	shaderList.clear();
+	shaderList.push_back(CreateShader(GL_VERTEX_SHADER, ReadFileToString("Vertex_Passthrough.glsl")));
+	shaderList.push_back(CreateShader(GL_FRAGMENT_SHADER, ReadFileToString("RenderTexture.glsl")));
+	GLuint rToTexProgram = CreateProgram(shaderList);
+	newRenderer->Init(m_program, rToTexProgram);
+	m_renderers[newRenderer->GetType()] = newRenderer;
+
+	newRenderer = new Shadowmap();
+	shaderList.clear();
+	shaderList.push_back(CreateShader(GL_VERTEX_SHADER, ReadFileToString("Shadowmap_Vertex.glsl")));
+	shaderList.push_back(CreateShader(GL_FRAGMENT_SHADER, ReadFileToString("Shadowmap_Fragment.glsl")));
+	GLuint shadowProgram = CreateProgram(shaderList);
+	newRenderer->Init(shadowProgram, rToTexProgram);
+	m_renderers[newRenderer->GetType()] = newRenderer;
+
+	//shaderList.clear();
+	//shaderList.push_back(CreateShader(GL_VERTEX_SHADER, ReadFileToString("Vertex_Passthrough.glsl")));
+	//shaderList.push_back(CreateShader(GL_FRAGMENT_SHADER, ReadFileToString("RenderTexture.glsl")));
+	//m_quadProgID = CreateProgram(shaderList);
+
 	m_direction = glm::vec3(
 		cos(m_yRotate) * sin(m_xRotate),
 		sin(m_yRotate),
@@ -56,7 +92,8 @@ bool RenderingSystem::Init()
 		);
 	m_up = glm::cross(m_right, m_direction);
 
-
+	//TODO: Write what these od for later
+	
 	return true;
 }
 void RenderingSystem::Clear()
@@ -68,6 +105,13 @@ void RenderingSystem::Clear()
 	//}
 
 	m_renderComponents.clear();
+
+	for (auto it = m_renderers.begin(); it != m_renderers.end(); ++it)
+	{
+		delete it->second;
+	}
+
+	m_renderers.clear();
 }
 
 void RenderingSystem::ClearRender()
@@ -136,38 +180,180 @@ void RenderingSystem::UpdateCameraRotation()
 	m_prevMouse = mouseStatus.position;
 }
 
-void RenderingSystem::Draw()
+void RenderingSystem::PreDraw(int drawOptions)
 {
-	glUseProgram(m_program);
-	glClearColor(.7f, 0.7f, 1.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//MVP matrix, for 2D drawing this is all we need
-	glm::mat4 vp(1.0f);
-
-	glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 200.0f);
-	glm::mat4 view = glm::lookAt(
+	RendererIterator it;
+	m_projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 200.0f);
+	m_view = glm::lookAt(
 		m_position,
 		m_position + m_direction,
 		m_up
 		);
-	vp = projection * view;
-
-	auto MVP = projection * view * glm::mat4(1.f);
+	m_MVP = m_projection * m_view *glm::mat4(1.f);
 	GLuint MVPMatID = glGetUniformLocation(m_program, "MVP");
-	glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &MVP[0][0]);
-	//glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
-	
-	for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
-		m_renderComponents[i].Draw(view, projection, m_position);
+	GLuint err;
+	if ((drawOptions &  Orbitals::DrawingType::TEXTURE) == Orbitals::DrawingType::TEXTURE)
+	{
+		it = m_renderers.find(Orbitals::DrawingType::TEXTURE);
+		if (it == m_renderers.end())
+		{
+			// Do something
+		}
+		else
+		{
+			it->second->PreDraw();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			GLuint VMatID = glGetUniformLocation(m_program, "V");
+			glUniformMatrix4fv(VMatID, 1, GL_FALSE, &m_view[0][0]);
 
+			GLuint lightPosID = glGetUniformLocation(m_program, "LightPosition_worldspace");
+			glUniform3f(lightPosID, m_position.x, m_position.y, m_position.z);
+
+			if ((drawOptions &  Orbitals::DrawingType::COMPONENTS) == Orbitals::DrawingType::COMPONENTS)
+			{
+				for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
+					m_renderComponents[i].Draw(m_view, m_projection, m_position);
+			}
+			if ((drawOptions &  Orbitals::DrawingType::PHYSICS) == Orbitals::DrawingType::PHYSICS)
+				m_physDebugDrawer.Draw(m_MVP);
+			while ((err = glGetError()) != GL_NO_ERROR)
+			{
+				std::cerr << "OpenGL error: " << err << std::endl;
+			}
+		}
+
+	}
+
+	if ((drawOptions & Orbitals::DrawingType::SHADOW_MAP) == Orbitals::DrawingType::SHADOW_MAP)
+	{
+		it = m_renderers.find(Orbitals::DrawingType::SHADOW_MAP);
+		if (it == m_renderers.end())
+		{
+			// Do something
+		}
+		else
+		{
+
+			GLuint prog = it->second->PreDraw(glm::mat4(1.0f), glm::mat4(0.f), m_spotPos, m_directionLightDir);//m_directionLightDir);
+			glm::mat4 depthVP = it->second->GetMVP();
+			
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			if ((drawOptions &  Orbitals::DrawingType::COMPONENTS) == Orbitals::DrawingType::COMPONENTS)
+			{
+				for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
+				{
+					m_renderComponents[i].Draw(depthVP, glm::mat4(1.f), m_position, prog);
+				}
+					
+			}
+
+			while ((err = glGetError()) != GL_NO_ERROR)
+			{
+				std::cerr << "OpenGL error: " << err << std::endl;
+			}
+		}
+
+	}
+}
+
+void RenderingSystem::Draw(int drawOptions)
+{
 	GLenum err;
-	while ((err = glGetError()) != GL_NO_ERROR) 
+	RendererIterator it;
+
+	//glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &m_MVP[0][0]);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glm::mat4 depthMVP(1.f);
+	GLuint depthTex = 0;
+	if ((drawOptions & Orbitals::DrawingType::SHADOW_MAP) == Orbitals::DrawingType::SHADOW_MAP)
+	{
+		it = m_renderers.find(Orbitals::DrawingType::SHADOW_MAP);
+		if (it == m_renderers.end())
+		{
+			// Do something
+		}
+		else
+		{
+			//it->second->Draw();
+			depthMVP = it->second->GetMVP();
+			depthTex = it->second->GetTexutreID();
+		}
+
+	}
+
+	glViewport(0, 0, 1024, 640);
+
+	glUseProgram(m_program);
+	glCullFace(GL_BACK);
+	GLuint VMatID = glGetUniformLocation(m_program, "V");
+	glUniformMatrix4fv(VMatID, 1, GL_FALSE, &m_view[0][0]);
+
+	GLuint lightPosID = glGetUniformLocation(m_program, "LightPosition_worldspace");
+	glUniform3f(lightPosID, m_position.x, m_position.y, m_position.z);
+
+	glm::mat4 biasMatrix(
+		0.5, 0.0, 0.0, 0.0,
+		0.0, 0.5, 0.0, 0.0,
+		0.0, 0.0, 0.5, 0.0,
+		0.5, 0.5, 0.5, 1.0
+		);
+	glm::mat4 depthBiasMVP = biasMatrix*depthMVP;
+	GLuint DepthBiasID = glGetUniformLocation(m_program, "DepthMVP");
+	glUniformMatrix4fv(DepthBiasID, 1, GL_FALSE, &depthBiasMVP[0][0]);
+
+	//Bind shadowmap texuture
+	if (depthTex != 0)
+	{
+		GLuint ShadowMapID = glGetUniformLocation(m_program, "shadowMap");
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthTex);
+		glUniform1i(ShadowMapID, 0);
+	}
+
+	if ((drawOptions & Orbitals::DrawingType::COMPONENTS) == Orbitals::DrawingType::COMPONENTS)
+	{
+		for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
+			m_renderComponents[i].Draw(m_view, m_projection, m_position);
+	}
+	if ((drawOptions & Orbitals::DrawingType::PHYSICS) == Orbitals::DrawingType::PHYSICS)
+		m_physDebugDrawer.Draw(m_MVP);
+
+	while ((err = glGetError()) != GL_NO_ERROR)
 	{
 		std::cerr << "OpenGL error: " << err << std::endl;
 	}
+	//return;
+	if ((drawOptions & Orbitals::DrawingType::TEXTURE) == Orbitals::DrawingType::TEXTURE)
+	{
+		it = m_renderers.find(Orbitals::DrawingType::TEXTURE);
+		if (it == m_renderers.end())
+		{
+			// Do something
+		}
+		else
+		{
+			it->second->Draw();
+		}
 
-	m_physDebugDrawer.Draw(MVP);
+	}
+
+	if ((drawOptions & Orbitals::DrawingType::SHADOW_MAP) == Orbitals::DrawingType::SHADOW_MAP)
+	{
+		it = m_renderers.find(Orbitals::DrawingType::SHADOW_MAP);
+		if (it == m_renderers.end())
+		{
+			// Do something
+		}
+		else
+		{
+			it->second->Draw();
+			depthMVP = it->second->GetMVP();
+			depthTex = it->second->GetTexutreID();
+		}
+
+	}
+
 }
 
 void RenderingSystem::CreateRenderComponent(IEventData* eventData)

@@ -51,9 +51,12 @@
     <ClInclude Include="..\..\code\Physics\SphereShape.h" />
     <ClInclude Include="..\..\code\Rendering\Camera.h" />
     <ClInclude Include="..\..\code\Rendering\GLRenderHelpers.h" />
+    <ClInclude Include="..\..\code\Rendering\IRendererType.h" />
     <ClInclude Include="..\..\code\Rendering\PhysDebugDrawer.h" />
     <ClInclude Include="..\..\code\Rendering\RenderComponent.h" />
     <ClInclude Include="..\..\code\Rendering\RenderingSystem.h" />
+    <ClInclude Include="..\..\code\Rendering\RenderToTexture.h" />
+    <ClInclude Include="..\..\code\Rendering\Shadowmap.h" />
     <ClInclude Include="..\..\code\Utilities\Debug.h" />
     <ClInclude Include="..\..\code\Utilities\GameDefs.h" />
     <ClInclude Include="..\..\code\Utilities\HelperFunctions.h" />
@@ -61,10 +64,14 @@
     <ClInclude Include="IObjectFactory.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\code\FragmentShader.glsl" />
-    <None Include="..\..\code\VertexShader.glsl" />
     <None Include="FragmentShader_Lighting.glsl" />
+    <None Include="RenderTexture.glsl" />
+    <None Include="Shadowmap_Fragment.glsl" />
+    <None Include="Shadowmap_Vertex.glsl" />
     <None Include="VertexShader_Lighting.glsl" />
+    <None Include="Vertex_Passthrough.glsl" />
+    <None Include="X:\VS\Orbitals\FragmentShader.glsl" />
+    <None Include="X:\VS\Orbitals\VertexShader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\code\Engine.cpp" />
@@ -90,6 +97,8 @@
     <ClCompile Include="..\..\code\Rendering\PhysDebugDrawer.cpp" />
     <ClCompile Include="..\..\code\Rendering\RenderComponent.cpp" />
     <ClCompile Include="..\..\code\Rendering\RenderingSystem.cpp" />
+    <ClCompile Include="..\..\code\Rendering\RenderToTexture.cpp" />
+    <ClCompile Include="..\..\code\Rendering\Shadowmap.cpp" />
     <ClCompile Include="..\..\code\Utilities\Debug.cpp" />
     <ClCompile Include="..\..\code\Utilities\HelperFunctions.cpp" />
   </ItemGroup>

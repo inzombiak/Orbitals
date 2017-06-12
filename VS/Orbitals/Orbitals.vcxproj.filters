@@ -82,6 +82,12 @@
     <Filter Include="Header Files\Metaprogramming\Common">
       <UniqueIdentifier>{89f40111-e0db-4975-aa42-ac87df0c8885}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Rendering\Renderers">
+      <UniqueIdentifier>{45b2726c-e1cb-4068-9f07-859924efec4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Renderers">
+      <UniqueIdentifier>{8cbd7413-c8e6-430e-a5fc-a9f0dc96c248}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\Events\EDCreateObject.h">
@@ -228,18 +234,39 @@
     <ClInclude Include="..\..\code\Physics\OTransform.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\RenderToTexture.h">
+      <Filter>Header Files\Rendering\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\IRendererType.h">
+      <Filter>Header Files\Rendering\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\Shadowmap.h">
+      <Filter>Header Files\Rendering\Renderers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\code\VertexShader.glsl">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\..\code\FragmentShader.glsl">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="FragmentShader_Lighting.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="VertexShader_Lighting.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="RenderTexture.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="X:\VS\Orbitals\VertexShader.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="X:\VS\Orbitals\FragmentShader.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Vertex_Passthrough.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shadowmap_Vertex.glsl">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shadowmap_Fragment.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>
@@ -318,6 +345,12 @@
     </ClCompile>
     <ClCompile Include="..\..\code\Physics\Manifold.cpp">
       <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Rendering\RenderToTexture.cpp">
+      <Filter>Source Files\Rendering\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\Rendering\Shadowmap.cpp">
+      <Filter>Source Files\Rendering\Renderers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

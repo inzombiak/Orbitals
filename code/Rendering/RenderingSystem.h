@@ -1,11 +1,12 @@
 #ifndef RENDERING_SYSTEM_H
 #define RENDERING_SYSTEM_H
 
-#include <unordered_map>
+#include <map>
 
 #include "../ISystem.h"
 #include "..\Utilities\HelperFunctions.h"
 
+#include "IRendererType.h"
 #include "RenderComponent.h"
 #include "PhysDebugDrawer.h"
 
@@ -32,7 +33,8 @@ public:
 	}
 
 	//Draw screen
-	void Draw();
+	void Draw(int drawOptions);
+	void PreDraw(int drawOptions);
 
 	SystemPriority GetPriority()
 	{
@@ -57,16 +59,29 @@ private:
 
 	GLuint m_program;
 
+
+	//TEST
+	//GLuint m_quad_VertexArrayID;
+
+
 	PhysDebugDrawer m_physDebugDrawer;
 
 	std::vector<RenderComponent> m_renderComponents;
-
+	std::map<Orbitals::DrawingType, IRendererType*> m_renderers;
+	typedef std::map<Orbitals::DrawingType, IRendererType*>::iterator RendererIterator;
 	//Used for camera speed and positioning
+
+	//Test lights, need to make rendering syste, more flexible
+	glm::vec3 m_directionLightDir = glm::vec3(-0.15, 0.156, -0.1536);
+	glm::vec3 m_spotPos = glm::vec3(-5, 10, -9);
+
 	glm::vec3 m_position = glm::vec3(-15, 16, 10);
 	glm::vec3 m_right = glm::vec3(0, 0, 1);
 	glm::vec3 m_up = glm::vec3(0, 1, 0);
 	glm::vec3 m_direction = glm::vec3(1, 0, 0);
+	glm::mat4 m_view;
 	glm::mat4 m_projection;
+	glm::mat4 m_MVP;
 	float m_speed = .04f;
 	float m_mouseSpeed = 0.005f;
 	bool m_trackingMouse = false;

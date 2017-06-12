@@ -63,6 +63,7 @@ private:
 	//WeakSystemPtr GetSystemWithByID
 	Input::MouseStatus m_mouseStatus;
 	int m_screenWidth, m_screenHeight;
+	int m_drawOptions = 0;
 	const double DELTA_T = 1.f / 30.f;
 	double m_accumulator = 0;
 	int m_numberOfSubSteps = 10;

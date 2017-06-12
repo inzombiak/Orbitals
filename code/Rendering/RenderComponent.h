@@ -15,7 +15,7 @@ public:
 		m_id = id;
 	};
 	//Draws buffer
-	void Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos);
+	void Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos, GLuint program = -1, bool assignUniforms = true);
 	//Update vertex buffer
 	void SetVertices(const std::vector<glm::vec3>& vertices);
 	//Update color buffer

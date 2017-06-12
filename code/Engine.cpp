@@ -50,13 +50,19 @@ void Engine::Draw()
 
 	std::shared_ptr<RenderingSystem> ptr;
 	if (CheckConvertAndCastPtr<ISystem, RenderingSystem>(it->second, ptr))
-		ptr->Draw();
+	{
+		ptr->PreDraw(m_drawOptions);
+		ptr->Draw(m_drawOptions);
+	}
+
 }
 
 //TODO: BAD. Use flag based initialization
 void Engine::InitSim()
 {
 	m_engineState = Initializing;
+
+	m_drawOptions = Orbitals::DrawingType::COMPONENTS | Orbitals::DrawingType::PHYSICS | Orbitals::DrawingType::SHADOW_MAP;
 
 	Functor<EDCreateObject*, TYPELIST_1(ObjectCreators::IDefaultShapeData*)> SphereDataCreator(&ObjectCreators::CreateSphereEventData);
 	Functor<EDCreateObject*, TYPELIST_1(ObjectCreators::IDefaultShapeData*)> BoxDataCreator(&ObjectCreators::CreateBoxEventData);
@@ -144,7 +150,7 @@ void Engine::Test()
 	boxData.extents = glm::vec3(2, 2, 2);
 //	boxData.rotation = glm::vec3((std::rand() % 360) * (M_PI / 180), (std::rand() % 360) * (M_PI / 180), (std::rand() % 360) * (M_PI / 180));
 	//boxData.rotation = glm::vec3(M_PI_2 / 3, 0.f, 0.f);
-	boxData.position = glm::vec3(0, 10, 0);
+	boxData.position = glm::vec3(0, 4, 0);
 	//boxData.position = glm::vec3(6, 5, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 5;
@@ -154,7 +160,7 @@ void Engine::Test()
 	if (Orbitals::CheckConvertAndCastPtr<IObjectComponent, PhysicsComponent>(boxED->GetData()->createdObject->GetComponent(PhysicsComponent::COMPONENT_ID), pc))
 	{
 		//pc->ApplyTorqueImpulse(glm::vec3(-20.f, 0.f, 0.f));
-	//	pc->ApplyImpulse(glm::vec3(0, -20.f, 0.f));
+		//pc->ApplyImpulse(glm::vec3(-40.f, 0, 0.f));
 	}
 	/*boxData.extents = glm::vec3(20, 2, 20);
 	boxData.rotation = glm::vec3(0, 0, 0);
