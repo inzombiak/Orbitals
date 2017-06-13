@@ -53,8 +53,6 @@ GLuint Shadowmap::PreDraw(const glm::mat4& proj, const glm::mat4& view, const gl
 		m_depthVP = m_depthProjMatrix * depthViewMatrix;
 	}
 
-	
-
 	glUseProgram(m_preProgID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 	glCullFace(GL_FRONT);

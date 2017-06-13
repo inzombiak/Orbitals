@@ -234,12 +234,12 @@ void PhysicsWorld::PerformMovement(float timeStep)
 		rot = glm::normalize(rot);
 		trans.SetOrigin(pos);
 		trans.SetRotation(rot);
-		if (glm::dot(linVel, linVel) < 0.02)
+		if (glm::dot(linVel, linVel) < 0.00001)
 		{
 			linVel = glm::vec3(0);
 			m_nonStaticRigidBodies[i]->SetLinearVelocity(linVel);
 		}
-		if (glm::dot(angVel, angVel) < 0.02)
+		if (glm::dot(angVel, angVel) < 0.00001)
 		{
 			angVel = glm::vec3(0);
 			m_nonStaticRigidBodies[i]->SetAngularVelocity(angVel);

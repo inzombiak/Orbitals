@@ -59,11 +59,14 @@ void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos, G
 	{
 		GLuint MVPMatID = glGetUniformLocation(program, "MVP");
 		glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &mvp[0][0]);
-		GLuint MMatID = glGetUniformLocation(program, "M");
-		glUniformMatrix4fv(MMatID, 1, GL_FALSE, &m_model[0][0]);
+
 	}
 
-
+	GLuint MMatID = glGetUniformLocation(program, "M");
+	glUniformMatrix4fv(MMatID, 1, GL_FALSE, &m_model[0][0]);
+	glm::mat3 transInverseM = glm::transpose(glm::inverse(glm::mat3(m_model)));
+	GLuint TIMMatID = glGetUniformLocation(program, "transInverseM");
+	glUniformMatrix3fv(TIMMatID, 1, GL_FALSE, &transInverseM[0][0]);
 	//Draw
 	if (m_numIndicies >= 0)
 	{

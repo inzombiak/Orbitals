@@ -72,8 +72,8 @@ private:
 	//Used for camera speed and positioning
 
 	//Test lights, need to make rendering syste, more flexible
-	glm::vec3 m_directionLightDir = glm::vec3(-0.15, 0.156, -0.1536);
-	glm::vec3 m_spotPos = glm::vec3(-5, 10, -9);
+	glm::vec3 m_directionLightDir = glm::vec3(-2.0f, 4.0f, -1.0f);;
+	glm::vec3 m_spotPos = glm::vec3(-8, 6, 4);
 
 	glm::vec3 m_position = glm::vec3(-15, 16, 10);
 	glm::vec3 m_right = glm::vec3(0, 0, 1);

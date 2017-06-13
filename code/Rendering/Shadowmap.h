@@ -28,7 +28,7 @@ public:
 private:
 	static const glm::vec3 quad_vBufferData[];
 
-	glm::mat4 m_depthProjMatrix = glm::ortho<float>(-20, 20, -20, 20, -20, 30);
+	glm::mat4 m_depthProjMatrix = glm::ortho<float>(-10.0f, 10.0f, -10.0f, 10.0f, -20, 20);
 	glm::mat4 m_depthVP = glm::mat4(1.f);
 
 	GLuint m_quad_vertexbuffer;
