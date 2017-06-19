@@ -6,6 +6,7 @@ layout (location = 1) in vec3 color;
 
 uniform mat4 MVP;
 
+
 out vec4 vert_color;
 
 void main()

@@ -44,20 +44,20 @@ GLuint Shadowmap::PreDraw(const glm::mat4& proj, const glm::mat4& view, const gl
 	{
 		glm::mat4 depthProjectionMatrix = glm::perspective<float>(45.0f, 1.0f, 2.0f, 50.0f);
 		glm::mat4 depthViewMatrix = glm::lookAt(lightPos, lightPos -lightDir, glm::vec3(0, 1, 0));
-		m_depthVP = depthProjectionMatrix * depthViewMatrix;
+		m_depthVP = depthProjectionMatrix * depthViewMatrix * glm::mat4(1.0f);
 	}
 	else
 	{
 		//Directional light
 		glm::mat4 depthViewMatrix = glm::lookAt(lightDir, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-		m_depthVP = m_depthProjMatrix * depthViewMatrix;
+		m_depthVP = m_depthProjMatrix * depthViewMatrix * glm::mat4(1.0f);
 	}
 
 	glUseProgram(m_preProgID);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
-	glCullFace(GL_FRONT);
-	glViewport(m_textureX, m_textureY, m_textureWidth, m_textureHeight);
 
+	glViewport(m_textureX, m_textureY, m_textureWidth, m_textureHeight);
+	glCullFace(GL_FRONT);
 	return m_preProgID;
 }
 

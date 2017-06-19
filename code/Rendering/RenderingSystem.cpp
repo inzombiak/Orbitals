@@ -240,6 +240,7 @@ void RenderingSystem::PreDraw(int drawOptions)
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			if ((drawOptions &  Orbitals::DrawingType::COMPONENTS) == Orbitals::DrawingType::COMPONENTS)
 			{
+				glCullFace(GL_FRONT);
 				for (unsigned int i = 0; i < m_renderComponents.size(); ++i)
 				{
 					m_renderComponents[i].Draw(depthVP, glm::mat4(1.f), m_position, prog);
@@ -289,8 +290,11 @@ void RenderingSystem::Draw(int drawOptions)
 	GLuint VMatID = glGetUniformLocation(m_program, "V");
 	glUniformMatrix4fv(VMatID, 1, GL_FALSE, &m_view[0][0]);
 
+	/*GLuint lightPosID = glGetUniformLocation(m_program, "LightPosition_worldspace");
+	glUniform3f(lightPosID, m_directionLightDir.x, m_directionLightDir.y, m_directionLightDir.z);*/
 	GLuint lightPosID = glGetUniformLocation(m_program, "lightPos");
-	glUniform3f(lightPosID, m_directionLightDir.x, m_directionLightDir.y, m_directionLightDir.z);
+	//glUniform3f(lightPosID, m_directionLightDir.x, m_directionLightDir.y, m_directionLightDir.z);
+	glUniform3f(lightPosID, m_spotPos.x, m_spotPos.y, m_spotPos.z);
 
 	GLuint viewPosID = glGetUniformLocation(m_program, "viewPos");
 	glUniform3f(viewPosID, m_position.x, m_position.y, m_position.z);
@@ -301,9 +305,9 @@ void RenderingSystem::Draw(int drawOptions)
 		0.0, 0.0, 0.5, 0.0,
 		0.5, 0.5, 0.5, 1.0
 		);
-	//glm::mat4 depthBiasMVP = depthMVP;
+	glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
 	GLuint DepthBiasID = glGetUniformLocation(m_program, "DepthMVP");
-	glUniformMatrix4fv(DepthBiasID, 1, GL_FALSE, &depthMVP[0][0]);
+	glUniformMatrix4fv(DepthBiasID, 1, GL_FALSE, &depthBiasMVP[0][0]);
 
 	//Bind shadowmap texuture
 	if (depthTex != 0)
