@@ -1,4 +1,5 @@
-#version 330 core
+//
+#version 330
 
 out vec4 FragColor;
 
@@ -7,10 +8,29 @@ in vec3 fragNormal;
 in vec4 fragColor;
 in vec4 shadowCoords;
 
-uniform sampler2D shadowMap;
+uniform sampler2DShadow shadowMap;
 
-uniform vec3 lightPos;
+uniform vec4 lightPos;
 uniform vec3 viewPos;
+
+vec2 poissonDisk[16] = vec2[]( 
+   vec2( -0.94201624, -0.39906216 ), 
+   vec2( 0.94558609, -0.76890725 ), 
+   vec2( -0.094184101, -0.92938870 ), 
+   vec2( 0.34495938, 0.29387760 ), 
+   vec2( -0.91588581, 0.45771432 ), 
+   vec2( -0.81544232, -0.87912464 ), 
+   vec2( -0.38277543, 0.27676845 ), 
+   vec2( 0.97484398, 0.75648379 ), 
+   vec2( 0.44323325, -0.97511554 ), 
+   vec2( 0.53742981, -0.47373420 ), 
+   vec2( -0.26496911, -0.41893023 ), 
+   vec2( 0.79197514, 0.19090188 ), 
+   vec2( -0.24188840, 0.99706507 ), 
+   vec2( -0.81409955, 0.91437590 ), 
+   vec2( 0.19984126, 0.78641367 ), 
+   vec2( 0.14383161, -0.14100790 ) 
+);
 
 float ShadowCalculation(vec4 fragPosLightSpace, float normLightDirDot)
 {
@@ -21,10 +41,22 @@ float ShadowCalculation(vec4 fragPosLightSpace, float normLightDirDot)
 	bias = clamp(bias, 0,0.01);
 	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
 	//projCoords = projCoords * 0.5 + 0.5;
-	float closestDepth = texture(shadowMap, projCoords.xy).r;  
-	float currentDepth = projCoords.z;  
-	float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;  
+//	projCoords.z += bias;
+	float shadow = 1.0;
+	for (int i=0;i<4;i++)
+	{
+		projCoords.xy += poissonDisk[i]/700.0;
+		if ( texture( shadowMap, projCoords )  >  (projCoords.z-bias) / fragPosLightSpace.w)
+		{
+			shadow-=0.2;
+		}
+	}
 
+	//float closestDepth = texture(shadowMap, projCoords.xyz);  
+	//float currentDepth = projCoords.z;  
+	//float shadow = closestDepth;//currentDepth> closestDepth  ? 1.0 : 0.0;  
+	 //if(projCoords.z > 1.0)
+        //shadow = 0.0;
 	return shadow;
 }
 
@@ -37,14 +69,14 @@ void main()
 
 	//Vertex normal
     vec3 normal = normalize(fragNormal);
+	vec3 lightDir = normalize(lightPos.xyz - lightPos.w * fragPos);
 
-    vec3 lightDir = normalize(lightPos - fragPos);
 	vec3 viewDir = normalize(viewPos - fragPos);
 	vec3 halfwayDir = normalize(lightDir + viewDir);  
 
     // ambient
     vec3 ambient = 0.15 * color;
-    	// diffuse
+    // diffuse
     float diff = clamp(dot(lightDir, normal), 0.0, 1.0);
     vec3 diffuse = diff * lightColor;
     // specular
@@ -162,4 +194,5 @@ void main()
    //Specular : reflective highlight, like a mirror			//
 	visibility * MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha, 5.0);// / (distance*distance);
 	FragColor = vec4(color, 1);
-}*/
+}
+*/

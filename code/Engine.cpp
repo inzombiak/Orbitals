@@ -120,7 +120,7 @@ void Engine::Test()
 	boxData.rotation = glm::vec3(0, 0, 0);
 	boxData.scale = glm::vec3(1, 1, 1);
 	boxData.color = glm::vec3(0.f, 1.f, 0.f);
-	boxData.extents = glm::vec3(20, 2, 20);
+	boxData.extents = glm::vec3(60, 2, 60);
 	boxData.position = glm::vec3(0, 0, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	//boxED->GetData()->rigidBodyData->rbci.mass = 5000;

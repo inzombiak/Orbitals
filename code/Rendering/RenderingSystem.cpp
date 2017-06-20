@@ -233,8 +233,8 @@ void RenderingSystem::PreDraw(int drawOptions)
 		}
 		else
 		{
-
-			GLuint prog = it->second->PreDraw(glm::mat4(1.0f), glm::mat4(0.f), glm::vec3(0.f)/*m_spotPos*/, m_directionLightDir);//m_directionLightDir);
+			GLuint prog = it->second->PreDraw(glm::mat4(1.0f), glm::mat4(0.f), glm::vec3(m_spotPos), glm::vec3(m_spotDir));//m_directionLightDir);
+			//GLuint prog = it->second->PreDraw(glm::mat4(1.0f), glm::mat4(0.f), glm::vec3(0.f), glm::vec3(m_directionLightDir));//m_directionLightDir);
 			glm::mat4 depthVP = it->second->GetMVP();
 			
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -293,8 +293,8 @@ void RenderingSystem::Draw(int drawOptions)
 	/*GLuint lightPosID = glGetUniformLocation(m_program, "LightPosition_worldspace");
 	glUniform3f(lightPosID, m_directionLightDir.x, m_directionLightDir.y, m_directionLightDir.z);*/
 	GLuint lightPosID = glGetUniformLocation(m_program, "lightPos");
-	//glUniform3f(lightPosID, m_directionLightDir.x, m_directionLightDir.y, m_directionLightDir.z);
-	glUniform3f(lightPosID, m_spotPos.x, m_spotPos.y, m_spotPos.z);
+	//glUniform4f(lightPosID, m_directionLightDir.x, m_directionLightDir.y, m_directionLightDir.z, m_directionLightDir.w);
+	glUniform4f(lightPosID, m_spotPos.x, m_spotPos.y, m_spotPos.z, m_spotPos.w);
 
 	GLuint viewPosID = glGetUniformLocation(m_program, "viewPos");
 	glUniform3f(viewPosID, m_position.x, m_position.y, m_position.z);

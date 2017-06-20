@@ -10,7 +10,7 @@
 std::string ReadFileToString(const char* filePath)
 {
 	std::string content;
-	std::ifstream fileStream(filePath, std::ios::in);
+	std::ifstream fileStream(filePath);
 	//Make sure file is open
 	if (!fileStream.is_open()) {
 		std::cerr << "Could not read file " << filePath << ". File does not exist." << std::endl;
@@ -18,8 +18,9 @@ std::string ReadFileToString(const char* filePath)
 	}
 
 	//Read contents to a string
-	std::string line = "";
-	while (!fileStream.eof()) {
+
+	while (fileStream.good()) {
+		std::string line;
 		std::getline(fileStream, line);
 		content.append(line + "\n");
 	}

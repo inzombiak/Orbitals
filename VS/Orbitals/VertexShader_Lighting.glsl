@@ -30,7 +30,7 @@ void main()
 	
 	gl_Position = MVP * vec4(position,1);
 	shadowCoords = DepthMVP * M * vec4(position,1);
-	fragPos = position;
+	fragPos = vec3(M * vec4(position, 1));
 	fragNormal = transInverseM  * normal;
 	fragColor = vec4(color, 0);
 
