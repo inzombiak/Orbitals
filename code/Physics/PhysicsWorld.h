@@ -2,7 +2,7 @@
 #define PHYSICS_WORLD_H
 
 #include <vector>
-
+#include <map>
 #include <glm\glm.hpp>
 
 #include "IRigidBody.h"
@@ -39,7 +39,11 @@ private:
 	static void NarrowphaseErrorCalback(std::vector<glm::vec3> finalResult);
 	// Stores error
 	static std::vector<glm::vec3> m_narrowphaseError;
-	std::vector<Manifold> m_manifolds;
+
+	//std::vector<Manifold> m_manifolds;
+	typedef std::map<ManifoldKey, Manifold> ManifoldMap;
+	typedef ManifoldMap::iterator ManifoldMapIter;
+	ManifoldMap m_manifolds;
 
 	float m_fixedTimeStep = 0;
 	float m_localTime = 0;

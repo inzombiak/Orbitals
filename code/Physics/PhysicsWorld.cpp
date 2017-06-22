@@ -152,15 +152,16 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 	PhysicsDefs::ContactInfo ci;
 	if (m_manifolds.size() > 0)
 	{
-		for (unsigned int i = 0; i < m_manifolds.size(); ++i)
+		ManifoldMapIter it;
+		for (it = m_manifolds.begin(); it != m_manifolds.end(); ++it)
 		{
-			pos1 = m_manifolds[i].m_bodyA->GetInterpolationTransform().GetOrigin();
-			pos2 = m_manifolds[i].m_bodyB->GetInterpolationTransform().GetOrigin();
+			pos1 =it->second.m_bodyA->GetInterpolationTransform().GetOrigin();
+			pos2 =it->second.m_bodyB->GetInterpolationTransform().GetOrigin();
 			m_physDebugDrawer->DrawPoint(pos1, 0.2, glm::vec3(0, 1, 0));
 			m_physDebugDrawer->DrawPoint(pos2, 0.5, glm::vec3(0, 0, 1));
-			for (int j = 0; j < m_manifolds[i].m_contactCount; ++j)
+			for (int j = 0; j < it->second.m_contactCount; ++j)
 			{
-				ci = m_manifolds[i].m_contacts[j];
+				ci = it->second.m_contacts[j];
 				m_physDebugDrawer->DrawPoint(ci.worldPos, 0.2, glm::vec3(0, 1, 1));
 				m_physDebugDrawer->DrawLine(pos1, pos1 + ci.localPointA, glm::vec3(0.5, 0.5, 0.5));
 				m_physDebugDrawer->DrawLine(pos2, pos2 + ci.localPointB, glm::vec3(0.5, 0.f, 0.5));
@@ -252,12 +253,46 @@ void PhysicsWorld::PerformMovement(float timeStep)
 void PhysicsWorld::PerformCollisionCheck(float dt)
 {
 	auto collidingPairs = m_broadphase->GetCollisionPairs();
-
+	
 	if (collidingPairs.size() != 0)
 	{
-		m_manifolds = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
-		if (m_manifolds.size() > 0)
-			m_constraintSolver->SolveConstraints2(m_manifolds, dt);
+		std::vector<Manifold> newManifolds;
+		newManifolds = m_narrowphase->CheckCollision(collidingPairs, NarrowphaseErrorCalback);
+		if (newManifolds.size() == 0)
+		{
+			m_manifolds.clear();
+			return;
+		}
+			
+		//This requires improvement, shouldn't have to recreate map every frame
+		ManifoldMap manifoldMap;
+		ManifoldMapIter it;
+
+		for (int i = 0; i < newManifolds.size(); ++i)
+		{
+			ManifoldKey key(newManifolds[i].m_bodyA, newManifolds[i].m_bodyB);
+
+			it = m_manifolds.find(key);
+
+			//If no manifold is found, add it and move on
+			if (it == m_manifolds.end())
+			{
+				manifoldMap.emplace(key, newManifolds[i]);
+
+				continue;
+			}
+
+			//Otherwise we need to merge
+			it->second.Update(newManifolds[i].m_contacts, newManifolds[i].m_contactCount);
+			it->second.m_isPersistent = true;
+			//Add it to the new map, this step need to be improved
+			manifoldMap.emplace(it->first, it->second);
+			newManifolds[i].m_isPersistent = true;
+			*(newManifolds[i].m_contacts) = *(it->second.m_contacts);
+			newManifolds[i].m_contactCount = it->second.m_contactCount;
+		}
+		m_manifolds = manifoldMap;
+		m_constraintSolver->SolveConstraints2(newManifolds, dt);
 	}
 }
 

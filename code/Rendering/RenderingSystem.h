@@ -73,7 +73,7 @@ private:
 
 	//Test lights, need to make rendering syste, more flexible
 	glm::vec4 m_directionLightDir = glm::vec4(-10.0f, 5.0f, -1.0f, 0.f);;
-	glm::vec4 m_spotPos = glm::vec4(-6, 10, -1, 1.f);
+	glm::vec4 m_spotPos = glm::vec4(-20, 10, -1, 1.f);
 	glm::vec4 m_spotDir = glm::vec4(-9, 5, 4, 1.f);
 
 	glm::vec3 m_position = glm::vec3(-15, 16, 10);

@@ -142,7 +142,7 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 {
 	PhysicsDefs::ContactInfo* contact;
 	float invM1, invM2, totalInvMass, minRest, friction;
-	glm::vec3 localANorm, localBNorm, localATangent, localBTangent, vel1, vel2, aVel1, aVel2;
+	glm::vec3 localANorm, localBNorm, localATangent, localBTangent, vel1, vel2, aVel1, aVel2, impulse, torque1, torque2;
 	glm::mat3 invTensor1, invTensor2;
 	float JV;
 	for (int i = 0; i < manifolds.size(); ++i)
@@ -192,6 +192,34 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 			JV = CalcJV(contact->normal, contact->localPointA, vel1, aVel1, contact->localPointB, vel2, aVel2);
 			contact->bias = -0.2f / dt * std::max(0.0f, contact->depth -0.1f) + minRest * JV;
 			contact->friction = friction;
+			
+			if (manifolds[i].m_isPersistent)
+			{
+
+				impulse = contact->normal * contact->prevNormalImp;
+				torque1 = glm::cross(contact->localPointA, impulse);
+				torque2 = glm::cross(contact->localPointB, impulse);
+				manifolds[i].m_bodyA->ApplyImpulse(-impulse);
+				manifolds[i].m_bodyB->ApplyImpulse(impulse);
+				manifolds[i].m_bodyA->ApplyTorqueImpulse(torque1);
+				manifolds[i].m_bodyB->ApplyTorqueImpulse(-torque2);
+
+				impulse = contact->tangent1 * contact->prevTangImp1;
+				torque1 = glm::cross(contact->localPointA, impulse);
+				torque2 = glm::cross(contact->localPointB, impulse);
+				manifolds[i].m_bodyA->ApplyImpulse(-impulse);
+				manifolds[i].m_bodyB->ApplyImpulse(impulse);
+				manifolds[i].m_bodyA->ApplyTorqueImpulse(torque1);
+				manifolds[i].m_bodyB->ApplyTorqueImpulse(-torque2);
+
+				impulse = contact->tangent2 * contact->prevTangImp2;
+				torque1 = glm::cross(contact->localPointA, impulse);
+				torque2 = glm::cross(contact->localPointB, impulse);
+				manifolds[i].m_bodyA->ApplyImpulse(-impulse);
+				manifolds[i].m_bodyB->ApplyImpulse(impulse);
+				manifolds[i].m_bodyA->ApplyTorqueImpulse(torque1);
+				manifolds[i].m_bodyB->ApplyTorqueImpulse(-torque2);
+			}
 		}
 	}
 }
