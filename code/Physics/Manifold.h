@@ -12,8 +12,7 @@ public:
 	void Update(PhysicsDefs::ContactInfo* newContacts, int newContactCount);
 
 	static const int MIN_POINTS = 4;
-	PhysicsDefs::ContactInfo m_contacts[6];
-	int m_contactCount = 0;
+	std::vector<PhysicsDefs::ContactInfo> m_contacts;
 	bool m_isPersistent = false;
 	IRigidBody* m_bodyA = 0;
 	IRigidBody* m_bodyB = 0;

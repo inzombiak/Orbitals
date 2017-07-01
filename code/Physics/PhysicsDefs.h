@@ -419,6 +419,32 @@ namespace PhysicsDefs
 
 	}
 
+	inline float DistanceToLineSq(const glm::vec3& start, const glm::vec3& end, const glm::vec3& p)
+	{
+		glm::vec3 pStart = p - start;
+		glm::vec3 line = end - start;
+		glm::vec3 proj = line * glm::dot(pStart, line) / glm::dot(line,line);
+		glm::vec3 projP = p - proj;
+		
+		return glm::dot(projP, projP);
+	}
+
+	inline float DistanceToTriangleSq(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& p)
+	{
+		glm::vec3 normal = glm::normalize(glm::cross((b - a), (c - a)));
+		glm::vec3 pa = p - a;
+		float dotp = glm::dot(pa, normal);
+		//Point projected onto normal
+		glm::vec3 projN = dotp * normal;
+		glm::vec3 diff = p - projN;
+		//Point projected onto triangle, relative to A
+		glm::vec3 projA = pa - projN;
+
+
+
+		return glm::dot(dotp, dotp);
+	}
+
 }
 
 #endif

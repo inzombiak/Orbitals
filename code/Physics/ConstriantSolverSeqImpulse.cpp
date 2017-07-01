@@ -105,7 +105,7 @@ void ConstraintSolverSeqImpulse::SolveConstraints2(std::vector<Manifold>& manifo
 	{
 		for (int i = 0; i < manifolds.size(); ++i)
 		{
-			for (int k = 0; k < manifolds[i].m_contactCount; ++k)
+			for (int k = 0; k < manifolds[i].m_contacts.size(); ++k)
 			{
 				SolveContact(manifolds[i].m_bodyA, manifolds[i].m_bodyB, manifolds[i].m_contacts[k], dt);
 			}
@@ -158,7 +158,7 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 		minRest = std::min(manifolds[i].m_bodyA->GetRestitution(), manifolds[i].m_bodyB->GetRestitution());
 		friction = manifolds[i].m_bodyA->GetFriction() * manifolds[i].m_bodyB->GetFriction();
 		totalInvMass = invM1 + invM2;
-		for (int k = 0; k < manifolds[i].m_contactCount; ++k)
+		for (int k = 0; k < manifolds[i].m_contacts.size(); ++k)
 		{
 			contact = &manifolds[i].m_contacts[k];
 			//Normal Mass

@@ -159,7 +159,7 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 			pos2 =it->second.m_bodyB->GetInterpolationTransform().GetOrigin();
 			m_physDebugDrawer->DrawPoint(pos1, 0.2, glm::vec3(0, 1, 0));
 			m_physDebugDrawer->DrawPoint(pos2, 0.5, glm::vec3(0, 0, 1));
-			for (int j = 0; j < it->second.m_contactCount; ++j)
+			for (int j = 0; j < it->second.m_contacts.size(); ++j)
 			{
 				ci = it->second.m_contacts[j];
 				m_physDebugDrawer->DrawPoint(ci.worldPos, 0.2, glm::vec3(0, 1, 1));
@@ -283,13 +283,12 @@ void PhysicsWorld::PerformCollisionCheck(float dt)
 			}
 
 			//Otherwise we need to merge
-			it->second.Update(newManifolds[i].m_contacts, newManifolds[i].m_contactCount);
+			it->second.Update(newManifolds[i].m_contacts.data(), newManifolds[i].m_contacts.size());// , newManifolds[i].m_contactCount);
 			it->second.m_isPersistent = true;
 			//Add it to the new map, this step need to be improved
 			manifoldMap.emplace(it->first, it->second);
 			newManifolds[i].m_isPersistent = true;
-			*(newManifolds[i].m_contacts) = *(it->second.m_contacts);
-			newManifolds[i].m_contactCount = it->second.m_contactCount;
+			newManifolds[i].m_contacts = it->second.m_contacts;
 		}
 		m_manifolds = manifoldMap;
 		m_constraintSolver->SolveConstraints2(newManifolds, dt);
