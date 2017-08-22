@@ -100,7 +100,9 @@ void ConstraintSolverSeqImpulse::SolveConstraints(std::vector<PhysicsDefs::CollP
 
 void ConstraintSolverSeqImpulse::SolveConstraints2(std::vector<Manifold>& manifolds, float dt)
 {
+
 	PreStep(manifolds, dt);
+
 	for (int j = 0; j < 10; ++j)
 	{
 		for (int i = 0; i < manifolds.size(); ++i)
@@ -226,6 +228,7 @@ void ConstraintSolverSeqImpulse::PreStep(std::vector<Manifold>& manifolds, float
 
 void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* body2, PhysicsDefs::ContactInfo& contact, float dt)
 {
+	
 	//TODO: FIND ERROR
 	//glm::vec3 normal = contact.normal;
 
@@ -275,7 +278,7 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 	body2->ApplyImpulse(impulse);
 	body1->ApplyTorqueImpulse(torque1);
 	body2->ApplyTorqueImpulse(-torque2);
-	
+
 	float coeff = contact.prevNormalImp * contact.friction;
 	vel1 = body1->GetLinearVelocity();
 	vel2 = body2->GetLinearVelocity();

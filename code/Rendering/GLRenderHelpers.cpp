@@ -18,7 +18,7 @@ struct PackedVertex{
 
 struct ComparePackedVertices
 {
-	bool operator()(const PackedVertex& a, const PackedVertex& b)
+	bool operator()(const PackedVertex& a, const PackedVertex& b) const
 	{
 		if (a.position.z < b.position.z)
 			return true;

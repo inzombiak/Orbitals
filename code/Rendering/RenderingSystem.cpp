@@ -330,7 +330,7 @@ void RenderingSystem::Draw(int drawOptions)
 	{
 		std::cerr << "OpenGL error: " << err << std::endl;
 	}
-	//return;
+	return;
 	if ((drawOptions & Orbitals::DrawingType::TEXTURE) == Orbitals::DrawingType::TEXTURE)
 	{
 		it = m_renderers.find(Orbitals::DrawingType::TEXTURE);

@@ -285,7 +285,7 @@ void PhysicsWorld::PerformCollisionCheck(float dt)
 			//Otherwise we need to merge
 			it->second.Update(newManifolds[i].m_contacts.data(), newManifolds[i].m_contacts.size());// , newManifolds[i].m_contactCount);
 			it->second.m_isPersistent = true;
-			//Add it to the new map, this step need to be improved
+			//Add it to the new map, this step needs to be improved
 			manifoldMap.emplace(it->first, it->second);
 			newManifolds[i].m_isPersistent = true;
 			newManifolds[i].m_contacts = it->second.m_contacts;

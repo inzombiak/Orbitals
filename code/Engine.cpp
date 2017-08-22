@@ -62,7 +62,7 @@ void Engine::InitSim()
 {
 	m_engineState = Initializing;
 
-	m_drawOptions = Orbitals::DrawingType::COMPONENTS | Orbitals::DrawingType::PHYSICS | Orbitals::DrawingType::SHADOW_MAP;
+	m_drawOptions = Orbitals::DrawingType::PHYSICS | Orbitals::DrawingType::COMPONENTS | Orbitals::DrawingType::SHADOW_MAP;
 
 	Functor<EDCreateObject*, TYPELIST_1(ObjectCreators::IDefaultShapeData*)> SphereDataCreator(&ObjectCreators::CreateSphereEventData);
 	Functor<EDCreateObject*, TYPELIST_1(ObjectCreators::IDefaultShapeData*)> BoxDataCreator(&ObjectCreators::CreateBoxEventData);
@@ -123,7 +123,7 @@ void Engine::Test()
 	boxData.extents = glm::vec3(60, 2, 60);
 	boxData.position = glm::vec3(0, 0, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
-	//boxED->GetData()->rigidBodyData->rbci.mass = 5000;
+	boxED->GetData()->rigidBodyData->rbci.mass = 0;
 	boxED->GetData()->rigidBodyData->rbci.enableGravity = false;
 	EventSystem::GetInstance()->QueueEvent(boxED, true);
 	/*
@@ -149,7 +149,7 @@ void Engine::Test()
 	std::srand(time(NULL));
 	boxData.extents = glm::vec3(2, 2, 2);
 	//boxData.rotation = glm::vec3((std::rand() % 360) * (M_PI / 180), (std::rand() % 360) * (M_PI / 180), (std::rand() % 360) * (M_PI / 180));
-	boxData.rotation = glm::vec3(0.f, M_PI_2 / 3, M_PI_2 / 3);
+	//boxData.rotation = glm::vec3(0.f, M_PI_2 / 3, M_PI_2 / 3);
 	boxData.position = glm::vec3(0, 3, -7);
 	//boxData.position = glm::vec3(6, 5, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
@@ -186,7 +186,7 @@ void Engine::Test()
 	boxData.position = glm::vec3(0, 22, 0);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 1;
-	EventSystem::GetInstance()->QueueEvent(boxED, false);/**/
+	EventSystem::GetInstance()->QueueEvent(boxED, false);
 	/*boxData.position = glm::vec3(6, 20, -5);
 	boxED = ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData));
 	boxED->GetData()->rigidBodyData->rbci.mass = 20;
