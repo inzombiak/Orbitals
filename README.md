@@ -13,7 +13,7 @@ Back on track!
 * Support for spheres and boxes
 * Camera controls
 * Broadphase collision detection using AABBs
-* Narrowphase collision detection using ~~GJK/EPA~~(need to add manifodl generation) or SAT
+* Narrowphase collision detection using ~~GJK/EPA~~(need to add manifold generation) or SAT
 * Contact manifold generation
 * Collision resolution using seqential impulse solver
 * Friction/Restitution
