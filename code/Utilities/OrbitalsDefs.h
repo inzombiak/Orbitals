@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#define USE_GL 0;
+
+
 class ISystem;
 class ICelestialObject;
 class IObjectComponent;

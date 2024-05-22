@@ -243,6 +243,12 @@
     <ClInclude Include="..\..\code\Rendering\Shadowmap.h">
       <Filter>Header Files\Rendering\Renderers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\Render_GL.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\Rendering\Render_DX12.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="FragmentShader_Lighting.glsl">

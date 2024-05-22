@@ -1,7 +1,7 @@
 /*
  For more details on Win32 check MSDN.
  The windows initalization code is taken from here https://msdn.microsoft.com/en-us/library/bb384843(v=vs.120).aspx
- Go to that link for a more detailed explanation of workign with the Win32 API
+ Go to that link for a more detailed explanation of working with the Win32 API
 */
 #include <fcntl.h>
 #include <stdio.h>
@@ -16,12 +16,12 @@
 #include <chrono>
 
 //Include GLEW. Used for handling OpenGL extensions. http://glew.sourceforge.net/
-#define GLEW_STATIC
-#include <GL\glew.h>
-
-//Include OpenGL for rendering
-#include <GL\gl.h>
-
+#if USE_GL
+	#define GLEW_STATIC
+	#include <GL\glew.h>
+	//Include OpenGL for rendering
+	#include <GL\gl.h>
+#endif
 //I didn't do the math library homework, so I'm using glm as an alternative. 
 //It's open source so you can use it as a reference
 #include <glm\glm.hpp>
