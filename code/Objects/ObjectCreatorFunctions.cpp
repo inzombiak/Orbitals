@@ -40,7 +40,7 @@ EDCreateObject* ObjectCreators::CreateSphereEventData(IDefaultShapeData* data)
 	scd->rbci.friction = 0.3f;
 	scd->rbci.rollingFriction = 0.3f;
 	scd->rbci.resititution = 0.5f;
-	scd->rbci.enableGravity - true;
+	scd->rbci.enableGravity = true;
 
 	scd->rbci.transform.SetRotation(glm::quat(glm::vec3(-data->rotation.x, -data->rotation.y, data->rotation.z)));
 	scd->rbci.transform.SetOrigin(data->position);

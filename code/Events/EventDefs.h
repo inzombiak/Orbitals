@@ -8,9 +8,9 @@
 class ICelestialObject;
 struct RenderCompCreationData
 {
-	ICelestialObject* owner;
+	ICelestialObject* owner = 0;
 
-	int id;
+	int id = -1;
 
 	std::vector<unsigned short> indicies;
 	std::vector<unsigned short> indiciesClean;
@@ -18,7 +18,7 @@ struct RenderCompCreationData
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> color;
 	std::vector<glm::vec3> normals;
-	unsigned int drawType;
+	unsigned int drawType = 0;
 };
 
 #endif

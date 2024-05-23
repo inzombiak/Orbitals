@@ -26,5 +26,5 @@ void PhysicsComponent::SetBody(IRigidBody* body)
 	m_rigidBody = body;
 }
 
-const const char* PhysicsComponent::COMPONENT_NAME = "PHYSICS_COMPONENT";
+const char* PhysicsComponent::COMPONENT_NAME = "PHYSICS_COMPONENT";
 const ObjComponentID PhysicsComponent::COMPONENT_ID = Orbitals::HashedString::hash_name(PhysicsComponent::COMPONENT_NAME);

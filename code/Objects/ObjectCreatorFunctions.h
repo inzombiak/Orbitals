@@ -21,10 +21,10 @@ namespace ObjectCreators
 	public:
 		virtual ~IDefaultShapeData(){}
 		virtual DefaultShapeType GetType() = 0;
-		glm::vec3 position;
-		glm::vec3 rotation;
-		glm::vec3 scale;
-		glm::vec3 color;
+		glm::vec3 position = glm::vec3();
+		glm::vec3 rotation = glm::vec3();
+		glm::vec3 scale = glm::vec3();
+		glm::vec3 color = glm::vec3();
 	};
 
 	class SphereShapeData : public IDefaultShapeData
@@ -34,7 +34,7 @@ namespace ObjectCreators
 		{
 			return Sphere;
 		}
-		float radius;
+		float radius = 0;
 
 	};
 
@@ -45,7 +45,7 @@ namespace ObjectCreators
 		{
 			return Box;
 		}
-		glm::vec3 extents;
+		glm::vec3 extents = glm::vec3();
 
 	};
 

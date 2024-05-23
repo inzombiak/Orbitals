@@ -6,9 +6,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h> 
 
+#include "../Utilities/GameDefs.h"
+
 #include <glm/gtc/quaternion.hpp>
 
-#include "../Utilities/GameDefs.h"
 #include "OTransform.h"
 class ICelestialObject;
 class ICollisionShape;
@@ -68,33 +69,33 @@ namespace PhysicsDefs
 
 	struct RigidBodyConstructionInfo
 	{
-		float mass;
-		float linearDamping;
-		float angularDamping;
-		float friction;
-		float rollingFriction;
-		float resititution;
+		float mass = 0;
+		float linearDamping = 0;
+		float angularDamping = 0;
+		float friction = 0;
+		float rollingFriction = 0;
+		float resititution = 0;
 
 		OTransform transform;
-		glm::vec3 localInertia;
+		glm::vec3 localInertia = glm::vec3(0, 0, 0);
 
-		bool enableGravity;
+		bool enableGravity = true;
 
 		ICollisionShape* collisionShape = 0;
 	};
 
 	struct SupportPoint
 	{
-		glm::vec3 position;
-		glm::vec3 originA;
-		glm::vec3 originB;
-		glm::vec3 dir;
+		glm::vec3 position = glm::vec3(0, 0, 0);
+		glm::vec3 originA = glm::vec3(0, 0, 0);
+		glm::vec3 originB = glm::vec3(0, 0, 0);
+		glm::vec3 dir = glm::vec3(0, 0, 0);
 	};
 
 	struct AABB
 	{
-		glm::vec3 min;
-		glm::vec3 max;
+		glm::vec3 min = glm::vec3(0, 0, 0);
+		glm::vec3 max = glm::vec3(0, 0, 0);
 
 		glm::mat4 worldTransform;
 		IRigidBody* body = 0;
@@ -186,13 +187,13 @@ namespace PhysicsDefs
 			return bodyType;
 		}
 
-		int id;
-		ICelestialObject* owner;
+		int id = -1;
+		ICelestialObject* owner = 0;
 		virtual ICreationData* clone() const = 0;
 	protected:
 		virtual void SetBodyAndShape() {};
-		CollisionShapeType shapeType;
-		PhysicsBodyType bodyType;
+		CollisionShapeType shapeType = CollisionShapeType::Box;
+		PhysicsBodyType bodyType = PhysicsBodyType::NULLBody;
 
 	};
 	class IRigidBodyCreationData : public ICreationData
@@ -232,7 +233,7 @@ namespace PhysicsDefs
 			SetBodyAndShape();
 		}
 		virtual ~SphereCreationData() {};
-		double sphereRadius;
+		float sphereRadius;
 
 		SphereCreationData* clone() const
 		{
@@ -275,8 +276,8 @@ namespace PhysicsDefs
 			direction = d;
 		}
 
-		glm::vec2 origin;
-		glm::vec2 direction;
+		glm::vec2 origin = glm::vec2(0, 0);
+		glm::vec2 direction = glm::vec2(1, 1);
 	};
 	
 	inline float Cross2D(const glm::vec2& a, const glm::vec2& b)

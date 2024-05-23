@@ -31,7 +31,7 @@ void CelestialObjectSystem::CreateObject(IEventData* data)
 
 	bool isSync = objData->GetIsSynchronous();
 
-	ICelestialObject* newObject = new ICelestialObject(objData->GetData()->name, m_objects.size(), CelestialObjTypes::Planet);
+	ICelestialObject* newObject = new ICelestialObject(objData->GetData()->name, (unsigned int)m_objects.size(), CelestialObjTypes::Planet);
 	if (objData->GetData()->renderCompData)
 	{
 		objData->GetData()->renderCompData->owner = newObject;

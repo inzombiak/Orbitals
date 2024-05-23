@@ -71,7 +71,7 @@ private:
 	typedef std::map<Orbitals::DrawingType, IRendererType*>::iterator RendererIterator;
 	//Used for camera speed and positioning
 
-	//Test lights, need to make rendering syste, more flexible
+	//Test lights, need to make rendering system more flexible
 	glm::vec4 m_directionLightDir = glm::vec4(-10.0f, 5.0f, -1.0f, 0.f);;
 	glm::vec4 m_spotPos = glm::vec4(-20, 10, -1, 1.f);
 	glm::vec4 m_spotDir = glm::vec4(-9, 5, 4, 1.f);
@@ -80,14 +80,14 @@ private:
 	glm::vec3 m_right = glm::vec3(0, 0, 1);
 	glm::vec3 m_up = glm::vec3(0, 1, 0);
 	glm::vec3 m_direction = glm::vec3(1, 0, 0);
-	glm::mat4 m_view;
-	glm::mat4 m_projection;
-	glm::mat4 m_MVP;
+	glm::mat4 m_view = glm::mat4();
+	glm::mat4 m_projection = glm::mat4();
+	glm::mat4 m_MVP = glm::mat4();
 	float m_speed = .4f;
 	float m_mouseSpeed = 0.005f;
 	bool m_trackingMouse = false;
 	float m_xRotate = 2.515f, m_yRotate = -0.475f;
-	glm::vec2 m_prevMouse;
+	glm::vec2 m_prevMouse = glm::vec2(0,0);
 	static const std::string SYSTEM_NAME;
 };
 

@@ -44,7 +44,7 @@ public:
 
 private:
 
-	IRigidBody* m_rigidBody;
+	IRigidBody* m_rigidBody = 0;
 };
 
 #endif

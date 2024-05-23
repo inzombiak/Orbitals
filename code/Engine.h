@@ -22,7 +22,7 @@ public:
 	~Engine();
 	void Init();
 	void Draw();
-	void Step(double timePassed);
+	void Step(float timePassed);
 
 	void SetKey(Input::InputKey key, bool value);
 	void SetMousePosition(int x, int y);
@@ -61,13 +61,13 @@ private:
 	void UpdateCameraRotation(float xRotate, float yRotate);
 	void ClearRender();
 	//WeakSystemPtr GetSystemWithByID
-	Input::MouseStatus m_mouseStatus;
-	int m_screenWidth, m_screenHeight;
+	Input::MouseStatus m_mouseStatus = Input::MouseStatus();
+	int m_screenWidth = 0, m_screenHeight = 0;
 	int m_drawOptions = 0;
 	const double DELTA_T = 1.f / 30.f;
 	double m_accumulator = 0;
 	int m_numberOfSubSteps = 10;
-	EngineState m_engineState;
+	EngineState m_engineState = EngineState::Initializing;
 	std::map<Orbitals::SystemPriority, StrongSystemPtr> m_systemMap;
 };
 

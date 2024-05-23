@@ -30,7 +30,7 @@ private:
 	//TODO ADD FLAGS
 	int m_debugMode = 0;
 
-	GLuint m_program;
+	GLuint m_program = 0;
 
 };
 

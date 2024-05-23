@@ -26,7 +26,6 @@ void Manifold::Update(PhysicsDefs::ContactInfo* newContacts, int newContactCount
 {
 	std::vector<ContactInfo> mergedContacts;
 
-	ContactInfo *newC, *oldC , *c;
 	//Merge the old and new contacts
 	//Based on Allen Chou's Game Physics series
 	if (m_contacts.size() == 0)

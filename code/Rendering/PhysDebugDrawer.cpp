@@ -60,7 +60,7 @@ void PhysDebugDrawer::Draw(glm::mat4& mvp)
 	glUniformMatrix4fv(MVPMatID, 1, GL_FALSE, &mvp[0][0]);
 
 	//Draw
-	glDrawArrays(GL_LINES, 0, m_vertices.size());
+	glDrawArrays(GL_LINES, 0, (GLsizei)m_vertices.size());
 }
 
 

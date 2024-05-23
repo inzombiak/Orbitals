@@ -1,12 +1,13 @@
 #ifndef ORBITALS_DEFS_H
 #define ORBITALS_DEFS_H
 
+#define USE_GL 1;
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 
-#define USE_GL 0;
 
 
 class ISystem;
@@ -183,7 +184,7 @@ namespace Orbitals
 
 			for (size_t len = strlen(pIdentStr); len > 0;)
 			{
-				unsigned long k = len < NMAX ? len : NMAX;
+				size_t k = len < NMAX ? len : NMAX;
 
 				len -= k;
 

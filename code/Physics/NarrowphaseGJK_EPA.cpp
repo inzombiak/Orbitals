@@ -253,7 +253,6 @@ NarrowphaseGJK_EPA::FaceListIterator NarrowphaseGJK_EPA::FindClosestFace()
 {
 	FaceListIterator result;
 	float minDist = FLT_MAX;
-	glm::vec3 norm, edge;
 
 	for (FaceListIterator it = m_faceList.begin(); it != m_faceList.end(); ++it)
 	{
@@ -274,8 +273,6 @@ bool NarrowphaseGJK_EPA::DoSimplex(std::vector<PhysicsDefs::SupportPoint>& simpl
 	This function makes use of helpers to detect collision
 	The process can be sped up by not used the functions and instead writing out each case by hand
 	*/
-
-	glm::vec3 newDir;
 	if (simplex.size() == 1)
 	{
 		//Vertex

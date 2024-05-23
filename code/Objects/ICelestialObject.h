@@ -49,10 +49,10 @@ private:
 	Orbitals::CelestialObjTypes m_type;
 	Orbitals::CelestialObjID m_id;
 
-	glm::vec3 m_position;
-	glm::quat m_rotation;
-	glm::vec3 m_scale;
-	glm::mat4 m_openGLMat;
+	glm::vec3 m_position = glm::vec3();
+	glm::quat m_rotation = glm::quat();
+	glm::vec3 m_scale = glm::vec3();
+	glm::mat4 m_openGLMat = glm::mat4();
 
 	std::string m_name;
 	typedef std::unordered_map<ObjComponentID, StrongObjComponentPtr, std::hash<int>> ComponentMap;

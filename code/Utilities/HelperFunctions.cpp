@@ -105,7 +105,7 @@ std::vector<glm::vec3> CreateCircle(glm::vec3 center, float radius)
 	glm::vec3 position;
 
 	//Calculate the step of the angle, more tirnagles means a more "realistic" circle
-	float stepAngle = atan(1) * 8 / NUMBER_OF_TRIANGLES;
+	float stepAngle = atan(1.f) * 8.f / NUMBER_OF_TRIANGLES;
 
 	//Calculate first point
 	position.x = center.x + (radius * cos(stepAngle * 0));
@@ -130,7 +130,7 @@ std::vector<glm::vec3> CreateOctahedronWithRadius(glm::vec3 center, float radius
 	//Calculate side length and pass to other octahedron function
 
 	float side;
-	side = radius * sqrt(2);
+	side = radius * sqrt(2.f);
 
 	return CreateOctahedronWithSide(center, side);
 }
@@ -143,10 +143,10 @@ std::vector<glm::vec3> CreateOctahedronWithSide(glm::vec3 center, float side)
 
 	//Calculate positions of the vertices
 	top = center;
-	top.y += side / sqrt(2);
+	top.y += side / sqrt(2.f);
 
 	bottom = center;
-	bottom.y -= side / sqrt(2);
+	bottom.y -= side / sqrt(2.f);
 
 	corners[0] = center;
 	corners[0].x -= side / 2;
@@ -189,7 +189,7 @@ std::vector<glm::vec3> OctahedronToSphere(std::vector<glm::vec3> octahedronVerti
 	//Reserve amount of space that will be needed, 8 faces with 4^n triangles each with 3 vertices
 	result.reserve((unsigned int)(pow(4, numSubdivisions) * 3 * 8));
 
-	unsigned int numVertices = octahedronVertices.size();
+	unsigned int numVertices = (unsigned int)octahedronVertices.size();
 
 	//Make sure we have a octahedron, or at least the right number of vertices
 	if (numVertices != 24)
@@ -227,14 +227,14 @@ std::vector<glm::vec3> OctahedronToSphere(std::vector<glm::vec3> octahedronVerti
 	}
 	//Perfrom split on each face
 	
-	printf("%i", result.size());
+	printf("%zi", result.size());
 	/*
 	We turn the split octahedron into a sphere by "wrapping" the vertices around the center.
 	This means we repeatedly loop over the vertices and move all of them to be radius distance from the center.
 	*/
 
 	//Number of vertices, should be equal to reserved space
-	int finalVertexCount = result.size();
+	unsigned int finalVertexCount = (unsigned int)result.size();
 	//Distance from center of the sphere
 	float distanceFromCenter;
 	//Vector from current point to the center of the sphere
@@ -245,8 +245,8 @@ std::vector<glm::vec3> OctahedronToSphere(std::vector<glm::vec3> octahedronVerti
 	int faceCounter = 0;
 	glm::vec3 normal;
 	//Perfrom looping operation 8 times. The more time we loop the more precise it will be. I found 8 to be enough
-	int loopMax = 1;
-	for (int j = 0; j < loopMax; ++j)
+	unsigned int loopMax = 1;
+	for (unsigned int j = 0; j < loopMax; ++j)
 	{
 		//Loop over all vertices
 		for (unsigned int i = 0; i < finalVertexCount; ++i)
@@ -527,7 +527,6 @@ glm::vec3 CalculateNormals(const std::vector<glm::vec3>& vertices)
 	glm::vec3 result;
 
 	glm::vec3 U, V;
-	glm::vec3 faceNorm;
 
 	U = vertices[1] - vertices[0];
 	V = vertices[2] - vertices[0];

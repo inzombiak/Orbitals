@@ -47,18 +47,18 @@ private:
 	const static ObjComponentID COMPONENT_ID;
 
 	//Number of vertices to be drawn
-	int m_numVertices;
-	int m_numIndicies;
-	glm::mat4 m_model;
+	int m_numVertices = 0;
+	int m_numIndicies = 0;
+	glm::mat4 m_model = glm::mat4();
 	//Program ID
-	GLuint m_program;
+	GLuint m_program = 0;
 	//Buffer IDs
 	GLuint m_vertexBufferObject = 0;
 	GLuint m_colorBufferObject = 0;
 	GLuint m_normalBufferObject = 0;
 	GLuint m_indexBufferObject = 0;
 	//Draw type
-	GLuint m_drawPrimitive;
+	GLuint m_drawPrimitive = 0;
 };
 
 #endif

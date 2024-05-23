@@ -5,22 +5,21 @@
 
 void ConstraintSolverSeqImpulse::SolveConstraints(std::vector<PhysicsDefs::CollPairContactInfo>& info, float dt)
 {
-	glm::vec3 dv, impulse, impulseTangent, tangent, vel1, vel2, aVel1, aVel2, correction;;
+	glm::vec3 vel1, vel2, aVel1, aVel2;
 	
-	float massNormal, massTangent;
-	glm::vec3 localANorm, localBNorm, localATang, localBTang;
+	glm::vec3 localANorm, localBNorm;
 	OTransform interpolationTrans1;
 	OTransform interpolationTrans2;
 	glm::mat3 invTensor1, invTensor2;
 
 	PhysicsDefs::ContactInfo* contact;
 
-	float invM1, invM2, totalInvMass, friction, minRest, invDt = 1.f/dt;
+	float invM1, invM2, totalInvMass, minRest, invDt = 1.f/dt;
 	float JV, JinvMJ;
-	float lambda, oldLambda;
+	float lambda = 1;
 	float bias;
-	glm::vec3 invMJ;
-	glm::vec3 impulse1, impulse2, torque1, torque2, relativeVel;
+
+	glm::vec3 impulse1, impulse2, relativeVel;
 	glm::vec3 startingVel1, startingVel2;
 
 	for (int j = 0; j < 10; ++j)
@@ -232,21 +231,19 @@ void ConstraintSolverSeqImpulse::SolveContact(IRigidBody* body1, IRigidBody* bod
 	//TODO: FIND ERROR
 	//glm::vec3 normal = contact.normal;
 
-	glm::vec3 dv, impulse, impulseTangent, tangent, vel1, vel2, aVel1, aVel2;
+	glm::vec3 impulse, vel1, vel2, aVel1, aVel2;
 	//body1->SetLinearVelocity(glm::vec3(0.f));
 	//body2->SetLinearVelocity(glm::vec3(0.f));
 	
-	float massNormal, massTangent, invM1, invM2, f;
-	glm::vec3 localANorm, localBNorm, localATang, localBTang;
+	float invM1, invM2;
+	glm::vec3 localANorm, localBNorm;
 	//glm::mat4 interpolationTrans1;
 	//glm::mat4 interpolationTrans2;
 
-	float friction, invDt = 1.f / dt;
 	float JV;
 	float lambda, oldLambda;
 
-	glm::vec3 invMJ;
-	glm::vec3 impulse1, impulse2, torque1, torque2;
+	glm::vec3 torque1, torque2;
 
 	invM1 = body1->GetInverseMass();
 	invM2 = body1->GetInverseMass();

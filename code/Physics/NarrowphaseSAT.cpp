@@ -5,7 +5,6 @@
 std::vector<Manifold> NarrowphaseSAT::CheckCollision(const std::vector<PhysicsDefs::CollisionPair>& collisionPairs, ErrorCallBack ecb)
 {
 	std::vector<Manifold> result;
-	float depth, velAlongColNormal, minConst, totalSytemMass, mass1, mass2, invMass1, invMass2;
 	for (int i = 0; i < collisionPairs.size(); ++i)
 	{
 
@@ -683,7 +682,7 @@ bool NarrowphaseSAT::SATDetectionOBB(IRigidBody* body1, IRigidBody* body2, Manif
 void NarrowphaseSAT::CullPoints(std::vector<glm::vec2> points, int finalCount, int firstEntry, int culledPoints[])
 {
 	// Compute centroid
-	int i, j, pointCount = points.size();
+	size_t pointCount = points.size();
 	glm::vec2 centroid(0, 0);
 	float a, q;
 
@@ -703,7 +702,7 @@ void NarrowphaseSAT::CullPoints(std::vector<glm::vec2> points, int finalCount, i
 		}
 
 		q = points[pointCount - 1].x * points[0].y - points[0].x * points[pointCount - 1].y;
-		a = 1.f/((3.0)*(a + q));
+		a = 1.f/((3.f)*(a + q));
 		centroid = a * (centroid + q * (points[pointCount - 1] + points[0]));
 	}
 

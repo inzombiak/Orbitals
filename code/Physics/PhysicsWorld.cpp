@@ -37,7 +37,7 @@ void PhysicsWorld::RemoveRigidBody(IRigidBody* body)
 void PhysicsWorld::SetGravity(const glm::vec3& grav)
 {
 	m_gravity = grav;
-	for (unsigned int i = 0; i, m_nonStaticRigidBodies.size(); ++i)
+	for (unsigned int i = 0; i < m_nonStaticRigidBodies.size(); ++i)
 	{
 		m_nonStaticRigidBodies[i]->SetGravity(grav);
 	}
@@ -157,12 +157,12 @@ void PhysicsWorld::StepSimulation(float timeStep, int maxSubSteps, float fixedTi
 		{
 			pos1 =it->second.m_bodyA->GetInterpolationTransform().GetOrigin();
 			pos2 =it->second.m_bodyB->GetInterpolationTransform().GetOrigin();
-			m_physDebugDrawer->DrawPoint(pos1, 0.2, glm::vec3(0, 1, 0));
-			m_physDebugDrawer->DrawPoint(pos2, 0.5, glm::vec3(0, 0, 1));
+			m_physDebugDrawer->DrawPoint(pos1, 0.2f, glm::vec3(0, 1, 0));
+			m_physDebugDrawer->DrawPoint(pos2, 0.5f, glm::vec3(0, 0, 1));
 			for (int j = 0; j < it->second.m_contacts.size(); ++j)
 			{
 				ci = it->second.m_contacts[j];
-				m_physDebugDrawer->DrawPoint(ci.worldPos, 0.2, glm::vec3(0, 1, 1));
+				m_physDebugDrawer->DrawPoint(ci.worldPos, 0.2f, glm::vec3(0, 1, 1));
 				m_physDebugDrawer->DrawLine(pos1, pos1 + ci.localPointA, glm::vec3(0.5, 0.5, 0.5));
 				m_physDebugDrawer->DrawLine(pos2, pos2 + ci.localPointB, glm::vec3(0.5, 0.f, 0.5));
 			}
@@ -283,7 +283,7 @@ void PhysicsWorld::PerformCollisionCheck(float dt)
 			}
 
 			//Otherwise we need to merge
-			it->second.Update(newManifolds[i].m_contacts.data(), newManifolds[i].m_contacts.size());// , newManifolds[i].m_contactCount);
+			it->second.Update(newManifolds[i].m_contacts.data(), (unsigned int)newManifolds[i].m_contacts.size());// , newManifolds[i].m_contactCount);
 			it->second.m_isPersistent = true;
 			//Add it to the new map, this step needs to be improved
 			manifoldMap.emplace(it->first, it->second);

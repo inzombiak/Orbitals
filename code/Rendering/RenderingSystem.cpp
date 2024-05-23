@@ -369,7 +369,7 @@ void RenderingSystem::CreateRenderComponent(IEventData* eventData)
 	if (!renderCompED)
 		return;
 
-	RenderComponent newComponent(m_renderComponents.size());
+	RenderComponent newComponent((unsigned int)m_renderComponents.size());
 	newComponent.SetVertices(renderCompED->GetData()->vertices);
 	newComponent.SetNormals(renderCompED->GetData()->normals);
 	newComponent.SetIndicies(renderCompED->GetData()->indicies);

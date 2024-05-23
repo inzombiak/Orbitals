@@ -51,9 +51,9 @@ public:
 	}
 
 protected:
-	bool m_delete;
-	bool m_isSynchronous;
-	EventID m_id;
-	EventDefs::EventType m_eventType;
+	bool m_delete = false;
+	bool m_isSynchronous = false;
+	EventID m_id = 0;
+	EventDefs::EventType m_eventType = EventDefs::EventType::NULL_TYPE;
 };
 

@@ -18,7 +18,7 @@ public:
 private:
 	int m_frames = 0;
 	float m_time = 0;
-	std::clock_t m_clock;
+	std::clock_t m_clock = std::clock_t();
 	bool m_clockRunning = false;
 };
 

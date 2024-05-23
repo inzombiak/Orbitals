@@ -124,8 +124,8 @@ public:
 	OTransform operator*(const OTransform& t) const;
 
 private:
-	glm::mat3 m_basis;
-	glm::vec3 m_origin;
+	glm::mat3 m_basis = glm::mat3();
+	glm::vec3 m_origin = glm::vec3(0, 0, 0);
 };
 
 inline OTransform OTransform::operator*(const OTransform& t) const

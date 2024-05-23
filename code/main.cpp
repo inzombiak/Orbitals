@@ -15,20 +15,17 @@
 #include <fstream>
 #include <chrono>
 
+//This is the file that contains most of the funcitonal and platform-independant code
+#include "Engine.h"
+Engine m_engine;
+
 //Include GLEW. Used for handling OpenGL extensions. http://glew.sourceforge.net/
-#if USE_GL
+#ifdef USE_GL
 	#define GLEW_STATIC
 	#include <GL\glew.h>
 	//Include OpenGL for rendering
 	#include <GL\gl.h>
 #endif
-//I didn't do the math library homework, so I'm using glm as an alternative. 
-//It's open source so you can use it as a reference
-#include <glm\glm.hpp>
-
-//This is the file that contains most of the funcitonal and platform-independant code
-#include "Engine.h"
-Engine m_engine;
 
 //Static consts for later
 static TCHAR szWindowClass[] = _T("orbitalsApp");
@@ -103,8 +100,6 @@ LRESULT CALLBACK WndProc(
 	LPARAM lParam)    // second message parameter
 {
 	//TODO: Explain
-	PAINTSTRUCT ps;
-	HDC hdc;
 	TCHAR greeting[] = _T("Hello, World!");
 
 	switch (message)
@@ -199,12 +194,12 @@ int WINAPI WinMain(		 //https://msdn.microsoft.com/library/windows/desktop/ms633
 	wcex.cbClsExtra     = 0;       //Extra bytes to allocate following the struct.
 	wcex.cbWndExtra     = 0;       //Extra bytes to allocate follwing the window instance
 	wcex.hInstance      = hInstance; //HAndle to the instance
-	wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPLICATION)); //Handle to our window icon. We use the default one. 
+	wcex.hIcon          = LoadIcon(hInstance, (LPWSTR)MAKEINTRESOURCE(IDI_APPLICATION)); //Handle to our window icon. We use the default one. 
 	wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);//Handle to our cursor icon. We use the default one.
 	wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1); //Handle to the brush used to  paint the background. It can be a brush or a color value.
 	wcex.lpszMenuName   = NULL; //Pointer to the name of the class menu as it appears in the resource menu.
 	wcex.lpszClassName  = szWindowClass; //Name used to identify the class.
-	wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION)); //Small icon for the window.
+	wcex.hIconSm        = LoadIcon(wcex.hInstance, (LPWSTR)MAKEINTRESOURCE(IDI_APPLICATION)); //Small icon for the window.
 
 	//Next we need to register the class. This is so the Windows API can work with the class.
 	//We handle the case of falure by displaying a message box.
@@ -297,7 +292,7 @@ int WINAPI WinMain(		 //https://msdn.microsoft.com/library/windows/desktop/ms633
 	{
 		GLfloat bg[3] = {255, 0, 0 };
 		glClearBufferfv(GL_COLOR, 0, bg); // clear the color buffer to color bg, which we set to red
-		m_engine.Step(GetCounter());
+		m_engine.Step((float)GetCounter());
  
 		SwapBuffers(hdc);  //Swap buffers to new display
 		DispatchMessage(&msg);  //Sends message to the window  procedure

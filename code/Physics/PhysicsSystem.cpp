@@ -92,7 +92,7 @@ void PhysicsSystem::CreatePhysicsComponent(IEventData* eventData)
 	if (!physCompED)
 		return;
 
-	PhysicsComponent newComponent(m_physComponents.size());
+	PhysicsComponent newComponent((unsigned int)m_physComponents.size());
 	ICollisionShape* newShape;
 	IRigidBody* rb;
 	if (physCompED->GetData()->GetShape() == PhysicsDefs::CollisionShapeType::Box)

@@ -1,8 +1,8 @@
 #ifndef I_COLLISION_SHAPE_H
 #define I_COLLISION_SHAPE_H
 
-#include <glm\glm.hpp>
 #include "PhysicsDefs.h"
+#include <glm\glm.hpp>
 
 enum CollisionShapeType
 {

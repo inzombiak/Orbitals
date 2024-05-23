@@ -146,7 +146,7 @@ void Engine::Test()
 	EventSystem::GetInstance()->QueueEvent(ObjectCreators::DefaultObjectFactory::Instance().CreateObject(ObjectCreators::DefaultShapeType::Box, static_cast<ObjectCreators::IDefaultShapeData*>(&boxData)), false);
 	*/
 	
-	std::srand(time(NULL));
+	std::srand((unsigned int)time(NULL));
 	boxData.extents = glm::vec3(2, 2, 2);
 	//boxData.rotation = glm::vec3((std::rand() % 360) * (M_PI / 180), (std::rand() % 360) * (M_PI / 180), (std::rand() % 360) * (M_PI / 180));
 	//boxData.rotation = glm::vec3(0.f, M_PI_2 / 3, M_PI_2 / 3);
@@ -216,7 +216,7 @@ void Engine::ClearRender()
 		ptr->ClearRender();
 }
 
-void Engine::Step(double elapsedTime)
+void Engine::Step(float elapsedTime)
 {
 	if (m_engineState != Running)
 		return;
@@ -250,9 +250,7 @@ void Engine::SetKey(Input::InputKey key, bool value)
 
 void Engine::SetMousePosition(int x, int y)
 {
-	glm::vec2 pos;
-	pos.x = -x;
-	pos.y = -y;
+	glm::vec2 pos(-x, -y);
 	std::shared_ptr<InputSystem> ptr;
 	if (FindSystem(SystemPriority::SInput, ptr))
 		ptr->SetMousePosition(pos);

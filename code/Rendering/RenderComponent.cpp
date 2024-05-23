@@ -53,7 +53,6 @@ void RenderComponent::Draw(glm::mat4 view, glm::mat4 proj, glm::vec3 lightPos, G
 	m_model = m_owner->GetOpenGLMatrix();
 
 	glm::mat4 mvp = proj * view * m_model;
-	GLuint err;
 	//Pass in MVP
 	if (assignUniforms)
 	{
@@ -111,7 +110,7 @@ void RenderComponent::SetVertices(const std::vector<glm::vec3>& vertices)
 	//Set data
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-	m_numVertices = vertices.size();
+	m_numVertices = (int)vertices.size();
 }
 
 void RenderComponent::SetColor(std::vector<glm::vec3> color)
@@ -153,7 +152,7 @@ void RenderComponent::SetIndicies(const std::vector<unsigned short>& indices)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
-	m_numIndicies = indices.size();
+	m_numIndicies = (int)indices.size();
 }
 
 void RenderComponent::SetDrawPrimitive(GLuint type)

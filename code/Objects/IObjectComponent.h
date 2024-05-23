@@ -38,8 +38,8 @@ public:
 
 protected:
 	  ICelestialObject* m_owner;
-	  bool m_inUse;
-	  unsigned int m_id;
+	  bool m_inUse = false;
+	  unsigned int m_id = 0;
 };
 
 #endif

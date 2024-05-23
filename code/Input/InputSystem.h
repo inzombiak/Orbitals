@@ -67,7 +67,7 @@ private:
 	static InputSystem* m_instance;
 
 	std::unordered_map<Input::InputKey, bool> m_keyMap;
-	Input::MouseStatus m_mouseStatus;
+	Input::MouseStatus m_mouseStatus = Input::MouseStatus();
 };
 
 #endif
